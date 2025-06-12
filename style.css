@@ -29,6 +29,10 @@ a {
     background-color: #24292e;
 }
 
+.btn-map {
+    background-color: #4a90e2;
+}
+
 a:hover {
     filter: brightness(85%);
 }
