@@ -36,6 +36,32 @@ export class InfiniteMap {
             isDragging = false;
             this.container.style.cursor = 'grab';
         });
+
+        // 移动端支持
+        this.container.addEventListener('touchstart', e => {
+            isDragging = true;
+            const touch = e.touches[0];
+            start = { x: touch.clientX, y: touch.clientY };
+            this.container.style.cursor = 'grabbing';
+        }, { passive: false });
+
+        window.addEventListener('touchmove', e => {
+            if (isDragging) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const dx = touch.clientX - start.x;
+                const dy = touch.clientY - start.y;
+                start = { x: touch.clientX, y: touch.clientY };
+                this.container.scrollLeft -= dx;
+                this.container.scrollTop -= dy;
+                this.renderViewport();
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+            this.container.style.cursor = 'grab';
+        });
     }
 
     renderViewport() {
