@@ -7,32 +7,42 @@ body {
     align-items: center;
     flex-direction: column;
 }
-
 h1 {
     font-size: 3em;
     color: #333;
-    margin-bottom: 20px;
+}
+img {
+    vertical-align: middle;
+}
+a:hover {
+    filter: brightness(85%);
 }
 
-a {
+.btn {
     display: inline-block;
     text-decoration: none;
     padding: 12px 24px;
     border-radius: 6px;
     font-size: 1em;
+    font-weight: bold;
     margin: 10px 0;
     transition: background 0.3s ease;
     color: white;
 }
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(255, 110, 196, 0.3);
+}
 
 .btn-github {
     background-color: #24292e;
+    padding: 10px 18px;
 }
 
 .btn-map {
-    background-color: #4a90e2;
+    background-color: #01B0F1;
 }
-
-a:hover {
-    filter: brightness(85%);
+.btn-rainbow {
+    background: linear-gradient(90deg, #ff6ec4, #7873f5, #2afadf, #00ffd5);
+    background-size: 150% 100%;
 }
