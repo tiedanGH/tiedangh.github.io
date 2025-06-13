@@ -1,0 +1,266 @@
+body {
+    font-family: 'Comic Neue', cursive;
+    text-align: center;
+    margin: 20px;
+    background-color: #f9f7f7;
+}
+/* 页面主布局：横向排列 */
+.main-layout {
+    justify-content: center;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+/* 右侧容器：纵向排列设置和规则 */
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 610px;
+}
+/* 响应式：小屏幕自动改为上下布局 */
+@media (max-width: 1200px) {
+    .main-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+    .side-panel {
+        max-width: 100%;
+    }
+    .game-container {
+        max-width: 100%;
+    }
+}
+.game-container {
+    display: inline-block;
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    max-width: 100%;
+    overflow: auto;
+}
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.grid {
+    display: grid;
+    gap: 3px;
+    background-color: #e8e8e8;
+    border-radius: 8px;
+    padding: 5px;
+    margin: 0 auto;
+}
+.cell {
+    width: 35px;
+    height: 35px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+}
+.cell.revealed {
+    background-color: #fff;
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
+}
+.cell.flagged-mine {
+    background-color: #ffcccc;
+}
+.cell.flagged-empty {
+    background-color: #ffffe0;
+}
+.cell.flagged-unknown {
+    background-color: #e6e6e6;
+}
+.game-over {
+    margin: 10px auto;
+    font-size: 24px;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+.btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4ecdc4;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Comic Neue', cursive;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+    transition: all 0.2s;
+}
+.btn:hover {
+    background-color: #3ddbd0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 8px rgba(0,0,0,0.16);
+}
+.color-r {
+    color: #ff6b6b;
+    background-color: #ffe6e6;
+    border-radius: 3px;
+}
+.color-b {
+    color: #4ea8de;
+    background-color: #e6f2ff;
+    border-radius: 3px;
+}
+.color-y {
+    color: #ffd166;
+    background-color: #fff7e6;
+    border-radius: 3px;
+}
+.color-p {
+    color: #be8feb;
+    background-color: #f5e6ff;
+    border-radius: 3px;
+}
+.color-o {
+    color: #ff9f1c;
+    background-color: #fff0e6;
+    border-radius: 3px;
+}
+.color-g {
+    color: #6cc04a;
+    background-color: #e6ffe6;
+    border-radius: 3px;
+}
+.revealed {
+    font-size: 18px;
+}
+h1 {
+    color: #3d5a80;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+.rules {
+    width: 100%;
+    /*margin: 20px auto;*/
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+.rules h3 {
+    margin-top: 0;
+    color: #3d5a80;
+}
+.rules ul {
+    padding-left: 20px;
+}
+.rules li {
+    margin-bottom: 8px;
+}
+.settings {
+    width: 100%;
+    /*margin: 20px auto;*/
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+.settings h3 {
+    margin-top: 0;
+    color: #3d5a80;
+}
+.setting-group {
+    margin-bottom: 10px;
+}
+.setting-group label {
+    display: inline-block;
+    width: 120px;
+}
+.setting-group input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.mark-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.mark-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.mark-button.active {
+    background-color: #3ddbd0;
+    color: white;
+}
+.audio-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.audio-btn {
+    padding: 8px 12px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.mode-selector {
+    margin-bottom: 5px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+@media (max-width: 600px) {
+    .cell {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    .stats {
+        font-size: 16px;
+    }
+}
+/* 新增的生命增加动画 */
+.life-up {
+    animation: lifeUp 0.5s;
+    position: relative;
+}
+@keyframes lifeUp {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); background-color: #aaffaa; }
+    100% { transform: scale(1); }
+}
+/* 新增的提示框样式 */
+#mode-change-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 100;
+    text-align: center;
+    display: none;
+}

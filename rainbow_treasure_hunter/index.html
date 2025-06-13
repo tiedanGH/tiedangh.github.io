@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>彩虹奇兵</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+
+<div class="main-layout">
+    <div class="game-container">
+        <h1>🌈彩虹奇兵🌈</h1>
+        <div class="stats">
+            <div>生命值: <span id="lives">2</span></div>
+            <div>得分: <span id="score">0</span></div>
+            <div>回合: <span id="round">0</span></div>
+            <div>宝藏: <span id="treasures">20</span></div>
+            <div>炸弹: <span id="bombs">20</span></div>
+        </div>
+        <label for="game-mode"></label><select id="game-mode" class="mode-selector">
+            <option value="normal">正常模式</option>
+            <option value="survival">生存模式</option>
+        </select>
+        <div id="game-over" class="game-over" style="display: none;">游戏结束!</div>
+        <div id="grid" class="grid"></div>
+        <button id="reset" class="btn">重新开始</button>
+        <div class="mark-buttons">
+            <button id="mark-mine" class="mark-button">标记雷</button>
+            <button id="mark-empty" class="mark-button">标记空地</button>
+            <button id="mark-unknown" class="mark-button">标记未知</button>
+        </div>
+        <div class="audio-controls">
+            <button id="bgm-toggle" class="audio-btn">🎵 背景音乐: 开</button>
+            <button id="sfx-toggle" class="audio-btn">🔊 音效: 开</button>
+        </div>
+        <!-- 模式切换提示框 -->
+        <div id="mode-change-alert" class="alert">
+            游戏模式已更改，请点击"重新开始"按钮生成新地图！
+            <button id="close-alert" class="btn">知道了</button>
+        </div>
+    </div>
+    <div class="side-panel">
+        <div class="settings">
+            <h3>游戏设置</h3>
+            <div class="setting-group">
+                <label for="size-setting">棋盘大小:</label>
+                <input type="number" id="size-setting" min="3" max="20" value="9">
+            </div>
+            <div class="setting-group">
+                <label for="lives-setting">初始生命值:</label>
+                <input type="number" id="lives-setting" min="1" value="2">
+            </div>
+            <div class="setting-group">
+                <label for="bombs-setting">炸弹数量:</label>
+                <input type="number" id="bombs-setting" min="1" value="20">
+            </div>
+            <div class="setting-group">
+                <label for="treasures-setting">宝藏数量:</label>
+                <input type="number" id="treasures-setting" min="1" value="20">
+            </div>
+            <button id="apply-settings" class="btn">应用设置</button>
+        </div>
+        <div class="rules">
+            <h3>游戏规则</h3>
+            <ul>
+                <li><strong>游戏目标为找到地图内的所有宝藏。</strong>初始生命值为 <span id="rule-lives">2</span>，生命值为 0 时游戏结束</li>
+                <li><strong>生存模式：</strong>初始生命值只有1点，连续踩雷只扣一次血，每找到3个宝藏增加1点生命</li>
+                <li>挖到 1 个宝藏(⭐)得 60 分</li>
+                <li>挖到炸弹(💣)时减少 1 点生命值，前 2 回合炸弹不生效</li>
+                <li>棋盘为 <span id="rule-size">9*9</span>，包含 <span id="rule-treasures">20</span> 个宝藏和 <span id="rule-bombs">20</span> 个炸弹</li>
+                <li>空格有不同颜色及对应数字，各颜色数字统计规则如下：
+                    <ul>
+                        <li><span class="color-r">R 红色</span>：统计周围 8 格的炸弹总数</li>
+                        <li><span class="color-b">B 蓝色</span>：统计本行本列的炸弹总数</li>
+                        <li><span class="color-y">Y 黄色</span>：统计周围 8 格的宝藏总数</li>
+                        <li><span class="color-p">P 紫色</span>：红 + 蓝之和（不重复计算）</li>
+                        <li><span class="color-o">O 橙色</span>：红 + 黄之和</li>
+                        <li><span class="color-g">G 绿色</span>：统计本行本列到周围 8 格的宝藏总数（不重复计算）</li>
+                    </ul>
+                </li>
+                <li>左键点击翻开格子，右键点击标记可疑格子，右键点一下标记为炸弹，两下标记为空地，三下标记为未知</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
