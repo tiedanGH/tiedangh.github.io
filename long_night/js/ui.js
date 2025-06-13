@@ -8,6 +8,7 @@ const wallOptions = [['空', '#FFFFFF'], ['墙', '#000000'], ['未知', '#D9D9D9
 export function bindCellEvents(map) {
     map.container.addEventListener('contextmenu', e => e.preventDefault());
     map.container.addEventListener('mousedown', e => {
+        removeSelector();
         const cell = e.target.closest('.cell');
         if (!cell || cell.classList.contains('center')) return;
         const type = cell.dataset.type;
@@ -37,7 +38,6 @@ export function bindCellEvents(map) {
 }
 
 function showSelector(e, options, callback) {
-    removeSelector();
     const sel = document.createElement('div');
     sel.className = 'selector';
     sel.style.left = e.clientX + 'px';

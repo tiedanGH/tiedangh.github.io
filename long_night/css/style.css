@@ -1,7 +1,7 @@
 html, body {
     margin: 0;
     height: 100%;
-    overflow: hidden;
+    overflow: scroll;
 }
 #map-container {
     width: 100%;
@@ -9,6 +9,9 @@ html, body {
     cursor: grab;
     position: relative;
     overflow: hidden;
+    touch-action: none; /* 禁用默认滑动行为 */
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
 }
 .cell {
     position: absolute;
