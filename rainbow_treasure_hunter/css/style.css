@@ -52,7 +52,7 @@ body {
     gap: 10px;
 }
 .grid {
-    display: grid;
+    display: inline-grid;
     gap: 3px;
     background-color: #e8e8e8;
     border-radius: 8px;

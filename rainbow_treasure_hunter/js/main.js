@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bombsEl           = document.getElementById('bombs');
     const gameOverEl        = document.getElementById('game-over');
     const resetBtn          = document.getElementById('reset');
+    const resetBtnShow      = document.getElementById('rst-btn');
     const applyBtn          = document.getElementById('apply-settings');
     const livesSet          = document.getElementById('lives-setting');
     const bombsSet          = document.getElementById('bombs-setting');
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roundEl.textContent     = state.round;
         treasuresEl.textContent = state.treasuresLeft;
         bombsEl.textContent     = state.bombsLeft;
-        gameOverEl.style.display = 'none';
+        gameOverEl.style.display = resetBtnShow.style.display = 'none';
     }
 
     function initGame() {
@@ -122,8 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
             state.bombProtectionActive = (mode==='survival'?false:state.bombProtectionActive);
             if (state.treasuresLeft===0) {
                 state.gameOver=true;
-                gameOverEl.textContent='恭喜你找到所有宝藏!';
-                gameOverEl.style.display='block';
+                gameOverEl.textContent='恭喜你找到所有宝藏';
+                gameOverEl.style.display=resetBtnShow.style.display='block';
                 bgmAudio.pause();
                 playSound(winSound);
                 revealAll(state.cells, settings);
@@ -140,7 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 livesEl.textContent=state.lives;
                 if (state.lives<=0) {
                     state.gameOver=true;
-                    gameOverEl.style.display='block';
+                    gameOverEl.textContent='游戏结束';
+                    gameOverEl.style.display=resetBtnShow.style.display='block';
                     bgmAudio.pause();
                     playSound(loseSound);
                     revealAll(state.cells, settings);
@@ -257,7 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
     modeSelect      .addEventListener('change', ()=>{
         if (modeSelect.value==='survival') livesSet.value = 1; else livesSet.value = 2;
         document.getElementById('mode-change-alert').style.display='block';
-        state.gameOver=true;});
+        initGame();
+    });
     closeAlertBtn   .addEventListener('click', ()=>{ document.getElementById('mode-change-alert').style.display='none'; });
     bgmBtn          .addEventListener('click', () => toggleBGM(bgmBtn));
     sfxBtn          .addEventListener('click', () => toggleSFX(sfxBtn));
