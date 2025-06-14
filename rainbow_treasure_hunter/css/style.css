@@ -240,7 +240,7 @@ h1 {
         font-size: 16px;
     }
 }
-/* 新增的生命增加动画 */
+/* 生命增加动画 */
 .life-up {
     animation: lifeUp 0.5s;
     position: relative;
@@ -250,7 +250,7 @@ h1 {
     50% { transform: scale(1.5); background-color: #aaffaa; }
     100% { transform: scale(1); }
 }
-/* 新增的提示框样式 */
+/* 提示框样式 */
 #mode-change-alert {
     position: fixed;
     top: 50%;
