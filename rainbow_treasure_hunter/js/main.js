@@ -1,5 +1,5 @@
 import { createBoard, placeItems, calculateCellValues, revealAll, resizeCells } from './board.js';
-import { playSound, clickSound, bombSound, treasureSound, flagSound, winSound, loseSound, lifeUpSound, toggleBGM, toggleSFX } from './sound.js';
+import { playSound, bgmAudio, bombSound, treasureSound, flagSound, winSound, loseSound, lifeUpSound, toggleBGM, toggleSFX } from './sound.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM 引用
@@ -98,8 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const cell = state.cells[r][c];
         if (cell.revealed || cell.flagged) return;
 
-        playSound(clickSound);
-
         if (state.firstClick) {
             state.firstClick = false;
             placeItems(state.cells, r, c, settings);
@@ -126,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.gameOver=true;
                 gameOverEl.textContent='恭喜你找到所有宝藏!';
                 gameOverEl.style.display='block';
+                bgmAudio.pause();
                 playSound(winSound);
                 revealAll(state.cells, settings);
             }
@@ -142,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (state.lives<=0) {
                     state.gameOver=true;
                     gameOverEl.style.display='block';
+                    bgmAudio.pause();
                     playSound(loseSound);
                     revealAll(state.cells, settings);
                 }
@@ -238,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 标记按钮
     function makeMarkHandler(mode, btn) {
         return () => {
-            playSound(clickSound);
             if (state.markMode===mode) {
                 state.markMode=null; btn.classList.remove('active');
             } else {
@@ -251,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 绑定事件
     applyBtn .addEventListener('click', initGame);
-    resetBtn .addEventListener('click', ()=>{ playSound(clickSound); initGame(); });
+    resetBtn .addEventListener('click', ()=>{ initGame(); });
     markMineBtn     .addEventListener('click', makeMarkHandler('mine',     markMineBtn));
     markEmptyBtn .addEventListener('click', makeMarkHandler('empty', markEmptyBtn));
     markUnknownBtn  .addEventListener('click', makeMarkHandler('unknown',  markUnknownBtn));

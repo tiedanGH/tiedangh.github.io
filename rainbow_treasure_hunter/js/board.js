@@ -1,4 +1,4 @@
-import { bgmAudio } from './sound.js';
+import { bgmEnabled, bgmAudio } from './sound.js';
 
 export function createBoard(settings, state, onLeft, onRight) {
     const grid = document.getElementById('grid');
@@ -34,7 +34,7 @@ export function createBoard(settings, state, onLeft, onRight) {
     }
 
     // 播放 BGM
-    if (!bgmAudio.paused) bgmAudio.play().catch(() => {});
+    if (bgmEnabled) bgmAudio.play().catch(() => {});
     return cells;
 }
 

@@ -1,17 +1,17 @@
 // 声音和音乐相关
-export const bgmAudio = new Audio('https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-668.mp3');
+export const bgmAudio = new Audio('audio/bgm.mp3');
 bgmAudio.loop = true; bgmAudio.volume = 0.2;
 
-const clickSound     = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-quick-jump-arcade-game-239.mp3');
-const bombSound      = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-arcade-game-explosion-2759.mp3');
-const treasureSound  = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-unlock-game-notification-253.mp3');
-const flagSound      = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-achievement-bell-600.mp3');
-const winSound       = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-winning-chimes-2015.mp3');
-const loseSound      = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-retro-arcade-lose-2027.mp3');
-const lifeUpSound    = new Audio('https://assets.mixkit.co/active/sounds/preview/mixkit-extra-bonus-in-a-video-game-2045.mp3');
+const bombSound      = new Audio('audio/bomb.mp3');
+const treasureSound  = new Audio('audio/treasure.mp3');
+const flagSound      = new Audio('audio/flag.mp3');
+const winSound       = new Audio('audio/win.mp3');
+const loseSound      = new Audio('audio/lose.mp3');
+const lifeUpSound    = new Audio('audio/life_up.mp3');
 
-[ clickSound, bombSound, treasureSound, flagSound, winSound, loseSound, lifeUpSound ].forEach(s => s.volume = 0.3);
+[ bombSound, treasureSound, flagSound, winSound, loseSound, lifeUpSound ].forEach(s => s.volume = 0.3);
 
+let bgmEnabled = false;
 let sfxEnabled = true;
 
 export function playSound(sound) {
@@ -21,11 +21,13 @@ export function playSound(sound) {
 }
 
 export function toggleBGM(btn) {
-    if (bgmAudio.paused) {
+    if (!bgmEnabled) {
         bgmAudio.play().catch(() => {});
+        bgmEnabled = true;
         btn.textContent = '🎵 背景音乐: 开';
     } else {
         bgmAudio.pause();
+        bgmEnabled = false;
         btn.textContent = '🎵 背景音乐: 关';
     }
 }
@@ -36,6 +38,5 @@ export function toggleSFX(btn) {
 }
 
 export {
-    clickSound, bombSound, treasureSound,
-    flagSound, winSound, loseSound, lifeUpSound
+    bgmEnabled, bombSound, treasureSound, flagSound, winSound, loseSound, lifeUpSound
 };
