@@ -20,19 +20,6 @@ body {
     gap: 20px;
     max-width: 610px;
 }
-/* 响应式：小屏幕自动改为上下布局 */
-@media (max-width: 1200px) {
-    .main-layout {
-        flex-direction: column;
-        align-items: center;
-    }
-    .side-panel {
-        max-width: 100%;
-    }
-    .game-container {
-        max-width: 100%;
-    }
-}
 .game-container {
     display: inline-block;
     background-color: white;
@@ -41,6 +28,23 @@ body {
     box-shadow: 0 0 15px rgba(0,0,0,0.1);
     max-width: 100%;
     overflow: auto;
+}
+/* 响应式：小屏幕自动改为上下布局 */
+@media (max-width: 1200px) {
+    body {
+        margin: 5px;
+    }
+    .main-layout {
+        flex-direction: column;
+        align-items: center;
+        padding: 5px;
+    }
+    .side-panel {
+        max-width: 100%;
+    }
+    .game-container {
+        padding: 5px;
+    }
 }
 .stats {
     display: flex;
@@ -237,7 +241,8 @@ h1 {
         font-size: 14px;
     }
     .stats {
-        font-size: 16px;
+        gap: 5px;
+        font-size: 15px;
     }
 }
 /* 生命增加动画 */
