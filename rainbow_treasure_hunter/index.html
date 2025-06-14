@@ -20,13 +20,15 @@
             <div>宝藏: <span id="treasures">20</span></div>
             <div>炸弹: <span id="bombs">20</span></div>
         </div>
-        <label for="game-mode"></label><select id="game-mode" class="mode-selector">
-            <option value="normal">正常模式</option>
-            <option value="survival">生存模式</option>
-        </select>
+        <div>
+            <label for="game-mode"></label><select id="game-mode" class="mode-selector">
+                <option value="normal">正常模式</option>
+                <option value="survival">生存模式</option>
+            </select>
+        </div>
         <div id="grid" class="grid"></div>
-        <div id="game-over" class="game-over" style="display: none;">游戏结束!</div>
-        <button id="reset" class="btn">重新开始</button>
+        <div id="game-over" class="game-over" style="display: none;"></div>
+        <div id="rst-btn"><button id="reset" class="btn">重新开始</button></div>
         <div class="mark-buttons">
             <button id="mark-mine" class="mark-button">标记炸弹</button>
             <button id="mark-empty" class="mark-button">标记空地</button>
@@ -38,8 +40,8 @@
         </div>
         <!-- 模式切换提示框 -->
         <div id="mode-change-alert" class="alert">
-            游戏模式已更改，请点击"重新开始"按钮生成新地图！
-            <button id="close-alert" class="btn">知道了</button>
+            游戏模式已更改，地图将重新生成
+            <div><button id="close-alert" class="btn">知道了</button></div>
         </div>
     </div>
     <div class="side-panel">
