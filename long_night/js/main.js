@@ -9,4 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     uiCellEvents(gameMap);
     blockCellEvent(gameMap)
+
+    const closeAlertBtn = document.getElementById('close-alert');
+    closeAlertBtn.addEventListener('click', ()=>{
+        document.getElementById('mode-change-alert').style.display='none';
+    });
 });

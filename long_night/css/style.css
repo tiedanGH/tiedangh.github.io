@@ -20,7 +20,6 @@ html, body {
 .cell.square {
     width: 40px;
     height: 40px;
-    /*border: 1px solid #000;*/
     background-color: #D9D9D9;
     z-index: 1;
 }
@@ -87,4 +86,54 @@ html, body {
     height: 12px;
     margin-right: 8px;
     border: 1px solid #000;
+}
+
+/* 帮助提示框样式 */
+#mode-change-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    text-align: center;
+    max-width: 400px;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+#mode-change-alert h2 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #01b0f1;
+}
+#mode-change-alert p {
+    margin: 10px 0;
+    font-size: 16px;
+    text-align: left;
+}
+#mode-change-alert span {
+    font-size: 22px;
+}
+.btn-help {
+    margin-top: 18px;
+    padding: 10px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #01b0f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+.btn-help:hover {
+    filter: brightness(90%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
