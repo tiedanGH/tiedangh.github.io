@@ -2,7 +2,7 @@ import {squareOptions} from "./ui.js";
 
 export let blocksData = {};
 export async function loadBlocks() {
-    const res = await fetch('block.json');
+    const res = await fetch('blocks.json');
     blocksData = await res.json();
 }
 

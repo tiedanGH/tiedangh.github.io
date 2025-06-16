@@ -9163,7 +9163,7 @@
         "wall": false
       },
       "ground": {
-        "type": "水洼"
+        "type": "传送门"
       },
       "left": {
         "type": "普通",
@@ -9290,7 +9290,7 @@
         "wall": false
       },
       "ground": {
-        "type": "水洼"
+        "type": "传送门"
       },
       "left": {
         "type": "普通",
