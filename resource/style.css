@@ -17,7 +17,7 @@ a:hover {
 .top-buttons {
     display: flex;
     gap: 10px;
-    margin-bottom: 24px;
+    margin-bottom: 10px;
 }
 .github {
     background-color: #F0F0F0;
