@@ -1,8 +1,12 @@
 import { InfiniteMap } from './map.js';
-import { bindCellEvents } from './ui.js';
+import { uiCellEvents } from './ui.js';
+import { loadBlocks, blockCellEvent } from './block.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadBlocks();
     const container = document.getElementById('map-container');
     const gameMap = new InfiniteMap(container);
-    bindCellEvents(gameMap);
+
+    uiCellEvents(gameMap);
+    blockCellEvent(gameMap)
 });

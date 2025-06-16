@@ -1,4 +1,3 @@
-// js/map.js
 export class InfiniteMap {
     constructor(container) {
         this.container = container;
@@ -113,6 +112,9 @@ export class InfiniteMap {
 
         cell.style.left = x + 'px';
         cell.style.top = y + 'px';
+
+        cell.dataset.i = i;
+        cell.dataset.j = j;
 
         this.container.appendChild(cell);
         this.cells.set(key, cell);

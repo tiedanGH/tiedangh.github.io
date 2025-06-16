@@ -1,11 +1,11 @@
-const squareOptions = [
+export const squareOptions = [
     ['空地', '#FFFFFF'], ['树丛', '#00AF50'], ['水洼', '#01B0F1'],
     ['传送门', '#73309A'], ['陷阱', '#808080'], ['热源', '#FF0000'],
     ['箱子', '#C55C10'], ['逃生舱', '#FFDB60'], ['未知', '#D9D9D9'],
 ];
 const wallOptions = [['空', '#FFFFFF'], ['墙', '#000000'], ['未知', '#D9D9D9']];
 
-export function bindCellEvents(map) {
+export function uiCellEvents(map) {
     map.container.addEventListener('contextmenu', e => e.preventDefault());
     map.container.addEventListener('mousedown', e => {
         removeSelector();

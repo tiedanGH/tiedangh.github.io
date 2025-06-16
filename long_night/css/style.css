@@ -55,6 +55,18 @@ html, body {
     border: 1px solid #ccc;
     padding: 5px;
     z-index: 1000;
+    border-radius: 6px;
+}
+.selector button {
+    width: 40px;
+    margin-bottom: 1px;
+    cursor: pointer;
+    border: 1px solid #666;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+.selector button:hover {
+    background: #ddd;
 }
 .option-list {
     list-style: none;
