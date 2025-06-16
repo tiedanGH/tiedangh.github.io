@@ -101,8 +101,8 @@ export function showBlockSelector(e, onSelect) {
     }
 
     const normalGrid = createGrid();
-    const specialGrid = createGrid('10px');
-    const exitGrid = createGrid('10px');
+    const specialGrid = createGrid('5px');
+    const exitGrid = createGrid('5px');
 
     ids.forEach(id => {
         const block = blocksData[id];
@@ -200,10 +200,10 @@ function createPreview(block) {
                 td.style.backgroundColor = squareOptions.find(([name]) => name === info.ground.type)?.[1] || '#D9D9D9';
             }
 
-            if (info?.top?.wall)    td.style.borderTop    = '2px solid black';
-            if (info?.right?.wall)  td.style.borderRight  = '2px solid black';
-            if (info?.bottom?.wall) td.style.borderBottom = '2px solid black';
-            if (info?.left?.wall)   td.style.borderLeft   = '2px solid black';
+            td.style.borderTop    = info?.top?.wall    ? '2px solid black' : '1px solid white';
+            td.style.borderRight  = info?.right?.wall  ? '2px solid black' : '1px solid white';
+            td.style.borderBottom = info?.bottom?.wall ? '2px solid black' : '1px solid white';
+            td.style.borderLeft   = info?.left?.wall   ? '2px solid black' : '1px solid white';
 
             tr.appendChild(td);
         }
