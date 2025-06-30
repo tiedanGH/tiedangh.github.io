@@ -14,11 +14,11 @@
     <div class="game-container">
         <h1>🌈彩虹奇兵🌈</h1>
         <div class="stats">
-            <div>生命值: <span id="lives">2</span></div>
+            <div>生命值: <span id="lives">3</span></div>
             <div>得分: <span id="score">0</span></div>
             <div>回合: <span id="round">0</span></div>
-            <div>宝藏: <span id="treasures">20</span></div>
-            <div>炸弹: <span id="bombs">20</span></div>
+            <div>宝藏: <span id="treasures">9</span></div>
+            <div>炸弹: <span id="bombs">12</span></div>
         </div>
         <div>
             <label for="game-mode"></label><select id="game-mode" class="mode-selector">
@@ -46,22 +46,37 @@
     </div>
     <div class="side-panel">
         <div class="settings">
-            <h3>游戏设置</h3>
+            <div class="preset-maps">
+                <h3>一键地图配置</h3>
+                <button type="button" class="preset-btn" data-size="6"  data-treasures="6"  data-bombs="4"  data-lives="2">
+                    小地图
+                </button>
+                <button type="button" class="preset-btn" data-size="9"  data-treasures="9"  data-bombs="12" data-lives="3">
+                    中地图
+                </button>
+                <button type="button" class="preset-btn" data-size="12" data-treasures="18" data-bombs="18" data-lives="4">
+                    大地图
+                </button>
+                <button type="button" class="preset-btn" data-size="15" data-treasures="33" data-bombs="24" data-lives="5">
+                    特大地图
+                </button>
+            </div>
+            <h3>自定义配置</h3>
             <div class="setting-group">
                 <label for="size-setting">棋盘大小:</label>
                 <input type="number" id="size-setting" min="3" max="20" value="9">
             </div>
             <div class="setting-group">
                 <label for="lives-setting">初始生命值:</label>
-                <input type="number" id="lives-setting" min="1" value="2">
-            </div>
-            <div class="setting-group">
-                <label for="bombs-setting">炸弹数量:</label>
-                <input type="number" id="bombs-setting" min="1" value="20">
+                <input type="number" id="lives-setting" min="1" value="3">
             </div>
             <div class="setting-group">
                 <label for="treasures-setting">宝藏数量:</label>
-                <input type="number" id="treasures-setting" min="1" value="20">
+                <input type="number" id="treasures-setting" min="1" value="9">
+            </div>
+            <div class="setting-group">
+                <label for="bombs-setting">炸弹数量:</label>
+                <input type="number" id="bombs-setting" min="1" value="12">
             </div>
             <button id="apply-settings" class="btn">应用设置</button>
         </div>

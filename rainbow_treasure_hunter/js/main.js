@@ -257,13 +257,25 @@ document.addEventListener('DOMContentLoaded', () => {
     markEmptyBtn .addEventListener('click', makeMarkHandler('empty', markEmptyBtn));
     markUnknownBtn  .addEventListener('click', makeMarkHandler('unknown',  markUnknownBtn));
     modeSelect      .addEventListener('change', ()=>{
-        if (modeSelect.value==='survival') livesSet.value = 1; else livesSet.value = 2;
+        if (modeSelect.value==='survival') livesSet.value = 1; else livesSet.value = 3;
         document.getElementById('mode-change-alert').style.display='block';
         initGame();
     });
     closeAlertBtn   .addEventListener('click', ()=>{ document.getElementById('mode-change-alert').style.display='none'; });
     bgmBtn          .addEventListener('click', () => toggleBGM(bgmBtn));
     sfxBtn          .addEventListener('click', () => toggleSFX(sfxBtn));
+
+    // 一键地图配置
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            sizeSet.value      = btn.dataset.size;
+            treasuresSet.value = btn.dataset.treasures;
+            bombsSet.value     = btn.dataset.bombs;
+            livesSet.value     = btn.dataset.lives;
+            if (modeSelect.value==='survival') livesSet.value = 1;
+            initGame();
+        });
+    });
 
     initGame();
 });
