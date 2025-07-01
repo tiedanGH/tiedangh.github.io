@@ -129,11 +129,6 @@ body {
     background-color: #fff7e6;
     border-radius: 3px;
 }
-.color-p {
-    color: #be8feb;
-    background-color: #f5e6ff;
-    border-radius: 3px;
-}
 .color-o {
     color: #ff9f1c;
     background-color: #fff0e6;
@@ -142,6 +137,11 @@ body {
 .color-g {
     color: #6cc04a;
     background-color: #e6ffe6;
+    border-radius: 3px;
+}
+.color-p {
+    color: #be8feb;
+    background-color: #f5e6ff;
     border-radius: 3px;
 }
 .revealed {
