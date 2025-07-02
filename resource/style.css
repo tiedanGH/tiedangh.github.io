@@ -44,12 +44,15 @@ a:hover {
 .btn:hover {
     transform: scale(1.05);
 }
+.btn-map {
+    background-color: #01B0F1;
+}
 .btn-rainbow {
     background: linear-gradient(90deg, #ff6ec4, #7873f5, #2afadf, #00ffd5);
     background-size: 150% 100%;
 }
-.btn-map {
-    background-color: #01B0F1;
+.btn-treasure {
+    background-color: #cc9a00;
 }
 
 .coming {
