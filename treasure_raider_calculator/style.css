@@ -32,6 +32,12 @@ h4 {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+.coord-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
 button {
     padding: 8px 16px;
     background: #007bff;
