@@ -54,9 +54,11 @@ export function blockCellEvent(map) {
                 const square = map.cells.get(key);
                 if (!square || square.dataset.type !== 'square') return;
 
-                square.style.backgroundColor = squareOptions.find(([name]) => name === cellInfo.ground.type)?.[1] || '#D9D9D9';
+                const imgFile = squareOptions.find(([name]) => name === cellInfo.ground.type)?.[1];
+                square.style.backgroundImage = `url('./image/${imgFile || 'unknown.png'}')`;
+                square.style.backgroundSize = 'cover';
 
-                ['top','right','bottom','left'].forEach(dir => {
+                ['top', 'right', 'bottom', 'left'].forEach(dir => {
                     if (cellInfo[dir].wall) {
                         let wi = i + (dir === 'left'  ? -1 : dir === 'right' ? 1 : 0);
                         let wj = j + (dir === 'top'   ? -1 : dir === 'bottom'? 1 : 0);
@@ -197,7 +199,9 @@ function createPreview(block) {
 
             const info = block.find(b => b.pos.x === x && b.pos.y === y);
             if (info) {
-                td.style.backgroundColor = squareOptions.find(([name]) => name === info.ground.type)?.[1] || '#D9D9D9';
+                const imgFile = squareOptions.find(([name]) => name === info.ground.type)?.[1];
+                td.style.backgroundImage = `url('./image/${imgFile || 'unknown.png'}')`;
+                td.style.backgroundSize = 'cover';
             }
 
             td.style.borderTop    = info?.top?.wall    ? '2px solid black' : '1px solid white';
