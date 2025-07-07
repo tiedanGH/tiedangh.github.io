@@ -12,17 +12,12 @@ export function uiCellEvents(map) {
         const cell = e.target.closest('.cell');
         if (!cell || cell.classList.contains('center')) return;
         const type = cell.dataset.type;
-        // 左键：方块或墙
-        if (e.button === 0) {
-            if (type === 'square') showSelector(e, squareOptions, c => cell.style.backgroundColor = c);
-            else if (type === 'wall') showSelector(e, wallOptions, c => cell.style.backgroundColor = c);
-        }
-        // 右键：切换人物
-        if (e.button === 2 && type === 'square') {
-            e.preventDefault();
+
+        function togglePlayer() {
             const p = cell.querySelector('.player');
-            if (p) p.remove();
-            else {
+            if (p) {
+                p.remove();
+            } else {
                 const mark = document.createElement('div');
                 mark.className = 'player';
                 mark.innerText = '🧍';
@@ -34,10 +29,21 @@ export function uiCellEvents(map) {
                 cell.appendChild(mark);
             }
         }
+
+        // 左键：方块或墙
+        if (e.button === 0) {
+            if (type === 'square') showSelector(e, squareOptions, c => cell.style.backgroundColor = c, togglePlayer);
+            else if (type === 'wall') showSelector(e, wallOptions, c => cell.style.backgroundColor = c);
+        }
+        // 右键：切换人物
+        if (e.button === 2 && type === 'square') {
+            e.preventDefault();
+            togglePlayer();
+        }
     });
 }
 
-function showSelector(e, options, callback) {
+function showSelector(e, options, callback, action) {
     const sel = document.createElement('div');
     sel.className = 'selector';
     sel.style.left = e.clientX + 'px';
@@ -59,6 +65,21 @@ function showSelector(e, options, callback) {
         };
         ul.appendChild(li);
     });
+
+    if (typeof action === 'function') {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+        const icon = document.createElement('span');
+        icon.innerText = '🧍';
+        icon.style.marginRight = '4px';
+        li.appendChild(icon);
+        li.appendChild(document.createTextNode('标记玩家'));
+        li.onclick = () => {
+            action();
+            removeSelector();
+        };
+        ul.appendChild(li);
+    }
 
     sel.appendChild(ul);
     document.body.appendChild(sel);
