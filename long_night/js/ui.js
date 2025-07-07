@@ -21,30 +21,43 @@ const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
 export function uiCellEvents(map) {
     map.container.addEventListener('contextmenu', e => e.preventDefault());
 
-    // 双击和右键：标记玩家
-    ['dblclick', 'mousedown'].forEach(evtType => {
-        map.container.addEventListener(evtType, e => {
-            if (evtType === 'mousedown' && e.button !== 2) return;
-            if (evtType === 'dblclick') e.preventDefault();
+    // 移动端双击支持
+    let lastClickTime = 0;
+    map.container.addEventListener('click', e => {
+        const now = Date.now();
+        const cell = e.target.closest('.cell');
+        if (!cell || cell.classList.contains('center') || cell.dataset.type !== 'square') return;
+
+        if (now - lastClickTime < 300) {
+            e.preventDefault();
             removeSelector();
-            const cell = e.target.closest('.cell');
-            if (!cell || cell.classList.contains('center') || cell.dataset.type!=='square') return;
-
-            // 如果按Shift则改为清空标记
-            if (e.shiftKey) {
-                clearMarkers(cell);
-                return;
-            }
-
             showPlayerSelector(e, (choice, color) => {
                 if (choice === '__CLEAR__') clearMarkers(cell);
                 else addMarker(cell, choice, color);
                 removeSelector();
             });
+        }
+        lastClickTime = now;
+    });
+
+    // 右键：标记玩家 / 清空标记
+    map.container.addEventListener('mousedown', e => {
+        if (e.button !== 2) return;
+        removeSelector();
+        const cell = e.target.closest('.cell');
+        if (!cell || cell.classList.contains('center') || cell.dataset.type !== 'square') return;
+
+        // 如果按Shift则改为清空标记
+        if (e.shiftKey) { clearMarkers(cell); return; }
+
+        showPlayerSelector(e, (choice, color) => {
+            if (choice === '__CLEAR__') clearMarkers(cell);
+            else addMarker(cell, choice, color);
+            removeSelector();
         });
     });
 
-    // 左键：方块/墙选择
+    // 左键：设置方块 / 墙
     map.container.addEventListener('mousedown', e => {
         if (e.button !== 0) return;
         removeSelector();
