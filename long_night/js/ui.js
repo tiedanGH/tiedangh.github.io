@@ -139,8 +139,8 @@ export function showPlayerSelector(e, onSelect) {
     const special = createGrid('10px');
     [['🧍','black'], ['★','red']].forEach(([ch, color]) => {
         const btn = document.createElement('button');
-        btn.className = 'player-option';
         btn.textContent = ch;
+        btn.style.padding = '4px 6px';
         btn.style.color = color;
         btn.onclick = () => onSelect(ch, color);
         special.appendChild(btn);
@@ -149,8 +149,8 @@ export function showPlayerSelector(e, onSelect) {
     for (let i = 0; i <= 7; i++) {
         const ch = num[i];
         const btn = document.createElement('button');
-        btn.className = 'player-option';
         btn.textContent = ch;
+        btn.style.padding = '4px 6px';
         btn.onclick = () => onSelect(ch);
         numbers.appendChild(btn);
     }
