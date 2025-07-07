@@ -10,9 +10,9 @@ export const squareOptions = [
     ['逃生舱', 'exit.png'],
     ['未知', 'unknown.png'],
 ];
-const wallOptions = [
+export const wallOptions = [
     ['空', '#FFFFFF'],
-    ['墙', '#000000'],
+    ['普通', '#000000'],
     ['门', '#EA68A2'],
     ['未知', '#D9D9D9'],
 ];
@@ -46,11 +46,12 @@ export function uiCellEvents(map) {
         if (e.button === 0) {
             if (type === 'square') {
                 showSelector(e, squareOptions, imgFile => {
-                    cell.style.backgroundImage = `url('./image/${imgFile}')`;
-                    cell.style.backgroundSize = 'cover';
+                    cell.style.backgroundImage = `url('./img/${imgFile}')`;
                 }, togglePlayer);
             } else if (type === 'wall') {
-                showSelector(e, wallOptions, c => cell.style.backgroundColor = c);
+                showSelector(e, wallOptions, c => {
+                    cell.style.backgroundColor = c;
+                });
             }
         }
         // 右键：切换人物
@@ -77,7 +78,7 @@ function showSelector(e, options, callback, action) {
         if (val.endsWith('.png') || val.endsWith('.jpg')) {
             const img = document.createElement('img');
             img.className = 'color-box';
-            img.src = `./image/${val}`;
+            img.src = `./img/${val}`;
             img.alt = name;
             li.appendChild(img);
         } else {

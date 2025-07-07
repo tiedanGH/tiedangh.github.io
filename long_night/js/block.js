@@ -1,9 +1,13 @@
-import {squareOptions} from "./ui.js";
+import {squareOptions, wallOptions} from "./ui.js";
 
 export let blocksData = {};
 export async function loadBlocks() {
     const res = await fetch('blocks.json');
     blocksData = await res.json();
+}
+
+function getWallColor(type) {
+    return wallOptions.find(([name]) => name === type)?.[1] || '#D9D9D9';
 }
 
 export function blockCellEvent(map) {
@@ -55,8 +59,7 @@ export function blockCellEvent(map) {
                 if (!square || square.dataset.type !== 'square') return;
 
                 const imgFile = squareOptions.find(([name]) => name === cellInfo.ground.type)?.[1];
-                square.style.backgroundImage = `url('./image/${imgFile || 'unknown.png'}')`;
-                square.style.backgroundSize = 'cover';
+                square.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;
 
                 ['top', 'right', 'bottom', 'left'].forEach(dir => {
                     if (cellInfo[dir].wall) {
@@ -64,7 +67,7 @@ export function blockCellEvent(map) {
                         let wj = j + (dir === 'top'   ? -1 : dir === 'bottom'? 1 : 0);
                         const wallCell = map.cells.get(`${wi},${wj}`);
                         if (wallCell && wallCell.dataset.type === 'wall') {
-                            wallCell.style.backgroundColor = '#000';
+                            wallCell.style.backgroundColor = getWallColor(cellInfo[dir].type);
                         }
                     }
                 });
@@ -163,7 +166,7 @@ function clearArea(map, i0, j0) {
             const j = j0 + dy * 2 + 1;
             const square = map.cells.get(`${i},${j}`);
             if (square?.dataset.type === 'square') {
-                square.style.backgroundColor = '#D9D9D9';
+                square.style.backgroundImage = 'url(./img/unknown.png)';
             }
 
             const directions = [
@@ -200,14 +203,15 @@ function createPreview(block) {
             const info = block.find(b => b.pos.x === x && b.pos.y === y);
             if (info) {
                 const imgFile = squareOptions.find(([name]) => name === info.ground.type)?.[1];
-                td.style.backgroundImage = `url('./image/${imgFile || 'unknown.png'}')`;
+                td.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;
                 td.style.backgroundSize = 'cover';
-            }
 
-            td.style.borderTop    = info?.top?.wall    ? '2px solid black' : '1px solid white';
-            td.style.borderRight  = info?.right?.wall  ? '2px solid black' : '1px solid white';
-            td.style.borderBottom = info?.bottom?.wall ? '2px solid black' : '1px solid white';
-            td.style.borderLeft   = info?.left?.wall   ? '2px solid black' : '1px solid white';
+                const t = info.top, r = info.right, b = info.bottom, l = info.left;
+                td.style.borderTop    = t.wall ? `2px solid ${getWallColor(t.type)}` : '1px solid white';
+                td.style.borderRight  = r.wall ? `2px solid ${getWallColor(r.type)}` : '1px solid white';
+                td.style.borderBottom = b.wall ? `2px solid ${getWallColor(b.type)}` : '1px solid white';
+                td.style.borderLeft   = l.wall ? `2px solid ${getWallColor(l.type)}` : '1px solid white';
+            }
 
             tr.appendChild(td);
         }

@@ -6836,6 +6836,233 @@
       }
     }
   ],
+  "34": [
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "门",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "门",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
   "S1": [
     {
       "pos": {
