@@ -35,7 +35,7 @@ export function blockCellEvent(map) {
                     const key = `${i},${j}`;
                     const square = map.cells.get(key);
                     if (square?.dataset.type === 'square') {
-                        square.style.backgroundColor = '#FFFFFF';
+                        square.style.backgroundImage = `url('./img/empty.png')`;
                     }
 
                     const directions = [[i - 1, j], [i + 1, j], [i, j - 1], [i, j + 1]];
@@ -106,8 +106,8 @@ export function showBlockSelector(e, onSelect) {
     }
 
     const normalGrid = createGrid();
-    const specialGrid = createGrid('5px');
-    const exitGrid = createGrid('5px');
+    const specialGrid = createGrid('6px');
+    const exitGrid = createGrid('6px');
 
     ids.forEach(id => {
         const block = blocksData[id];
@@ -144,10 +144,10 @@ export function showBlockSelector(e, onSelect) {
     clearBtn.onclick = () => onSelect('__CLEAR__');
 
     container.appendChild(normalGrid);
+    container.appendChild(exitGrid);
     if (specialGrid.children.length > 0) {
         container.appendChild(specialGrid);
     }
-    container.appendChild(exitGrid);
     container.appendChild(clearBtn);
 
     panel.appendChild(container);
