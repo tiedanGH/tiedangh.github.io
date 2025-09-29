@@ -44,6 +44,10 @@ a:hover {
 .btn:hover {
     transform: scale(1.05);
 }
+.btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 .btn-map {
     background-color: #01B0F1;
 }
