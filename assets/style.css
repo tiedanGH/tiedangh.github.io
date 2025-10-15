@@ -64,3 +64,15 @@ a:hover {
     color: #8898aa;
     font-style: italic;
 }
+
+/* 响应式设计*/
+@media (max-width: 768px) {
+    .btn {
+        font-size: 1.1em;
+        padding: 14px 28px;
+    }
+
+    .github {
+        font-size: 1.05em;
+    }
+}
