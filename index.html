@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <script>
+        // 如果不是在 GitHub 域名访问时，修改 info 文本
+        (function() {
+            const githubDomains = ["github.tiedan.site", "page.tiedan.site", "tiedangh.github.io"];
+            const host = window.location.hostname.toLowerCase();
+            const isGithub = githubDomains.some(domain => host === domain || host.endsWith("." + domain));
+
+            if (!isGithub) {
+                window.addEventListener("DOMContentLoaded", function() {
+                    const info = document.querySelector(".info");
+                    if (info) {
+                        info.innerHTML = '您正在访问备用版本，Github Page链接：<a href="https://github.tiedan.site">https://github.tiedan.site</a>';
+                    }
+                });
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>铁蛋的游戏网站</title>
@@ -10,7 +27,7 @@
 <body>
 
 <h1>铁蛋的游戏网站</h1>
-<p>一个使用 GitHub Page 发布的网站</p>
+<p class="info">一个使用 GitHub Page 发布的网站</p>
 <div class="top-buttons">
     <a href="https://github.com/tiedanGH/tiedangh.github.io" target="_blank" class="github">
         <img src="assets/GitHub.png" alt="icon"/>
