@@ -31,9 +31,12 @@ a:hover {
 }
 
 .btn {
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-decoration: none;
-    padding: 12px 24px;
+    width: 190px;
+    padding: 12px 0;
     border-radius: 6px;
     font-size: 1em;
     font-weight: bold;
@@ -57,6 +60,9 @@ a:hover {
 }
 .btn-treasure {
     background-color: #cc9a00;
+}
+.btn-glot {
+    background-color: #50b5ff;
 }
 
 .coming {
