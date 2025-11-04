@@ -19,20 +19,6 @@
 // @run-at             document-start
 // ==/UserScript==
 
-/**
- * # 使用方法
- * 1. 引导用户安装本脚本并刷新页面使脚本生效
- * 2. 在代码中可以直接调用window.corsFetch或者corsFetch函数，调用方法同原生fetch函数，即可直接访问Glot等网站，无需cors-anywhere中间件
- * 
- * # 开发指南
- * ## 获取typescript源代码
- * 脚本采用typescript开发，最好以typescript进行编辑再编译
- * 
- * ## 添加网站连接
- * 1. 将域名添加到 AllowedDomains 数组中
- * 2. 在脚本头中添加对应的@connect标签
- */
-
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-return-assign */
 
