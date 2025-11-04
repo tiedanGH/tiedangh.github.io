@@ -1,0 +1,9 @@
+{
+    "devDependencies": {
+        "typescript": "^5.9.3"
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "tsc --build --clean"
+    }
+}
