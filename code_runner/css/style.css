@@ -24,7 +24,7 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     background: white;
     border-radius: 10px;
@@ -93,6 +93,28 @@ main {
     padding: 8px 30px;
     overflow: visible;
     position: relative;
+}
+
+/* 主要内容区域布局 */
+.content-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.form-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.result-container {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+    border-left: 1px solid #eee;
+    padding-left: 30px;
 }
 
 .form-group {
@@ -399,6 +421,18 @@ button:disabled:hover {
         padding: 20px;
     }
 
+    .content-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .result-container {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+    }
+
     .tooltip-content {
         width: 280px;
         left: 50%;
@@ -413,5 +447,16 @@ button:disabled:hover {
 
     .security-notice, .debug-notice {
         font-size: 13px;
+    }
+}
+
+/* 中等屏幕适配 */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .content-wrapper {
+        gap: 20px;
+    }
+
+    .result-container {
+        padding-left: 20px;
     }
 }

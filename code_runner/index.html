@@ -28,111 +28,115 @@
     </div>
 
     <main>
-        <form id="codeForm">
-            <div class="form-group">
-                <label for="apiKey">
-                    Glot API Key
-                    <span class="tooltip">
-                        <i class="fas fa-info-circle"></i>
-                        <div class="tooltip-content">
-                            <strong>安全提示：</strong><br>
-                            • API Key将通过第三方代理服务器(cors-anywhere)发送<br>
-                            • 建议使用专用的、非主要API Key<br>
-                            • 在HTTPS环境下使用更安全<br>
-                            • 定期轮换您的API Key
+        <div class="content-wrapper">
+            <div class="form-container">
+                <form id="codeForm">
+                    <div class="form-group">
+                        <label for="apiKey">
+                            Glot API Key
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="tooltip-content">
+                                    <strong>安全提示：</strong><br>
+                                    • API Key将通过第三方代理服务器(cors-anywhere)发送<br>
+                                    • 建议使用专用的、非主要API Key<br>
+                                    • 在HTTPS环境下使用更安全<br>
+                                    • 定期轮换您的API Key
+                                </div>
+                            </span>
+                        </label>
+                        <div class="password-container">
+                            <input type="password" id="apiKey" placeholder="请输入您的 Glot API Key" required>
+                            <button type="button" id="togglePassword" class="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
-                    </span>
-                </label>
-                <div class="password-container">
-                    <input type="password" id="apiKey" placeholder="请输入您的 Glot API Key" required>
-                    <button type="button" id="togglePassword" class="password-toggle">
-                        <i class="fas fa-eye"></i>
+                        <div class="security-notice">
+                            <i class="fas fa-shield-alt"></i>
+                            API Key将通过第三方代理服务器发送，建议使用专用Key
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="language">编程语言</label>
+                        <select id="language" required>
+                            <option value="">请选择语言</option>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="php">PHP</option>
+                            <option value="swift">Swift</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="bash">Bash</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codeSource">代码来源</label>
+                        <select id="codeSource">
+                            <option value="textarea">在文本框内输入代码</option>
+                            <option value="url">从 URL 获取代码</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="urlGroup" style="display: none;">
+                        <label for="codeUrl">
+                            代码 URL
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="tooltip-content">
+                                    支持的网站:<br>
+                                    • https://pastebin.ubuntu.com/p/<br>
+                                    • https://glot.io/snippets/<br>
+                                    • https://pastebin.com/raw/<br>
+                                    • https://gist.githubusercontent.com/<br>
+                                    • https://bytebin.lucko.me/<br>
+                                    • https://pastes.dev/<br>
+                                    • https://p.ip.fi/
+                                </div>
+                            </span>
+                        </label>
+                        <input type="url" id="codeUrl" placeholder="请输入代码 URL">
+                    </div>
+
+                    <div class="form-group" id="codeGroup">
+                        <label for="code">代码</label>
+                        <textarea id="code" placeholder="请输入您的代码" rows="15"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stdin">程序输入 (stdin)</label>
+                        <textarea id="stdin" placeholder="请输入程序的标准输入（可选）" rows="3"></textarea>
+                    </div>
+
+                    <!-- 调试模式开关 - 在HTTPS环境下隐藏 -->
+                    <div class="form-group debug-section" id="debugSection">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="debugMode">
+                            <span class="checkmark"></span>
+                            调试模式（允许在非HTTPS环境下执行）
+                        </label>
+                        <div class="debug-notice">
+                            <i class="fas fa-bug"></i>
+                            启用后可在HTTP环境下执行代码，但API Key安全性无法保证
+                        </div>
+                    </div>
+
+                    <button type="submit" id="runButton">
+                        <i class="fas fa-play"></i> 执行代码
                     </button>
-                </div>
-                <div class="security-notice">
-                    <i class="fas fa-shield-alt"></i>
-                    API Key将通过第三方代理服务器发送，建议使用专用Key
-                </div>
+                </form>
             </div>
 
-            <div class="form-group">
-                <label for="language">编程语言</label>
-                <select id="language" required>
-                    <option value="">请选择语言</option>
-                    <option value="python">Python</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="java">Java</option>
-                    <option value="c">C</option>
-                    <option value="cpp">C++</option>
-                    <option value="go">Go</option>
-                    <option value="rust">Rust</option>
-                    <option value="ruby">Ruby</option>
-                    <option value="php">PHP</option>
-                    <option value="swift">Swift</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="bash">Bash</option>
-                </select>
+            <div class="result-container" id="result" style="display: none;">
+                <h2>执行结果</h2>
+                <div id="output"></div>
             </div>
-
-            <div class="form-group">
-                <label for="codeSource">代码来源</label>
-                <select id="codeSource">
-                    <option value="textarea">在文本框内输入代码</option>
-                    <option value="url">从 URL 获取代码</option>
-                </select>
-            </div>
-
-            <div class="form-group" id="urlGroup" style="display: none;">
-                <label for="codeUrl">
-                    代码 URL
-                    <span class="tooltip">
-                        <i class="fas fa-info-circle"></i>
-                        <div class="tooltip-content">
-                            支持的网站:<br>
-                            • https://pastebin.ubuntu.com/p/<br>
-                            • https://glot.io/snippets/<br>
-                            • https://pastebin.com/raw/<br>
-                            • https://gist.githubusercontent.com/<br>
-                            • https://bytebin.lucko.me/<br>
-                            • https://pastes.dev/<br>
-                            • https://p.ip.fi/
-                        </div>
-                    </span>
-                </label>
-                <input type="url" id="codeUrl" placeholder="请输入代码 URL">
-            </div>
-
-            <div class="form-group" id="codeGroup">
-                <label for="code">代码</label>
-                <textarea id="code" placeholder="请输入您的代码" rows="15"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="stdin">程序输入 (stdin)</label>
-                <textarea id="stdin" placeholder="请输入程序的标准输入（可选）" rows="3"></textarea>
-            </div>
-
-            <!-- 调试模式开关 - 在HTTPS环境下隐藏 -->
-            <div class="form-group debug-section" id="debugSection">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="debugMode">
-                    <span class="checkmark"></span>
-                    调试模式（允许在非HTTPS环境下执行）
-                </label>
-                <div class="debug-notice">
-                    <i class="fas fa-bug"></i>
-                    启用后可在HTTP环境下执行代码，但API Key安全性无法保证
-                </div>
-            </div>
-
-            <button type="submit" id="runButton">
-                <i class="fas fa-play"></i> 执行代码
-            </button>
-        </form>
-
-        <div id="result" class="result-container" style="display: none;">
-            <h2>执行结果</h2>
-            <div id="output"></div>
         </div>
     </main>
 </div>
