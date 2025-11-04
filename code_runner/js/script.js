@@ -476,20 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 加密存储函数
-    function encryptData(data) {
-        return btoa(JSON.stringify(data));
-    }
-
-    // 解密读取函数
-    function decryptData(encryptedData) {
-        try {
-            return JSON.parse(atob(encryptedData));
-        } catch (e) {
-            return null;
-        }
-    }
-
     // 保存数据到localStorage
     function saveDataToStorage(apiKey, language, codeSource, codeUrl, code, stdin) {
         const data = {
@@ -500,16 +486,15 @@ document.addEventListener('DOMContentLoaded', function() {
             code,
             stdin
         };
-        localStorage.setItem('glotRunnerLastData', encryptData(data));
+        localStorage.setItem('glotRunnerLastData', JSON.stringify(data));
     }
 
     // 从localStorage加载数据
     function loadStoredData() {
-        const storedData = localStorage.getItem('glotRunnerLastData');
+        const data = localStorage.getItem('glotRunnerLastData');
 
-        if (storedData) {
+        if (data) {
             try {
-                const data = decryptData(storedData);
                 if (data) {
                     apiKeyInput.value = data.apiKey || '';
                     languageSelect.value = data.language || '';
