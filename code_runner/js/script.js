@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 公共CORS代理
+    const ProxyURL = 'https://cors-anywhere.herokuapp.com/';
+
     // 获取DOM元素
     const codeForm = document.getElementById('codeForm');
     const apiKeyInput = document.getElementById('apiKey');
@@ -89,6 +92,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         // 更新执行按钮状态
         updateRunButtonState();
+
+        // 检查是否已安装跨域用户脚本
+        if (window.corsFetch) {
+            document.querySelector('#security-notice').classList.add('safe');
+            document.querySelector('#security-notice-text').innerText = '您已安装用户脚本，请求将通过用户脚本发送而无需经过中间服务器，您的连接是安全的！';
+        }
     }
 
     // 更新执行按钮状态
@@ -203,13 +212,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // 发送请求到Glot API（通过CORS代理）
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/'; // 公共CORS代理
             const targetUrl = `https://glot.io/api/run/${language}/latest`;
+            const finalUrl = window.corsFetch ? targetUrl : ProxyURL + targetUrl; // 根据是否安装了脚本决定是否使用代理
 
-            console.log('Sending request to:', proxyUrl + targetUrl);
+            console.log(window.corsFetch ? '(Userscript)' : '(Proxy)', 'Sending request to:', finalUrl);
 
             const response = await fetchWithTimeout(
-                proxyUrl + targetUrl, // 使用代理
+                finalUrl,
                 {
                     method: 'POST',
                     headers: {
@@ -274,12 +283,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 finalUrl = url.replace('pastes', 'api.pastes');
             }
 
-            // 使用代理避免CORS问题
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            // 根据用户脚本是否安装确定是否使用代理
+            window.corsFetch || (finalUrl = ProxyURL + finalUrl);
 
             // 发送请求获取代码
             const response = await fetchWithTimeout(
-                proxyUrl + finalUrl,
+                finalUrl,
                 options,
                 10000 // 10秒超时
             );
@@ -338,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 reject(new Error('请求超时'));
             }, timeout);
 
-            fetch(url, options)
+            (window.corsFetch ?? fetch)(url, options)
                 .then(response => {
                     clearTimeout(timer);
                     resolve(response);

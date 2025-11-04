@@ -204,7 +204,21 @@ input:focus, select:focus, textarea:focus {
 }
 
 .security-notice i {
-    color: #ff9800;
+    color: #e76620;
+}
+
+.security-notice a {
+    color: #ffa216;
+}
+
+.security-notice.safe {
+    background-color: #e1ffe5;
+    border: 1px solid #3cc853;
+    color: #1c7e45;
+}
+
+.security-notice.safe i {
+    color: #27cb02;
 }
 
 .tooltip {
