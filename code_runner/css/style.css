@@ -423,10 +423,15 @@ button:disabled:hover {
 
     .content-wrapper {
         flex-direction: column;
-        gap: 20px;
+        gap: 0;
+    }
+
+    .form-container {
+        width: 100%;
     }
 
     .result-container {
+        width: 100%;
         border-left: none;
         padding-left: 0;
         border-top: 1px solid #eee;
@@ -447,16 +452,5 @@ button:disabled:hover {
 
     .security-notice, .debug-notice {
         font-size: 13px;
-    }
-}
-
-/* 中等屏幕适配 */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .content-wrapper {
-        gap: 20px;
-    }
-
-    .result-container {
-        padding-left: 20px;
     }
 }
