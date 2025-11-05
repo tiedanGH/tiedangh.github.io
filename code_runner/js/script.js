@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 检查是否是CORS错误
             if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
-                displayError('由于浏览器安全限制，无法直接访问Glot API。请修改浏览器扩展禁用CORS限制并重新发送请求。');
+                displayError('由于 CORS 限制，尝试请求 Glot API 失败。请尝试再次执行，或者安装用户脚本代替公共代理。');
             } else {
                 displayError(error.message);
             }
@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 保存数据到localStorage
     function saveDataToStorage(apiKey, language, codeSource, codeUrl, code, stdin) {
         const data = {
-            apiKey: apiKey,
+            apiKey,
             language,
             codeSource,
             codeUrl,
@@ -500,18 +500,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 从localStorage加载数据
     function loadStoredData() {
-        const data = localStorage.getItem('glotRunnerLastData');
+        const storedData = localStorage.getItem('glotRunnerLastData');
 
-        if (data) {
+        if (storedData) {
             try {
-                if (data) {
-                    apiKeyInput.value = data.apiKey || '';
-                    languageSelect.value = data.language || '';
-                    codeSourceSelect.value = data.codeSource || 'textarea';
-                    codeUrlInput.value = data.codeUrl || '';
-                    codeTextarea.value = data.code || '';
-                    stdinTextarea.value = data.stdin || '';
-                }
+                const data = JSON.parse(storedData);
+
+                apiKeyInput.value = data.apiKey || '';
+                languageSelect.value = data.language || '';
+                codeSourceSelect.value = data.codeSource || 'textarea';
+                codeUrlInput.value = data.codeUrl || '';
+                codeTextarea.value = data.code || '';
+                stdinTextarea.value = data.stdin || '';
             } catch (error) {
                 console.error('加载存储的数据时出错:', error);
             }
