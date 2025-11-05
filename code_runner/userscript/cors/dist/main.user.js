@@ -5,8 +5,9 @@
 // @description        为铁蛋Site的Code Runner添加跨域访问Glot API和Pastebin类网站的能力
 // @author             InvFish
 // @license            GPL-3.0-or-later
-// @match              http*://page.tiedan.site/code_runner/*
+// @match              http*://tiedan.site/tiedan/code_runner/*
 // @match              http*://github.tiedan.site/tiedan/code_runner/*
+// @match              http*://*.tiedan.site/code_runner/*
 // @match              http*://127.0.0.1/*
 // @connect            pastebin.ubuntu.com
 // @connect            glot.io
