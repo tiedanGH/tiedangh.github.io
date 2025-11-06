@@ -24,7 +24,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1350px;
     margin: 0 auto;
     background: white;
     border-radius: 10px;
@@ -35,7 +35,7 @@ body {
 header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    padding: 20px 30px;
+    padding: 20px;
     border-radius: 10px 10px 0 0;
     text-align: center;
 }
@@ -90,7 +90,7 @@ header a {
 }
 
 main {
-    padding: 8px 30px;
+    padding: 8px 30px 22px 30px;
     overflow: visible;
     position: relative;
 }
@@ -232,7 +232,7 @@ input:focus, select:focus, textarea:focus {
 
 .tooltip-content {
     visibility: hidden;
-    width: 320px;
+    width: 370px;
     background-color: var(--dark-color);
     color: white;
     text-align: left;
@@ -420,11 +420,11 @@ button:disabled:hover {
 
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 8px;
     }
 
     header {
-        padding: 20px;
+        padding: 12px;
     }
 
     header h1 {
@@ -432,7 +432,7 @@ button:disabled:hover {
     }
 
     main {
-        padding: 20px;
+        padding: 6px 15px 8px 15px;
     }
 
     .content-wrapper {
@@ -454,6 +454,7 @@ button:disabled:hover {
 
     .tooltip-content {
         width: 280px;
+        font-size: 11px;
         left: 50%;
         transform: translateX(calc(-50% + 10px));
     }
