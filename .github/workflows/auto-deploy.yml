@@ -32,13 +32,20 @@ jobs:
           if [[ $STATUS =~ ^2 ]]; then
             MESSAGE=$(echo "$BODY" | jq -r '.message // empty')
             if [[ -n "$MESSAGE" ]]; then
-              echo -e "\033[1;32m[SUCCESS] $MESSAGE\033[0m"
+              echo -e "\033[1;32m[SUCCESS] deploy to server successfully.\033[0m"
+              echo "$MESSAGE"
             else
-              echo -e "\033[1;32m[SUCCESS] Project '$PROJECT_NAME' deployed successfully.\033[0m"
+              echo -e "\033[1;31m[ERROR] Server did not return a message.\033[0m"
+              echo -e "\033[1;31m[ERROR] Full response:\033[0m"
+              echo "$BODY"
+              exit 1
             fi
           else
             echo -e "\033[1;31m[ERROR] Deployment failed with status $STATUS\033[0m"
             echo -e "\033[1;31m[ERROR] Full response:\033[0m"
-            echo "$BODY"
-            exit 1
+            ERROR_MSG=$(echo "$BODY" | jq -r '"Error: \(.error // "")\nExit Code: \(.exit_code // "")\nMessage:\n\(.message // "")"')
+            while IFS= read -r line; do
+              echo -e "\033[1;31m[ERROR] $line\033[0m"
+            done <<< "$ERROR_MSG"
+          exit 1
           fi
