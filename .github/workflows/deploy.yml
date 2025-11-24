@@ -1,0 +1,44 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    if: ${{ github.event.repository.fork == false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    env:
+      PROJECT_NAME: tiedan
+      SERVER: ${{ secrets.SERVER }}
+      TOKEN: ${{ secrets.TOKEN }}
+      
+    steps:
+      - name: Deploy to Server
+        run: |
+          echo -e "\033[1;34m[INFO] Sending POST request for project '$PROJECT_NAME'...\033[0m"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 180 -X POST \
+            -H "token: $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"name\":\"$PROJECT_NAME\"}" \
+            "$SERVER/pull")
+          
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          STATUS=$(echo "$RESPONSE" | tail -n1)
+          
+          if [[ $STATUS =~ ^2 ]]; then
+            MESSAGE=$(echo "$BODY" | jq -r '.message // empty')
+            if [[ -n "$MESSAGE" ]]; then
+              echo -e "\033[1;32m[SUCCESS] $MESSAGE\033[0m"
+            else
+              echo -e "\033[1;32m[SUCCESS] Project '$PROJECT_NAME' deployed successfully.\033[0m"
+            fi
+          else
+            echo -e "\033[1;31m[ERROR] Deployment failed with status $STATUS\033[0m"
+            echo -e "\033[1;31m[ERROR] Full response:\033[0m"
+            echo "$BODY"
+            exit 1
+          fi
