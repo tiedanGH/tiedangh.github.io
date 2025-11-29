@@ -19,9 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const httpsWarning = document.getElementById('httpsWarning');
     const debugModeCheckbox = document.getElementById('debugMode');
     const debugSection = document.getElementById('debugSection');
+    const apiKeyHint = document.getElementById('apiKeyHint');
 
     // 检查是否为HTTPS
     const isHttps = window.location.protocol === 'https:';
+
+    const SECRET_KEY = "glot-runner-local-secret-key";
 
     // 初始化安全设置
     initSecuritySettings();
@@ -31,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 确保页面加载时正确显示代码来源对应的UI
     updateCodeSourceUI();
+
+    // 检查并显示API Key提示
+    checkAndShowApiKeyHint();
 
     apiKeyInput.addEventListener('mousedown', function(e) {
         e.stopPropagation();
@@ -54,6 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     apiKeyInput.addEventListener('keyup', function(e) {
         e.stopPropagation();
+        // 输入时检查是否显示提示
+        checkAndShowApiKeyHint();
     });
 
     // 切换密码可见性
@@ -133,6 +141,15 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             urlGroup.style.display = 'none';
             codeGroup.style.display = 'block';
+        }
+    }
+
+    // 检查并显示API Key提示
+    function checkAndShowApiKeyHint() {
+        if (!apiKeyInput.value.trim()) {
+            apiKeyHint.style.display = 'block';
+        } else {
+            apiKeyHint.style.display = 'none';
         }
     }
 
@@ -485,16 +502,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // 加密和解密函数
+    function encrypt(text) {
+        return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
+    }
+
+    function decrypt(ciphertext) {
+        try {
+            const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+            return bytes.toString(CryptoJS.enc.Utf8) || "";
+        } catch {
+            return "";
+        }
+    }
+
     // 保存数据到localStorage
     function saveDataToStorage(apiKey, language, codeSource, codeUrl, code, stdin) {
+        const encryptedApiKey = apiKey ? encrypt(apiKey) : "";
+
         const data = {
-            apiKey,
+            apiKey: encryptedApiKey,
             language,
             codeSource,
             codeUrl,
             code,
             stdin
         };
+
         localStorage.setItem('glotRunnerLastData', JSON.stringify(data));
     }
 
@@ -506,12 +540,19 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const data = JSON.parse(storedData);
 
-                apiKeyInput.value = data.apiKey || '';
+                if (data.apiKey) {
+                    apiKeyInput.value = decrypt(data.apiKey);
+                    console.log(apiKeyInput.value);
+                } else {
+                    apiKeyInput.value = '';
+                }
+
                 languageSelect.value = data.language || '';
                 codeSourceSelect.value = data.codeSource || 'textarea';
                 codeUrlInput.value = data.codeUrl || '';
                 codeTextarea.value = data.code || '';
                 stdinTextarea.value = data.stdin || '';
+
             } catch (error) {
                 console.error('加载存储的数据时出错:', error);
             }

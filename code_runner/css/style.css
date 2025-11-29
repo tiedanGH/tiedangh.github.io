@@ -221,6 +221,32 @@ input:focus, select:focus, textarea:focus {
     color: #27cb02;
 }
 
+/* API Key 提示 */
+.api-key-hint {
+    margin-bottom: 4px;
+    padding: 4px 12px;
+    gap: 8px;
+    background-color: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 4px;
+    color: #1565c0;
+    font-size: 14px;
+}
+
+.api-key-hint i {
+    color: #1976d2;
+}
+
+.api-key-hint a {
+    color: #0d47a1;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.api-key-hint a:hover {
+    color: #1565c0;
+}
+
 .tooltip {
     position: relative;
     display: inline-block;

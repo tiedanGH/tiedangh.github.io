@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="js/main.js"></script>
 </head>
 <body>
@@ -47,6 +48,10 @@
                                 </div>
                             </span>
                         </label>
+                        <div id="apiKeyHint" class="api-key-hint" style="display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            <span>没有API Key？<a href="https://glot.io/account/token" target="_blank">前往官网3分钟注册一个</a></span>
+                        </div>
                         <div class="password-container">
                             <input type="password" id="apiKey" placeholder="请输入您的 Glot API Key" required>
                             <button type="button" id="togglePassword" class="password-toggle">
