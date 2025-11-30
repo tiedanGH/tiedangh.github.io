@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <url>
+        <loc>https://tdgame.tiedan.site/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <url>
+        <loc>https://tdgame.tiedan.site/long_night/</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://tdgame.tiedan.site/code_runner/</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://tdgame.tiedan.site/rainbow_treasure_hunter/</loc>
+        <changefreq>never</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://tdgame.tiedan.site/treasure_raider_calculator/</loc>
+        <changefreq>never</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+</urlset>
