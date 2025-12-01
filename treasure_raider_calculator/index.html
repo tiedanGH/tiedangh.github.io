@@ -1,26 +1,31 @@
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>夺宝奇兵计算器</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="夺宝奇兵可视化概率计算器，支持自定义边长和宝藏数，轻松算出最佳选择！"/>
+    <meta property="og:image" content="https://tdgame.tiedan.site/assets/icons/games/treasure_raider_calculator.png">
 
-  <script src="js/main.js"></script>
+    <title>夺宝奇兵计算器</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/icons/games/treasure_raider_calculator.png"/>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/main.js"></script>
 </head>
 <body>
 <div class="container">
-  <h1>夺宝奇兵概率计算器</h1>
-  <h5>（仅输入关键信息可大幅提升计算速度）</h5>
-  <div class="controls">
-    <label>边长: <input id="sizeInput" type="number" min="1" max="15" value="9"></label>
-    <label>宝藏数: <input id="totalInput" type="number" min="0" value="20"></label>
-  </div>
-  <div class="action-row">
-    <button id="calcBtn">计算概率</button>
-  </div>
-  <div class="message-row"><div id="message"></div></div>
-  <div id="boardContainer"></div>
+    <h1>夺宝奇兵概率计算器</h1>
+    <h5>（仅输入关键信息可大幅提升计算速度）</h5>
+    <div class="controls">
+        <label>边长: <input id="sizeInput" type="number" min="1" max="15" value="9"></label>
+        <label>宝藏数: <input id="totalInput" type="number" min="0" value="20"></label>
+    </div>
+    <div class="action-row">
+        <button id="calcBtn">计算概率</button>
+    </div>
+    <div class="message-row"><div id="message"></div></div>
+    <div id="boardContainer"></div>
 </div>
 </body>
 </html>
