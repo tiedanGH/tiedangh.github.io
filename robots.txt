@@ -1,4 +1,4 @@
 User-agent: *
-Disallow: /.github/
+Allow: /
 
 Sitemap: https://tdgame.tiedan.site/sitemap.xml
