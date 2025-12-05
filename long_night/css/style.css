@@ -120,9 +120,10 @@ html, body {
 }
 /* 返回主页按钮 */
 .back-home {
-    position: absolute;
-    left: 10px;
+    position: fixed;
     top: 10px;
+    left: 10px;
+    z-index: 1000;
     padding: 6px 12px;
     background: #01b0f1;
     color: #fff;

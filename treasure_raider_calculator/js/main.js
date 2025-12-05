@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ========== grid ==========
 function buildGrid(board, msg, n) {
-    const gap = window.innerWidth > 600 ? 40 : 30;
+    const gap = window.innerWidth > 600 ? 40 : 35;
     msg.textContent = '';
     board.innerHTML = '';
     board.style.gridTemplateColumns = `repeat(${n + 2}, ${gap}px)`;
@@ -86,7 +86,7 @@ function buildGrid(board, msg, n) {
 }
 
 function applyBoard(board, n) {
-    const gap = window.innerWidth > 600 ? 40 : 30;
+    const gap = window.innerWidth > 600 ? 40 : 35;
     board.style.gridTemplateColumns = `repeat(${n + 2}, ${gap}px)`;
 }
 
