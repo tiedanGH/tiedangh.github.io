@@ -4,7 +4,12 @@ export class InfiniteMap {
         this.cells = new Map(); // 存储已渲染的单元格
         this.initDrag();
         // 浏览器窗口大小变化时重新渲染可视区域
-        window.addEventListener('resize', () => this.renderViewport());
+        window.addEventListener('resize', () => {
+            const size = window.innerWidth > 600 ? 40 : 30;
+            const wall = window.innerWidth > 600 ? 11 : 9;
+            this.updateCellPositions(size, wall);
+            this.renderViewport();
+        });
         this.renderViewport();
     }
 
@@ -64,8 +69,8 @@ export class InfiniteMap {
     }
 
     renderViewport() {
-        const size = 40;
-        const wall = 10;
+        const size = window.innerWidth > 600 ? 40 : 30;
+        const wall = window.innerWidth > 600 ? 11 : 9;
         const base = size + wall;
 
         // 计算需要渲染的行列数
@@ -118,5 +123,18 @@ export class InfiniteMap {
 
         this.container.appendChild(cell);
         this.cells.set(key, cell);
+    }
+
+    updateCellPositions(size, wall) {
+        const base = size + wall;
+
+        this.cells.forEach((cell, key) => {
+            const [i, j] = key.split(',').map(Number);
+            const x = Math.floor(i / 2) * base + (i % 2) * size;
+            const y = Math.floor(j / 2) * base + (j % 2) * size;
+
+            cell.style.left = x + 'px';
+            cell.style.top = y + 'px';
+        });
     }
 }

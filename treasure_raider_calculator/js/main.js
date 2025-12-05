@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始构建网格
     buildGrid(board, msg, parseInt(sizeInput.value, 10));
 
+    // 适配窗口大小
+    window.addEventListener('resize', () => {
+        applyBoard(board, parseInt(sizeInput.value, 10));
+    });
+
     // 事件监听
     sizeInput.addEventListener('change', () => {
         buildGrid(board, msg, parseInt(sizeInput.value, 10));
@@ -27,9 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ========== grid ==========
 function buildGrid(board, msg, n) {
+    const gap = window.innerWidth > 600 ? 40 : 30;
     msg.textContent = '';
     board.innerHTML = '';
-    board.style.gridTemplateColumns = `repeat(${n + 2}, 40px)`;
+    board.style.gridTemplateColumns = `repeat(${n + 2}, ${gap}px)`;
 
     for (let row = 0; row < n + 2; row++) {
         for (let col = 0; col < n + 2; col++) {
@@ -77,6 +83,11 @@ function buildGrid(board, msg, n) {
             board.appendChild(inp);
         }
     }
+}
+
+function applyBoard(board, n) {
+    const gap = window.innerWidth > 600 ? 40 : 30;
+    board.style.gridTemplateColumns = `repeat(${n + 2}, ${gap}px)`;
 }
 
 // ========== calculator ==========

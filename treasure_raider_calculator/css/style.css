@@ -5,6 +5,7 @@ body {
     padding: 5px;
 }
 .container {
+    position: relative;
     max-width: 600px;
     margin: auto;
     background: #fff;
@@ -38,7 +39,7 @@ h5 {
     align-items: center;
     font-weight: bold;
 }
-button {
+.button {
     padding: 8px 16px;
     background: #007bff;
     color: #fff;
@@ -49,6 +50,18 @@ button {
     font-size: 14px;
 }
 button:hover { background: #0056b3; }
+/* 返回主页按钮 */
+.back-home {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    padding: 6px 12px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.back-home:hover {
+    background: #0056b3;
+}
 
 .action-row {
     text-align: center;
@@ -98,4 +111,16 @@ button:hover { background: #0056b3; }
 /* 最高概率高亮 */
 #boardContainer input.highlight {
     box-shadow: inset 0 0 0 2px #ffc107;
+}
+/* 响应式处理：适配小屏设备 */
+@media (max-width: 600px) {
+    #boardContainer {
+        grid-auto-rows: 30px;
+        grid-auto-columns: 30px;
+    }
+    #boardContainer input {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
 }

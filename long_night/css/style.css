@@ -118,6 +118,25 @@ html, body {
 #mode-change-alert span {
     font-size: 22px;
 }
+/* 返回主页按钮 */
+.back-home {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    padding: 6px 12px;
+    background: #01b0f1;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background 0.2s;
+}
+.back-home:hover {
+    background: #1f8bff;
+}
+/* 关闭帮助按钮 */
 .btn-help {
     margin-top: 18px;
     padding: 10px 24px;
@@ -151,6 +170,22 @@ html, body {
         font-size: 15px;
         padding: 10px 20px;
         width: 100%;
+    }
+    .cell.square {
+        width: 30px;
+        height: 30px;
+    }
+    .cell.wall.vertical {
+        width: 9px;
+        height: 30px;
+    }
+    .cell.wall.horizontal {
+        width: 30px;
+        height: 9px;
+    }
+    .cell.center {
+        width: 9px;
+        height: 9px;
     }
 }
 
