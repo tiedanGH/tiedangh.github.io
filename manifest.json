@@ -1,6 +1,7 @@
 {
   "name": "铁蛋的游戏网站",
   "short_name": "铁蛋游戏",
+  "description": "一个提供单机游戏与辅助工具支持的静态网页平台",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
