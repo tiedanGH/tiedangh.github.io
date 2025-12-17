@@ -5506,7 +5506,7 @@
         "wall": false
       },
       "ground": {
-        "type": "箱子"
+        "type": "空地"
       },
       "left": {
         "type": "普通",
@@ -5556,7 +5556,7 @@
         "wall": false
       },
       "ground": {
-        "type": "空地"
+        "type": "热源"
       },
       "left": {
         "type": "普通",
@@ -5581,7 +5581,7 @@
         "wall": false
       },
       "ground": {
-        "type": "空地"
+        "type": "热源"
       },
       "left": {
         "type": "普通",
@@ -5733,7 +5733,7 @@
         "wall": false
       },
       "ground": {
-        "type": "空地"
+        "type": "箱子"
       },
       "left": {
         "type": "普通",
@@ -5783,7 +5783,7 @@
         "wall": false
       },
       "ground": {
-        "type": "箱子"
+        "type": "空地"
       },
       "left": {
         "type": "普通",
@@ -5808,7 +5808,7 @@
         "wall": false
       },
       "ground": {
-        "type": "箱子"
+        "type": "空地"
       },
       "left": {
         "type": "普通",
@@ -5960,7 +5960,7 @@
         "wall": false
       },
       "ground": {
-        "type": "陷阱"
+        "type": "空地"
       },
       "left": {
         "type": "普通",
@@ -6010,7 +6010,7 @@
         "wall": false
       },
       "ground": {
-        "type": "空地"
+        "type": "箱子"
       },
       "left": {
         "type": "普通",
@@ -6035,7 +6035,7 @@
         "wall": false
       },
       "ground": {
-        "type": "空地"
+        "type": "箱子"
       },
       "left": {
         "type": "普通",
@@ -6057,10 +6057,10 @@
     {
       "bottom": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "left": {
         "type": "普通",
@@ -6072,24 +6072,24 @@
       },
       "right": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "top": {
         "type": "普通",
-        "wall": true
+        "wall": false
       }
     },
     {
       "bottom": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "left": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "pos": {
         "x": 2.0,
@@ -6101,7 +6101,7 @@
       },
       "top": {
         "type": "普通",
-        "wall": true
+        "wall": false
       }
     },
     {
@@ -6126,13 +6126,13 @@
       },
       "top": {
         "type": "普通",
-        "wall": true
+        "wall": false
       }
     },
     {
       "bottom": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "ground": {
         "type": "空地"
@@ -6184,7 +6184,7 @@
     {
       "bottom": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "ground": {
         "type": "水洼"
@@ -6203,7 +6203,7 @@
       },
       "top": {
         "type": "普通",
-        "wall": false
+        "wall": true
       }
     },
     {
@@ -6284,7 +6284,7 @@
     {
       "bottom": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "ground": {
         "type": "空地"
@@ -6378,7 +6378,7 @@
       },
       "top": {
         "type": "普通",
-        "wall": false
+        "wall": true
       }
     }
   ],
@@ -6476,11 +6476,11 @@
       },
       "right": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "top": {
         "type": "普通",
-        "wall": false
+        "wall": true
       }
     },
     {
@@ -6493,7 +6493,7 @@
       },
       "left": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "pos": {
         "x": 1.0,
@@ -6501,7 +6501,7 @@
       },
       "right": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "top": {
         "type": "普通",
@@ -6511,14 +6511,14 @@
     {
       "bottom": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "ground": {
         "type": "空地"
       },
       "left": {
         "type": "普通",
-        "wall": false
+        "wall": true
       },
       "pos": {
         "x": 2.0,
@@ -6838,6 +6838,233 @@
   ],
   "34": [
     {
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "ground": {
+        "type": "陷阱"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
+  "35": [
+    {
       "pos": {
         "x": 0.0,
         "y": 0.0
@@ -7063,363 +7290,11 @@
       }
     }
   ],
-  "S1": [
+  "36": [
     {
       "pos": {
         "x": 0.0,
         "y": 0.0
-      },
-      "ground": {
-        "type": "水洼"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": true
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 1.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "陷阱"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": true
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": true
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 0.0,
-        "y": 1.0
-      },
-      "ground": {
-        "type": "树丛"
-      },
-      "top": {
-        "type": "普通",
-        "wall": true
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 1.0,
-        "y": 1.0
-      },
-      "ground": {
-        "type": "热源"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 1.0
-      },
-      "ground": {
-        "type": "树丛"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": true
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 0.0,
-        "y": 2.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": true
-      }
-    },
-    {
-      "pos": {
-        "x": 1.0,
-        "y": 2.0
-      },
-      "ground": {
-        "type": "陷阱"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": true
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 2.0
-      },
-      "ground": {
-        "type": "水洼"
-      },
-      "top": {
-        "type": "普通",
-        "wall": true
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    }
-  ],
-  "S2": [
-    {
-      "pos": {
-        "x": 0.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 1.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "空地"
-      },
-      "top": {
-        "type": "普通",
-        "wall": true
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 0.0,
-        "y": 1.0
-      },
-      "ground": {
-        "type": "空地"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": true
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 1.0,
-        "y": 1.0
-      },
-      "ground": {
-        "type": "水洼"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 1.0
       },
       "ground": {
         "type": "空地"
@@ -7438,6 +7313,131 @@
       },
       "right": {
         "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "门",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "门",
+        "wall": true
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "门",
+        "wall": true
+      },
+      "right": {
+        "type": "门",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "门",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
         "wall": true
       }
     },
@@ -7447,7 +7447,7 @@
         "y": 2.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7472,11 +7472,11 @@
         "y": 2.0
       },
       "ground": {
-        "type": "空地"
+        "type": "按钮"
       },
       "top": {
-        "type": "普通",
-        "wall": false
+        "type": "门",
+        "wall": true
       },
       "bottom": {
         "type": "普通",
@@ -7497,7 +7497,7 @@
         "y": 2.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7517,14 +7517,14 @@
       }
     }
   ],
-  "S3": [
+  "37": [
     {
       "pos": {
         "x": 0.0,
         "y": 0.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7537,31 +7537,6 @@
       "left": {
         "type": "普通",
         "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": true
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": true
       },
       "right": {
         "type": "普通",
@@ -7571,10 +7546,35 @@
     {
       "pos": {
         "x": 1.0,
-        "y": 1.0
+        "y": 0.0
       },
       "ground": {
-        "type": "陷阱"
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "按钮"
       },
       "top": {
         "type": "普通",
@@ -7596,10 +7596,60 @@
     {
       "pos": {
         "x": 0.0,
-        "y": 2.0
+        "y": 1.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "门",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "门",
+        "wall": true
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "门",
+        "wall": true
+      },
+      "right": {
+        "type": "门",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7610,12 +7660,62 @@
         "wall": true
       },
       "left": {
+        "type": "门",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
         "type": "普通",
         "wall": false
       },
       "right": {
         "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "门",
         "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
       }
     },
     {
@@ -7624,7 +7724,7 @@
         "y": 2.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7644,93 +7744,18 @@
       }
     }
   ],
-  "S4": [
+  "38": [
     {
       "pos": {
         "x": 0.0,
         "y": 0.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
         "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": true
-      },
-      "left": {
-        "type": "普通",
-        "wall": false
-      },
-      "right": {
-        "type": "普通",
-        "wall": true
-      }
-    },
-    {
-      "pos": {
-        "x": 1.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": false
-      },
-      "left": {
-        "type": "普通",
-        "wall": true
-      },
-      "right": {
-        "type": "普通",
-        "wall": true
-      }
-    },
-    {
-      "pos": {
-        "x": 2.0,
-        "y": 0.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": false
-      },
-      "bottom": {
-        "type": "普通",
-        "wall": true
-      },
-      "left": {
-        "type": "普通",
-        "wall": true
-      },
-      "right": {
-        "type": "普通",
-        "wall": false
-      }
-    },
-    {
-      "pos": {
-        "x": 0.0,
-        "y": 1.0
-      },
-      "ground": {
-        "type": "传送门"
-      },
-      "top": {
-        "type": "普通",
-        "wall": true
       },
       "bottom": {
         "type": "普通",
@@ -7748,18 +7773,18 @@
     {
       "pos": {
         "x": 1.0,
-        "y": 1.0
+        "y": 0.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
         "wall": false
       },
       "bottom": {
-        "type": "普通",
-        "wall": false
+        "type": "门",
+        "wall": true
       },
       "left": {
         "type": "普通",
@@ -7773,18 +7798,18 @@
     {
       "pos": {
         "x": 2.0,
-        "y": 1.0
+        "y": 0.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "按钮"
       },
       "top": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "bottom": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "left": {
         "type": "普通",
@@ -7798,10 +7823,10 @@
     {
       "pos": {
         "x": 0.0,
-        "y": 2.0
+        "y": 1.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7816,8 +7841,83 @@
         "wall": false
       },
       "right": {
+        "type": "门（开）",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "门",
+        "wall": true
+      },
+      "bottom": {
+        "type": "门",
+        "wall": true
+      },
+      "left": {
+        "type": "门（开）",
+        "wall": true
+      },
+      "right": {
+        "type": "门（开）",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
         "type": "普通",
         "wall": true
+      },
+      "left": {
+        "type": "门（开）",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
       }
     },
     {
@@ -7826,11 +7926,11 @@
         "y": 2.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
-        "type": "普通",
-        "wall": false
+        "type": "门",
+        "wall": true
       },
       "bottom": {
         "type": "普通",
@@ -7838,11 +7938,11 @@
       },
       "left": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "right": {
         "type": "普通",
-        "wall": true
+        "wall": false
       }
     },
     {
@@ -7851,7 +7951,7 @@
         "y": 2.0
       },
       "ground": {
-        "type": "传送门"
+        "type": "空地"
       },
       "top": {
         "type": "普通",
@@ -7863,7 +7963,7 @@
       },
       "left": {
         "type": "普通",
-        "wall": true
+        "wall": false
       },
       "right": {
         "type": "普通",
@@ -10136,6 +10236,1495 @@
         "wall": false
       },
       "top": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
+  "E11": [
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 2,
+        "y": 0
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "逃生舱"
+      },
+      "pos": {
+        "x": 1,
+        "y": 1
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "pos": {
+        "x": 2,
+        "y": 1
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "门"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 0,
+        "y": 2
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "门"
+      },
+      "right": {
+        "wall": true,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 1,
+        "y": 2
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 2,
+        "y": 2
+      }
+    }
+  ],
+  "E12": [
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "门"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "门"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 2,
+        "y": 0
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "按钮"
+      },
+      "pos": {
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "普通"
+      },
+      "right": {
+        "wall": true,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "逃生舱"
+      },
+      "pos": {
+        "x": 1,
+        "y": 1
+      }
+    },
+    {
+      "top": {
+        "wall": false,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": true,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 2,
+        "y": 1
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 0,
+        "y": 2
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": true,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 1,
+        "y": 2
+      }
+    },
+    {
+      "top": {
+        "wall": true,
+        "type": "普通"
+      },
+      "bottom": {
+        "wall": false,
+        "type": "普通"
+      },
+      "left": {
+        "wall": false,
+        "type": "普通"
+      },
+      "right": {
+        "wall": false,
+        "type": "普通"
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "pos": {
+        "x": 2,
+        "y": 2
+      }
+    }
+  ],
+  "S1": [
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "水洼"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "陷阱"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "树丛"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "热源"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "树丛"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "陷阱"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "水洼"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
+  "S2": [
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "水洼"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
+  "S3": [
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "陷阱"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
+  "S4": [
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": true
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": true
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "传送门"
+      },
+      "top": {
+        "type": "普通",
+        "wall": true
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": true
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    }
+  ],
+  "SS": [
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 0.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 0.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
+        "type": "普通",
+        "wall": false
+      }
+    },
+    {
+      "pos": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "ground": {
+        "type": "空地"
+      },
+      "top": {
+        "type": "普通",
+        "wall": false
+      },
+      "bottom": {
+        "type": "普通",
+        "wall": false
+      },
+      "left": {
+        "type": "普通",
+        "wall": false
+      },
+      "right": {
         "type": "普通",
         "wall": false
       }
