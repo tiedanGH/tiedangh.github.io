@@ -184,9 +184,10 @@ function movePlayer(direction) {
     addMarker(targetSquare, '🧍', 'black');
     playerCell = targetSquare;
 
-    // 仅替换未知类型
+    // 仅替换未知区域
     const currentBg = targetSquare.style.backgroundImage;
-    if (!currentBg || currentBg.includes('unknown.png')) {
+    const isUnknown = !currentBg || currentBg.includes('unknown.png');
+    if (isUnknown) {
         targetSquare.style.backgroundImage = `url('./img/empty.png')`;
     }
 
@@ -338,9 +339,12 @@ export function addMarker(cell, marker, color = 'black') {
 
     ctr.appendChild(span);
 
-    // 当放置玩家标记时，自动将该格子设置为空地
     if (marker === '🧍') {
-        cell.style.backgroundImage = `url('./img/empty.png')`;
+        const currentBg = cell.style.backgroundImage;
+        const isUnknown = !currentBg || currentBg.includes('unknown.png');
+        if (isUnknown) {
+            cell.style.backgroundImage = `url('./img/empty.png')`;
+        }
     }
 }
 
