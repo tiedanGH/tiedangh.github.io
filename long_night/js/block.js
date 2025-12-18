@@ -1,8 +1,20 @@
 
 let blocksData = {};
-async function loadBlocks() {
-    const res = await fetch('blocks.json');
-    blocksData = await res.json();
+
+function loadBlocks() {
+    fetch('blocks.json')
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            blocksData = data;
+            console.log('Blocks loaded:', blocksData);
+        })
+        .catch(err => {
+            console.error('Failed to load blocks:', err);
+            blocksData = {};
+        });
 }
 
 function getWallColor(type) {
