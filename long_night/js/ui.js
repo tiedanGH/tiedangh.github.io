@@ -18,6 +18,10 @@ export const wallOptions = [
     ['未知', '#D9D9D9'],
 ];
 const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
+const MARKER_TYPE = {
+    '🧍': 'player',
+    '★':  'star',
+};
 
 export function uiCellEvents(map) {
     map.container.addEventListener('contextmenu', e => e.preventDefault());
@@ -194,10 +198,21 @@ function getMarkerContainer(cell) {
 }
 
 export function addMarker(cell, marker, color = 'black') {
+    const type = MARKER_TYPE[marker];
+    if (type) {
+        document.querySelectorAll('.marker').forEach(m => {
+            if (m.dataset.markerType === type) {
+                m.remove();
+            }
+        });
+    }
     const ctr = getMarkerContainer(cell);
     const span = document.createElement('span');
     span.className   = 'marker';
     span.textContent = marker;
+    if (type) {
+        span.dataset.markerType = type;
+    }
     Object.assign(span.style, {
         color:     color,
         fontSize:  '14px',
