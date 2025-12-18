@@ -41,6 +41,7 @@ html, body {
     height: 11px;
 }
 .cell.center {
+    cursor: pointer;
     width: 11px;
     height: 11px;
     background-color: #000;
@@ -137,6 +138,29 @@ html, body {
 .back-home:hover {
     background: #1f8bff;
 }
+
+/* 帮助按钮 */
+.help-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    background: #01b0f1;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background 0.2s;
+}
+.help-button:hover {
+    background: #1f8bff;
+}
+
 /* 关闭帮助按钮 */
 .btn-help {
     margin-top: 18px;
@@ -157,6 +181,7 @@ html, body {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
+
 /* 响应式处理：适配小屏设备 */
 @media (max-width: 600px) {
     #mode-change-alert {
@@ -188,5 +213,11 @@ html, body {
         width: 9px;
         height: 9px;
     }
+    .help-button {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+        top: 8px;
+        right: 8px;
+    }
 }
-

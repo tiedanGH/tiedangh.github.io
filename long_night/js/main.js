@@ -14,4 +14,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     closeAlertBtn.addEventListener('click', ()=>{
         document.getElementById('mode-change-alert').style.display='none';
     });
+
+    const helpButton = document.getElementById('help-button');
+    helpButton.addEventListener('click', ()=>{
+        document.getElementById('mode-change-alert').style.display='block';
+    });
 });
