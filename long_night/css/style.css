@@ -184,6 +184,51 @@ html, body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* 方向控制按钮 - 仅移动端 */
+.direction-controls {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: none; /* 默认隐藏 */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    pointer-events: none; /* 容器不拦截事件 */
+}
+.direction-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+.direction-btn {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    background-color: rgba(1, 176, 241, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    touch-action: manipulation;
+    user-select: none;
+    pointer-events: auto; /* 按钮本身可点击 */
+}
+.direction-btn:active {
+    background-color: rgba(31, 139, 255, 0.9);
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 /* 响应式处理：适配小屏设备 */
 @media (max-width: 600px) {
     #mode-change-alert {
@@ -221,5 +266,10 @@ html, body {
         font-size: 20px;
         top: 8px;
         right: 8px;
+    }
+
+    /* 按钮仅在移动端显示 */
+    .direction-controls {
+        display: flex;
     }
 }

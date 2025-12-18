@@ -97,73 +97,102 @@ export function uiCellEvents(map) {
         }
     });
 
-    // 添加键盘事件监听
     initKeyboardControls();
+    initMobileDirectionControls();
 }
 
 function initKeyboardControls() {
     document.addEventListener('keydown', (e) => {
-        // 只处理方向键
         if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
 
-        if (!playerCell) return; // 没有玩家标记
+        if (!playerCell) return;
 
-        e.preventDefault(); // 防止页面滚动
+        e.preventDefault();
 
-        const i = parseInt(playerCell.dataset.i, 10);
-        const j = parseInt(playerCell.dataset.j, 10);
-
-        let targetI = i;
-        let targetJ = j;
-        let wallI = i;
-        let wallJ = j;
-
-        // 根据方向键确定移动方向
+        let direction;
         switch(e.key) {
-            case 'ArrowUp':
-                targetJ -= 2;
-                wallJ = j - 1;
-                break;
-            case 'ArrowDown':
-                targetJ += 2;
-                wallJ = j + 1;
-                break;
-            case 'ArrowLeft':
-                targetI -= 2;
-                wallI = i - 1;
-                break;
-            case 'ArrowRight':
-                targetI += 2;
-                wallI = i + 1;
-                break;
+            case 'ArrowUp': direction = 'up'; break;
+            case 'ArrowDown': direction = 'down'; break;
+            case 'ArrowLeft': direction = 'left'; break;
+            case 'ArrowRight': direction = 'right'; break;
         }
 
-        const size = window.innerWidth > 600 ? 40 : 30;
-        const wall = window.innerWidth > 600 ? 11 : 9;
-
-        currentMap.ensureCell(targetI, targetJ, size, wall);
-        currentMap.ensureCell(wallI, wallJ, size, wall);
-
-        const targetSquare = currentMap.cells.get(`${targetI},${targetJ}`);
-        const wallCell = currentMap.cells.get(`${wallI},${wallJ}`);
-
-        if (!targetSquare || !wallCell) return;
-
-        // 移动玩家标记
-        clearMarkers(playerCell);
-        addMarker(targetSquare, '🧍', 'black');
-        playerCell = targetSquare;
-
-        // 仅替换未知类型
-        const currentBg = targetSquare.style.backgroundImage;
-        if (!currentBg || currentBg.includes('unknown.png')) {
-            targetSquare.style.backgroundImage = `url('./img/empty.png')`;
-        }
-
-        if (wallCell.dataset.type === 'wall') {
-            wallCell.style.backgroundColor = '#FFFFFF';
-        }
+        movePlayer(direction);
     });
+}
+
+function initMobileDirectionControls() {
+    const directionBtns = document.querySelectorAll('.direction-btn');
+
+    directionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const direction = btn.dataset.direction;
+            movePlayer(direction);
+        });
+
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const direction = btn.dataset.direction;
+            movePlayer(direction);
+        }, { passive: false });
+    });
+}
+
+function movePlayer(direction) {
+    if (!playerCell) return;
+
+    const i = parseInt(playerCell.dataset.i, 10);
+    const j = parseInt(playerCell.dataset.j, 10);
+
+    let targetI = i;
+    let targetJ = j;
+    let wallI = i;
+    let wallJ = j;
+
+    switch(direction) {
+        case 'up':
+            targetJ -= 2;
+            wallJ = j - 1;
+            break;
+        case 'down':
+            targetJ += 2;
+            wallJ = j + 1;
+            break;
+        case 'left':
+            targetI -= 2;
+            wallI = i - 1;
+            break;
+        case 'right':
+            targetI += 2;
+            wallI = i + 1;
+            break;
+    }
+
+    const size = window.innerWidth > 600 ? 40 : 30;
+    const wall = window.innerWidth > 600 ? 11 : 9;
+
+    currentMap.ensureCell(targetI, targetJ, size, wall);
+    currentMap.ensureCell(wallI, wallJ, size, wall);
+
+    const targetSquare = currentMap.cells.get(`${targetI},${targetJ}`);
+    const wallCell = currentMap.cells.get(`${wallI},${wallJ}`);
+
+    if (!targetSquare || !wallCell) return;
+
+    // 移动玩家标记
+    clearMarkers(playerCell);
+    addMarker(targetSquare, '🧍', 'black');
+    playerCell = targetSquare;
+
+    // 仅替换未知类型
+    const currentBg = targetSquare.style.backgroundImage;
+    if (!currentBg || currentBg.includes('unknown.png')) {
+        targetSquare.style.backgroundImage = `url('./img/empty.png')`;
+    }
+
+    if (wallCell.dataset.type === 'wall') {
+        wallCell.style.backgroundColor = '#FFFFFF';
+    }
 }
 
 function showSelector(e, options, callback) {
@@ -308,6 +337,11 @@ export function addMarker(cell, marker, color = 'black') {
     });
 
     ctr.appendChild(span);
+
+    // 当放置玩家标记时，自动将该格子设置为空地
+    if (marker === '🧍') {
+        cell.style.backgroundImage = `url('./img/empty.png')`;
+    }
 }
 
 function clearMarkers(cell) {

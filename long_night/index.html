@@ -24,6 +24,7 @@
     <h2>草稿本使用帮助</h2>
     <p>🖱️ <b>左键点击</b>格子或墙壁以设置类型</p>
     <p>🖱️ <b>右键或双击</b>格子来标记玩家位置</p>
+    <p>🔼🔽◀️▶️ <b>移动</b>人物自动更新地图</p>
     <p>⌨️ <b>Shift + 右键</b>快速清除格子所有标记</p>
     <p><span>▪️</span> <b>左键点击</b>格子角落的黑点，可选择区块进行放置</p>
     <p>✋ <b>拖动</b>来拓展地图，<b>刷新</b>将重置草稿本</p>
@@ -34,6 +35,17 @@
 <button id="help-button" class="help-button">?</button>
 
 <div id="map-container"></div>
+
+<div id="direction-controls" class="direction-controls">
+    <div class="direction-row">
+        <button class="direction-btn up-btn" data-direction="up">↑</button>
+    </div>
+    <div class="direction-row">
+        <button class="direction-btn left-btn" data-direction="left">←</button>
+        <button class="direction-btn down-btn" data-direction="down">↓</button>
+        <button class="direction-btn right-btn" data-direction="right">→</button>
+    </div>
+</div>
 
 </body>
 </html>
