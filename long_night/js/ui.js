@@ -23,7 +23,13 @@ const MARKER_TYPE = {
     '★':  'star',
 };
 
+// 键盘控制相关
+let currentMap = null;
+let playerCell = null;
+
 export function uiCellEvents(map) {
+    currentMap = map; // 保存地图引用
+
     map.container.addEventListener('contextmenu', e => e.preventDefault());
 
     // 移动端双击支持
@@ -40,6 +46,11 @@ export function uiCellEvents(map) {
                 if (choice === '__CLEAR__') clearMarkers(cell);
                 else addMarker(cell, choice, color);
                 removeSelector();
+
+                // 更新玩家位置
+                if (choice === '🧍') {
+                    playerCell = cell;
+                }
             });
         }
         lastClickTime = now;
@@ -59,6 +70,11 @@ export function uiCellEvents(map) {
             if (choice === '__CLEAR__') clearMarkers(cell);
             else addMarker(cell, choice, color);
             removeSelector();
+
+            // 更新玩家位置
+            if (choice === '🧍') {
+                playerCell = cell;
+            }
         });
     });
 
@@ -78,6 +94,74 @@ export function uiCellEvents(map) {
             showSelector(e, wallOptions, c => {
                 cell.style.backgroundColor = c;
             });
+        }
+    });
+
+    // 添加键盘事件监听
+    initKeyboardControls();
+}
+
+function initKeyboardControls() {
+    document.addEventListener('keydown', (e) => {
+        // 只处理方向键
+        if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+
+        if (!playerCell) return; // 没有玩家标记
+
+        e.preventDefault(); // 防止页面滚动
+
+        const i = parseInt(playerCell.dataset.i, 10);
+        const j = parseInt(playerCell.dataset.j, 10);
+
+        let targetI = i;
+        let targetJ = j;
+        let wallI = i;
+        let wallJ = j;
+
+        // 根据方向键确定移动方向
+        switch(e.key) {
+            case 'ArrowUp':
+                targetJ -= 2;
+                wallJ = j - 1;
+                break;
+            case 'ArrowDown':
+                targetJ += 2;
+                wallJ = j + 1;
+                break;
+            case 'ArrowLeft':
+                targetI -= 2;
+                wallI = i - 1;
+                break;
+            case 'ArrowRight':
+                targetI += 2;
+                wallI = i + 1;
+                break;
+        }
+
+        const size = window.innerWidth > 600 ? 40 : 30;
+        const wall = window.innerWidth > 600 ? 11 : 9;
+
+        currentMap.ensureCell(targetI, targetJ, size, wall);
+        currentMap.ensureCell(wallI, wallJ, size, wall);
+
+        const targetSquare = currentMap.cells.get(`${targetI},${targetJ}`);
+        const wallCell = currentMap.cells.get(`${wallI},${wallJ}`);
+
+        if (!targetSquare || !wallCell) return;
+
+        // 移动玩家标记
+        clearMarkers(playerCell);
+        addMarker(targetSquare, '🧍', 'black');
+        playerCell = targetSquare;
+
+        // 仅替换未知类型
+        const currentBg = targetSquare.style.backgroundImage;
+        if (!currentBg || currentBg.includes('unknown.png')) {
+            targetSquare.style.backgroundImage = `url('./img/empty.png')`;
+        }
+
+        if (wallCell.dataset.type === 'wall') {
+            wallCell.style.backgroundColor = '#FFFFFF';
         }
     });
 }
@@ -199,6 +283,7 @@ function getMarkerContainer(cell) {
 
 export function addMarker(cell, marker, color = 'black') {
     const type = MARKER_TYPE[marker];
+
     if (type) {
         document.querySelectorAll('.marker').forEach(m => {
             if (m.dataset.markerType === type) {
@@ -206,18 +291,22 @@ export function addMarker(cell, marker, color = 'black') {
             }
         });
     }
+
     const ctr = getMarkerContainer(cell);
     const span = document.createElement('span');
-    span.className   = 'marker';
+    span.className = 'marker';
     span.textContent = marker;
+
     if (type) {
         span.dataset.markerType = type;
     }
+
     Object.assign(span.style, {
-        color:     color,
-        fontSize:  '14px',
-        lineHeight:'1',
+        color,
+        fontSize: '14px',
+        lineHeight: '1',
     });
+
     ctr.appendChild(span);
 }
 
