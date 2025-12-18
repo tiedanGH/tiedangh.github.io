@@ -4,16 +4,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('map-container');
     const gameMap = new InfiniteMap(container);
 
-    uiCellEvents(gameMap);
-    blockCellEvent(gameMap)
+    window.playerCell = null;
 
+    // 历史管理器
+    window.historyManager = new HistoryManager(gameMap);
+
+    uiCellEvents(gameMap);
+    blockCellEvent(gameMap);
+
+    // 帮助弹窗
     const closeAlertBtn = document.getElementById('close-alert');
-    closeAlertBtn.addEventListener('click', ()=>{
-        document.getElementById('mode-change-alert').style.display='none';
+    closeAlertBtn.addEventListener('click', () => {
+        document.getElementById('mode-change-alert').style.display = 'none';
     });
 
     const helpButton = document.getElementById('help-button');
-    helpButton.addEventListener('click', ()=>{
-        document.getElementById('mode-change-alert').style.display='block';
+    helpButton.addEventListener('click', () => {
+        document.getElementById('mode-change-alert').style.display = 'block';
     });
 });

@@ -1,0 +1,205 @@
+
+class HistoryManager {
+    constructor(map) {
+        this.map = map;
+        this.history = [];
+        this.currentIndex = -1;
+        this.maxHistory = 50; // 最大历史记录数
+        this.undoButton = document.getElementById('undo-button');
+
+        this.init();
+    }
+
+    init() {
+        this.saveState();
+
+        if (this.undoButton) {
+            this.undoButton.addEventListener('click', () => this.undo());
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                this.undo();
+            }
+        });
+    }
+
+    // 获取当前地图状态快照
+    getStateSnapshot() {
+        const snapshot = {
+            cells: new Map(),
+            playerPosition: null,
+            timestamp: Date.now()
+        };
+
+        // 查找并保存玩家位置
+        let playerCellElement = null;
+        this.map.cells.forEach((cell, key) => {
+            const markers = cell.querySelectorAll('.marker');
+            markers.forEach(marker => {
+                if (marker.textContent === '🧍' || marker.dataset.markerType === 'player') {
+                    playerCellElement = cell;
+                }
+            });
+        });
+        if (playerCellElement) {
+            snapshot.playerPosition = {
+                i: parseInt(playerCellElement.dataset.i, 10),
+                j: parseInt(playerCellElement.dataset.j, 10)
+            };
+        }
+
+        // 只保存可见区域的格子状态（优化性能）
+        this.map.cells.forEach((cell, key) => {
+            const cellCopy = {
+                element: cell.cloneNode(true),
+                i: cell.dataset.i,
+                j: cell.dataset.j,
+                type: cell.dataset.type,
+                style: {
+                    backgroundImage: cell.style.backgroundImage,
+                    backgroundColor: cell.style.backgroundColor,
+                    border: cell.style.border
+                },
+                markers: []
+            };
+
+            // 保存标记
+            const markerContainer = cell.querySelector('.marker-container');
+            if (markerContainer) {
+                markerContainer.querySelectorAll('.marker').forEach(marker => {
+                    cellCopy.markers.push({
+                        text: marker.textContent,
+                        color: marker.style.color,
+                        type: marker.dataset.markerType
+                    });
+                });
+            }
+
+            snapshot.cells.set(key, cellCopy);
+        });
+
+        return snapshot;
+    }
+
+    // 保存当前状态到历史记录
+    saveState() {
+        // 清除当前索引之后的历史
+        this.history = this.history.slice(0, this.currentIndex + 1);
+
+        // 限制历史记录数量
+        if (this.history.length >= this.maxHistory) {
+            this.history.shift();
+            this.currentIndex--;
+        }
+
+        const snapshot = this.getStateSnapshot();
+        this.history.push(snapshot);
+        this.currentIndex++;
+
+        this.updateUndoButton();
+        console.log(`Saving history, currently ${this.history.length}, index ${this.currentIndex}`);
+    }
+
+    // 恢复到指定状态
+    restoreState(snapshot) {
+        // 清除当前所有标记
+        document.querySelectorAll('.marker').forEach(marker => marker.remove());
+
+        // 恢复玩家位置全局变量
+        if (snapshot.playerPosition) {
+            const playerKey = `${snapshot.playerPosition.i},${snapshot.playerPosition.j}`;
+            const playerCell = this.map.cells.get(playerKey);
+            if (playerCell) {
+                window.playerCell = playerCell;
+            } else {
+                window.playerCell = null;
+            }
+        } else {
+            window.playerCell = null;
+        }
+
+        // 恢复每个单元格的状态
+        snapshot.cells.forEach((cellData, key) => {
+            const existingCell = this.map.cells.get(key);
+            if (existingCell) {
+                // 恢复样式
+                existingCell.style.backgroundImage = cellData.style.backgroundImage;
+                existingCell.style.backgroundColor = cellData.style.backgroundColor;
+                existingCell.style.border = cellData.style.border;
+
+                // 恢复标记
+                if (cellData.markers && cellData.markers.length > 0) {
+                    let container = existingCell.querySelector('.marker-container');
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.className = 'marker-container';
+                        Object.assign(container.style, {
+                            position: 'absolute',
+                            top: '0',
+                            left: '0',
+                            right: '0',
+                            bottom: '0',
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: '2px',
+                            pointerEvents: 'none',
+                        });
+                        existingCell.appendChild(container);
+                    }
+
+                    cellData.markers.forEach(markerData => {
+                        const span = document.createElement('span');
+                        span.className = 'marker';
+                        span.textContent = markerData.text;
+                        span.style.color = markerData.color;
+                        span.style.fontSize = '14px';
+                        span.style.lineHeight = '1';
+                        if (markerData.type) {
+                            span.dataset.markerType = markerData.type;
+                        }
+                        container.appendChild(span);
+
+                        // 如果是玩家标记，更新全局引用
+                        if (markerData.type === 'player') {
+                            window.playerCell = existingCell;
+                        }
+                    });
+                }
+            }
+        });
+
+        this.updateUndoButton();
+    }
+
+    // 撤销操作
+    undo() {
+        if (this.currentIndex <= 0) {
+            console.warn('Cannot undo: No more history available.');
+            return;
+        }
+
+        this.currentIndex--;
+        const previousState = this.history[this.currentIndex];
+        console.log(`Undo to history ${this.currentIndex}`);
+        this.restoreState(previousState);
+    }
+
+    // 更新撤销按钮状态
+    updateUndoButton() {
+        if (this.undoButton) {
+            this.undoButton.disabled = this.currentIndex <= 0;
+            this.undoButton.title = `撤销 (Ctrl+Z)`;
+        }
+    }
+
+    // 清除历史记录
+    clearHistory() {
+        this.history = [];
+        this.currentIndex = -1;
+        this.saveState(); // 保存初始状态
+    }
+}

@@ -31,8 +31,12 @@ function blockCellEvent(map) {
 
         showBlockSelector(e, blockId => {
             removeBlockSelector()
+
             if (blockId === '__CLEAR__') {
                 clearArea(map, i0, j0);
+                setTimeout(() => {
+                    if (window.historyManager) window.historyManager.saveState(); // 清除后保存历史
+                }, 10);
                 return;
             }
 
@@ -83,6 +87,10 @@ function blockCellEvent(map) {
                     }
                 });
             });
+
+            setTimeout(() => {
+                if (window.historyManager) window.historyManager.saveState(); // 区块放置后保存历史
+            }, 10);
         });
     });
 }

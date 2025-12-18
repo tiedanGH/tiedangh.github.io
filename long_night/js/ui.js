@@ -24,9 +24,8 @@ const MARKER_TYPE = {
     '★':  'star',
 };
 
-// 键盘控制相关
+// 玩家移动相关
 let currentMap = null;
-let playerCell = null;
 
 function uiCellEvents(map) {
     currentMap = map; // 保存地图引用
@@ -50,7 +49,7 @@ function uiCellEvents(map) {
 
                 // 更新玩家位置
                 if (choice === '🧍') {
-                    playerCell = cell;
+                    window.playerCell = cell;
                 }
             });
         }
@@ -74,7 +73,7 @@ function uiCellEvents(map) {
 
             // 更新玩家位置
             if (choice === '🧍') {
-                playerCell = cell;
+                window.playerCell = cell;
             }
         });
     });
@@ -106,7 +105,7 @@ function initKeyboardControls() {
     document.addEventListener('keydown', (e) => {
         if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
 
-        if (!playerCell) return;
+        if (!window.playerCell) return;
 
         e.preventDefault();
 
@@ -140,10 +139,10 @@ function initMobileDirectionControls() {
 }
 
 function movePlayer(direction) {
-    if (!playerCell) return;
+    if (!window.playerCell) return;
 
-    const i = parseInt(playerCell.dataset.i, 10);
-    const j = parseInt(playerCell.dataset.j, 10);
+    const i = parseInt(window.playerCell.dataset.i, 10);
+    const j = parseInt(window.playerCell.dataset.j, 10);
 
     let targetI = i;
     let targetJ = j;
@@ -181,9 +180,9 @@ function movePlayer(direction) {
     if (!targetSquare || !wallCell) return;
 
     // 移动玩家标记
-    clearMarkers(playerCell);
+    clearMarkers(window.playerCell);
     addMarker(targetSquare, '🧍', 'black');
-    playerCell = targetSquare;
+    window.playerCell = targetSquare;
 
     // 仅替换未知区域
     const currentBg = targetSquare.style.backgroundImage;
@@ -195,6 +194,8 @@ function movePlayer(direction) {
     if (wallCell.dataset.type === 'wall') {
         wallCell.style.backgroundColor = '#FFFFFF';
     }
+
+    saveHistory(); // 保存历史
 }
 
 function showSelector(e, options, callback) {
@@ -226,6 +227,7 @@ function showSelector(e, options, callback) {
         li.appendChild(document.createTextNode(name));
         li.onclick = () => {
             callback(val);
+            saveHistory(); // 保存历史
             removeSelector();
         };
         ul.appendChild(li);
@@ -243,7 +245,7 @@ function showPlayerSelector(e, onSelect) {
     const panel = document.createElement('div');
     panel.className = 'selector';
     panel.style.left = `${e.clientX}px`;
-    panel.style.top  = `${e.clientY}px`;
+    panel.style.top = `${e.clientY}px`;
 
     function createGrid(marginTop = '0px') {
         const grid = document.createElement('div');
@@ -260,24 +262,33 @@ function showPlayerSelector(e, onSelect) {
     title.style.fontWeight = 'bold';
     title.style.fontSize = '16px';
     title.style.marginBottom = '8px';
+
     const special = createGrid('10px');
     [['🧍','black'], ['★','red']].forEach(([ch, color]) => {
         const btn = document.createElement('button');
         btn.textContent = ch;
         btn.style.padding = '4px 6px';
         btn.style.color = color;
-        btn.onclick = () => onSelect(ch, color);
+        btn.onclick = () => {
+            onSelect(ch, color);
+            saveHistory(); // 保存历史
+        };
         special.appendChild(btn);
     });
+
     const numbers = createGrid('10px');
     for (let i = 0; i <= 7; i++) {
         const ch = num[i];
         const btn = document.createElement('button');
         btn.textContent = ch;
         btn.style.padding = '4px 6px';
-        btn.onclick = () => onSelect(ch);
+        btn.onclick = () => {
+            onSelect(ch);
+            saveHistory(); // 保存历史
+        };
         numbers.appendChild(btn);
     }
+
     const clearBtn = document.createElement('button');
     clearBtn.textContent = '清除标记';
     clearBtn.style.width = '100px';
@@ -285,7 +296,10 @@ function showPlayerSelector(e, onSelect) {
     clearBtn.style.marginTop = '10px';
     clearBtn.style.marginLeft = 'auto';
     clearBtn.style.marginRight = 'auto';
-    clearBtn.onclick = () => onSelect('__CLEAR__');
+    clearBtn.onclick = () => {
+        onSelect('__CLEAR__');
+        saveHistory(); // 保存历史
+    };
 
     panel.appendChild(title);
     panel.appendChild(special);
@@ -360,4 +374,12 @@ function clearMarkers(cell) {
 function removeSelector() {
     const ex = document.querySelector('.selector');
     if (ex) ex.remove();
+}
+
+function saveHistory() {
+    if (window.historyManager) {
+        setTimeout(() => {
+            window.historyManager.saveState();
+        }, 10);
+    }
 }
