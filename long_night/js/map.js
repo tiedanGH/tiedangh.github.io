@@ -1,4 +1,5 @@
-export class InfiniteMap {
+
+class InfiniteMap {
     constructor(container) {
         this.container = container;
         this.cells = new Map(); // 存储已渲染的单元格

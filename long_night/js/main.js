@@ -1,6 +1,3 @@
-import { InfiniteMap } from './map.js?v=20251219';
-import { uiCellEvents } from './ui.js?v=20251219';
-import { loadBlocks, blockCellEvent } from './block.js?v=20251219';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadBlocks();

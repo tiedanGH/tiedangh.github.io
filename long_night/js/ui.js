@@ -1,4 +1,5 @@
-export const squareOptions = [
+
+const squareOptions = [
     ['空地', 'empty.png'],
     ['树丛', 'grass.png'],
     ['水洼', 'water.png'],
@@ -10,7 +11,7 @@ export const squareOptions = [
     ['逃生舱', 'exit.png'],
     ['未知', 'unknown.png'],
 ];
-export const wallOptions = [
+const wallOptions = [
     ['空', '#FFFFFF'],
     ['普通', '#000000'],
     ['门', '#EA68A2'],
@@ -27,7 +28,7 @@ const MARKER_TYPE = {
 let currentMap = null;
 let playerCell = null;
 
-export function uiCellEvents(map) {
+function uiCellEvents(map) {
     currentMap = map; // 保存地图引用
 
     map.container.addEventListener('contextmenu', e => e.preventDefault());
@@ -232,9 +233,13 @@ function showSelector(e, options, callback) {
 
     sel.appendChild(ul);
     document.body.appendChild(sel);
+
+    setTimeout(() => {
+        adjustElementPosition(sel, e);
+    }, 0);
 }
 
-export function showPlayerSelector(e, onSelect) {
+function showPlayerSelector(e, onSelect) {
     const panel = document.createElement('div');
     panel.className = 'selector';
     panel.style.left = `${e.clientX}px`;
@@ -311,7 +316,7 @@ function getMarkerContainer(cell) {
     return ctr;
 }
 
-export function addMarker(cell, marker, color = 'black') {
+function addMarker(cell, marker, color = 'black') {
     const type = MARKER_TYPE[marker];
 
     if (type) {

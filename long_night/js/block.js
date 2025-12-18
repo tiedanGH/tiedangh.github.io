@@ -1,7 +1,6 @@
-import {squareOptions, wallOptions} from "./ui.js";
 
-export let blocksData = {};
-export async function loadBlocks() {
+let blocksData = {};
+async function loadBlocks() {
     const res = await fetch('blocks.json');
     blocksData = await res.json();
 }
@@ -10,7 +9,7 @@ function getWallColor(type) {
     return wallOptions.find(([name]) => name === type)?.[1] || '#D9D9D9';
 }
 
-export function blockCellEvent(map) {
+function blockCellEvent(map) {
     map.container.addEventListener('click', e => {
         const center = e.target.closest('.cell.center');
         if (!center) return;
@@ -76,7 +75,7 @@ export function blockCellEvent(map) {
     });
 }
 
-export function showBlockSelector(e, onSelect) {
+function showBlockSelector(e, onSelect) {
     removeBlockSelector();
 
     const panel = document.createElement('div');
@@ -147,38 +146,42 @@ export function showBlockSelector(e, onSelect) {
     panel.appendChild(container);
     document.body.appendChild(panel);
 
-    // 边界检查：确保菜单不会超出屏幕
-    const adjustMenuPosition = () => {
-        const rect = panel.getBoundingClientRect();
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-
-        // 调整水平位置
-        if (rect.right > windowWidth - 10) {
-            panel.style.left = (windowWidth - rect.width - 10) + 'px';
-        }
-        if (rect.left < 10) {
-            panel.style.left = '10px';
-        }
-        // 调整垂直位置
-        if (rect.bottom > windowHeight - 10) {
-            const newTop = e.clientY - rect.height - 20;
-            if (newTop > 10) {
-                panel.style.top = newTop + 'px';
-            } else {
-                panel.style.maxHeight = (windowHeight - e.clientY - 30) + 'px';
-                panel.style.top = e.clientY + 'px';
-            }
-        }
-        const newRect = panel.getBoundingClientRect();
-        if (newRect.top < 10) {
-            panel.style.top = '10px';
-            panel.style.maxHeight = (windowHeight - 30) + 'px';
-        }
-    };
-
-    setTimeout(adjustMenuPosition, 0);
+    setTimeout(() => {
+        adjustElementPosition(panel, e);
+    }, 0);
 }
+
+// 边界检查：确保菜单不会超出屏幕
+const adjustElementPosition = (element, e) => {
+    const rect = element.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    // 调整水平位置
+    if (rect.right > windowWidth - 10) {
+        element.style.left = (windowWidth - rect.width - 10) + 'px';
+    }
+    if (rect.left < 10) {
+        element.style.left = '10px';
+    }
+
+    // 调整垂直位置
+    if (rect.bottom > windowHeight - 10) {
+        const newTop = e.clientY - rect.height - 20;
+        if (newTop > 10) {
+            element.style.top = newTop + 'px';
+        } else {
+            element.style.maxHeight = (windowHeight - e.clientY - 30) + 'px';
+            element.style.top = e.clientY + 'px';
+        }
+    }
+
+    const newRect = element.getBoundingClientRect();
+    if (newRect.top < 10) {
+        element.style.top = '10px';
+        element.style.maxHeight = (windowHeight - 30) + 'px';
+    }
+};
 
 function removeBlockSelector() {
     const ex = document.querySelector('.selector');
