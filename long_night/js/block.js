@@ -87,11 +87,8 @@ export function showBlockSelector(e, onSelect) {
     const ids = Object.keys(blocksData);
 
     const title = document.createElement('div');
+    title.className = 'title';
     title.textContent = '放置区块';
-    title.style.textAlign = 'center';
-    title.style.fontWeight = 'bold';
-    title.style.fontSize = '16px';
-    title.style.marginBottom = '8px';
     panel.appendChild(title);
 
     const container = document.createElement('div');
@@ -118,7 +115,6 @@ export function showBlockSelector(e, onSelect) {
 
         const btn = document.createElement('button');
         btn.textContent = id;
-        btn.style.padding = '4px 6px';
         btn.onclick = () => onSelect(id);
 
         const preview = createPreview(block);
@@ -135,16 +131,14 @@ export function showBlockSelector(e, onSelect) {
     });
 
     const clearBtn = document.createElement('button');
+    clearBtn.className = 'clear-btn';
     clearBtn.textContent = '清除区块';
-    clearBtn.style.width = '100px';
-    clearBtn.style.marginTop = '12px';
-    clearBtn.style.display = 'block';
-    clearBtn.style.marginLeft = 'auto';
-    clearBtn.style.marginRight = 'auto';
     clearBtn.onclick = () => onSelect('__CLEAR__');
 
     container.appendChild(normalGrid);
-    container.appendChild(exitGrid);
+    if (exitGrid.children.length > 0) {
+        container.appendChild(exitGrid);
+    }
     if (specialGrid.children.length > 0) {
         container.appendChild(specialGrid);
     }
@@ -152,6 +146,38 @@ export function showBlockSelector(e, onSelect) {
 
     panel.appendChild(container);
     document.body.appendChild(panel);
+
+    // 边界检查：确保菜单不会超出屏幕
+    const adjustMenuPosition = () => {
+        const rect = panel.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // 调整水平位置
+        if (rect.right > windowWidth - 10) {
+            panel.style.left = (windowWidth - rect.width - 10) + 'px';
+        }
+        if (rect.left < 10) {
+            panel.style.left = '10px';
+        }
+        // 调整垂直位置
+        if (rect.bottom > windowHeight - 10) {
+            const newTop = e.clientY - rect.height - 20;
+            if (newTop > 10) {
+                panel.style.top = newTop + 'px';
+            } else {
+                panel.style.maxHeight = (windowHeight - e.clientY - 30) + 'px';
+                panel.style.top = e.clientY + 'px';
+            }
+        }
+        const newRect = panel.getBoundingClientRect();
+        if (newRect.top < 10) {
+            panel.style.top = '10px';
+            panel.style.maxHeight = (windowHeight - 30) + 'px';
+        }
+    };
+
+    setTimeout(adjustMenuPosition, 0);
 }
 
 function removeBlockSelector() {
@@ -184,21 +210,12 @@ function clearArea(map, i0, j0) {
 
 function createPreview(block) {
     const table = document.createElement('table');
-    table.style.borderCollapse = 'collapse';
-    table.style.width  = '36px';
-    table.style.height = '36px';
-    table.style.pointerEvents = 'none';
+    table.className = 'preview';
 
     for (let y = 0; y < 3; y++) {
         const tr = document.createElement('tr');
         for (let x = 0; x < 3; x++) {
             const td = document.createElement('td');
-            td.style.width  = '12px';
-            td.style.height = '12px';
-            td.style.padding = '0';
-            td.style.margin  = '0';
-            td.style.boxSizing = 'border-box';
-            td.style.backgroundColor = '#FFFFFF';
 
             const info = block.find(b => b.pos.x === x && b.pos.y === y);
             if (info) {
@@ -220,4 +237,3 @@ function createPreview(block) {
 
     return table;
 }
-

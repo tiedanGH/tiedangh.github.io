@@ -56,12 +56,27 @@ html, body {
     position: absolute;
     background: #fff;
     border: 1px solid #ccc;
-    padding: 5px;
-    z-index: 1000;
+    padding: 0 5px 5px 5px;
+    z-index: 10;
     border-radius: 6px;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.selector .title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 3px;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    padding: 5px 0;
+    z-index: 11;
 }
 .selector button {
-    width: 40px;
+    width: 38px;
+    padding: 3px;
     margin-bottom: 1px;
     cursor: pointer;
     border: 1px solid #666;
@@ -70,6 +85,28 @@ html, body {
 }
 .selector button:hover {
     background: #ddd;
+}
+.selector .clear-btn {
+    width: 120px;
+    margin-top: 12px;
+    padding: 2px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.selector .preview {
+    width: 36px;
+    height: 36px;
+    border-collapse: collapse;
+    pointer-events: none;
+}
+.selector .preview td {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: #ffffff;
 }
 .option-list {
     list-style: none;
@@ -102,7 +139,7 @@ html, body {
     padding: 24px 30px;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    z-index: 100;
+    z-index: 1000;
     text-align: center;
     width: 370px;
     line-height: 1.6;
@@ -266,6 +303,36 @@ html, body {
         font-size: 20px;
         top: 8px;
         right: 8px;
+    }
+
+    .selector {
+        padding: 0 3px 3px 3px;
+        border-radius: 4px;
+        max-height: 60vh;
+    }
+    .selector .title {
+        font-size: 14px;
+        padding: 2px 0;
+    }
+    .selector button {
+        width: 28px;
+        padding: 1px;
+        margin-bottom: 1px;
+        font-size: 12px;
+    }
+    .selector .clear-btn {
+        width: 100px;
+        margin-top: 6px;
+        padding: 1px;
+        font-size: 12px;
+    }
+    .selector .preview {
+        width: 27px;
+        height: 27px;
+    }
+    .selector .preview td {
+        width: 9px;
+        height: 9px;
     }
 
     /* 按钮仅在移动端显示 */
