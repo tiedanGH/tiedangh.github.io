@@ -7841,7 +7841,7 @@
         "wall": false
       },
       "right": {
-        "type": "门（开）",
+        "type": "门 (开)",
         "wall": true
       }
     },
@@ -7862,11 +7862,11 @@
         "wall": true
       },
       "left": {
-        "type": "门（开）",
+        "type": "门 (开)",
         "wall": true
       },
       "right": {
-        "type": "门（开）",
+        "type": "门 (开)",
         "wall": true
       }
     },
@@ -7887,7 +7887,7 @@
         "wall": true
       },
       "left": {
-        "type": "门（开）",
+        "type": "门 (开)",
         "wall": true
       },
       "right": {

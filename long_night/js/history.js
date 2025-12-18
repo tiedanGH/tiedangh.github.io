@@ -35,7 +35,7 @@ class HistoryManager {
 
         // 查找并保存玩家位置
         let playerCellElement = null;
-        this.map.cells.forEach((cell, key) => {
+        this.map.cells.forEach((cell, _) => {
             const markers = cell.querySelectorAll('.marker');
             markers.forEach(marker => {
                 if (marker.textContent === '🧍' || marker.dataset.markerType === 'player') {
