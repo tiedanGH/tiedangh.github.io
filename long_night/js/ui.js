@@ -21,7 +21,6 @@ const wallOptions = [
 const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
 const MARKER_TYPE = {
     '🧍': 'player',
-    '★':  'star',
 };
 
 // 玩家移动相关
@@ -180,7 +179,6 @@ function movePlayer(direction) {
     if (!targetSquare || !wallCell) return;
 
     // 移动玩家标记
-    clearMarkers(window.playerCell);
     addMarker(targetSquare, '🧍', 'black');
     window.playerCell = targetSquare;
 
@@ -306,6 +304,10 @@ function showPlayerSelector(e, onSelect) {
     panel.appendChild(numbers);
     panel.appendChild(clearBtn);
     document.body.appendChild(panel);
+
+    setTimeout(() => {
+        adjustElementPosition(panel, e);
+    }, 0);
 }
 
 function getMarkerContainer(cell) {
