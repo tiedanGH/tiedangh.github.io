@@ -78,8 +78,8 @@ function blockCellEvent(map) {
 
                 ['top', 'right', 'bottom', 'left'].forEach(dir => {
                     if (cellInfo[dir].wall) {
-                        let wi = i + (dir === 'left'  ? -1 : dir === 'right' ? 1 : 0);
-                        let wj = j + (dir === 'top'   ? -1 : dir === 'bottom'? 1 : 0);
+                        let wi = i + (dir === 'left' ? -1 : dir === 'right' ? 1 : 0);
+                        let wj = j + (dir === 'top'  ? -1 : dir === 'bottom'? 1 : 0);
                         const wallCell = map.cells.get(`${wi},${wj}`);
                         if (wallCell && wallCell.dataset.type === 'wall') {
                             wallCell.style.backgroundColor = getWallColor(cellInfo[dir].type);
