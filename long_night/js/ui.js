@@ -1,5 +1,5 @@
 
-const squareOptions = [
+const gridOptions = [
     ['空地', 'empty.png'],
     ['树丛', 'grass.png'],
     ['水洼', 'water.png'],
@@ -7,9 +7,12 @@ const squareOptions = [
     ['陷阱', 'trap.png'],
     ['热源', 'heat.png'],
     ['箱子', 'box.png'],
-    ['按钮', 'button.png'],
     ['逃生舱', 'exit.png'],
     ['未知', 'unknown.png'],
+];
+const attachOptions = [
+    ['按钮', 'button.png'],
+    ['无', 'transparent.png'],
 ];
 const wallOptions = [
     ['空', '#FFFFFF'],
@@ -86,9 +89,7 @@ function uiCellEvents(map) {
         const type = cell.dataset.type;
 
         if (type === 'square') {
-            showSelector(e, squareOptions, imgFile => {
-                cell.style.backgroundImage = `url('./img/${imgFile}')`;
-            });
+            showSquareAttachSelector(e, cell);
         } else if (type === 'wall') {
             showSelector(e, wallOptions, c => {
                 cell.style.backgroundColor = c;
@@ -98,6 +99,224 @@ function uiCellEvents(map) {
 
     initKeyboardControls();
     initMobileDirectionControls();
+}
+
+function showSquareAttachSelector(e, cell) {
+    const sel = document.createElement('div');
+    sel.className = 'selector';
+    sel.style.left = e.clientX + 'px';
+    sel.style.top = e.clientY + 'px';
+    sel.style.display = 'flex';
+
+    function createGroup(titleText, options, onSelect) {
+        const group = document.createElement('div');
+
+        const title = document.createElement('div');
+        title.textContent = titleText;
+        Object.assign(title.style, {
+            fontWeight: 'bold',
+            textAlign: 'center',
+            margin: '6px 0',
+        });
+
+        const ul = document.createElement('ul');
+        ul.className = 'option-list';
+
+        options.forEach(([name, val]) => {
+            const li = document.createElement('li');
+            li.className = 'option-item';
+
+            const img = document.createElement('img');
+            img.className = 'color-box';
+            img.src = `./img/${val}`;
+            img.alt = name;
+
+            li.appendChild(img);
+            li.appendChild(document.createTextNode(name));
+
+            li.onclick = () => {
+                onSelect(val);
+                saveHistory();
+                removeSelector();
+            };
+
+            ul.appendChild(li);
+        });
+
+        group.appendChild(title);
+        group.appendChild(ul);
+        return group;
+    }
+
+    sel.appendChild(
+        createGroup('地形', gridOptions, imgFile => {
+            cell.style.backgroundImage = `url('./img/${imgFile}')`;
+        })
+    );
+    sel.appendChild(
+        createGroup('附着', attachOptions, imgFile => {
+            setAttachment(cell, imgFile);
+        })
+    );
+
+    document.body.appendChild(sel);
+
+    setTimeout(() => {
+        adjustElementPosition(sel, e);
+    }, 0);
+}
+
+function showSelector(e, options, callback) {
+    const sel = document.createElement('div');
+    sel.className = 'selector';
+    sel.style.left = e.clientX + 'px';
+    sel.style.top = e.clientY + 'px';
+
+    const ul = document.createElement('ul');
+    ul.className = 'option-list';
+
+    options.forEach(([name, val]) => {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+
+        if (val.endsWith('.png') || val.endsWith('.jpg')) {
+            const img = document.createElement('img');
+            img.className = 'color-box';
+            img.src = `./img/${val}`;
+            img.alt = name;
+            li.appendChild(img);
+        } else {
+            const box = document.createElement('span');
+            box.className = 'color-box';
+            box.style.backgroundColor = val;
+            li.appendChild(box);
+        }
+
+        li.appendChild(document.createTextNode(name));
+        li.onclick = () => {
+            callback(val);
+            saveHistory(); // 保存历史
+            removeSelector();
+        };
+        ul.appendChild(li);
+    });
+
+    sel.appendChild(ul);
+    document.body.appendChild(sel);
+
+    setTimeout(() => {
+        adjustElementPosition(sel, e);
+    }, 0);
+}
+
+function setAttachment(cell, imgFile) {
+    const layer = getAttachmentLayer(cell);
+    layer.style.backgroundImage = imgFile
+        ? `url('./img/${imgFile}')`
+        : '';
+}
+
+function getAttachmentLayer(cell) {
+    let layer = cell.querySelector('.attachment-layer');
+    if (layer) return layer;
+
+    layer = document.createElement('div');
+    layer.className = 'attachment-layer';
+    cell.appendChild(layer);
+    return layer;
+}
+
+function showPlayerSelector(e, onSelect) {
+    const panel = document.createElement('div');
+    panel.className = 'selector';
+    panel.style.left = `${e.clientX}px`;
+    panel.style.top = `${e.clientY}px`;
+
+    function createGrid(marginTop = '0px') {
+        const grid = document.createElement('div');
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        grid.style.gap = '4px';
+        grid.style.marginTop = marginTop;
+        return grid;
+    }
+
+    const title = document.createElement('div');
+    title.textContent = '标记玩家';
+    title.style.textAlign = 'center';
+    title.style.fontWeight = 'bold';
+    title.style.fontSize = '16px';
+    title.style.marginBottom = '8px';
+
+    const special = createGrid('10px');
+    [['🧍','black'], ['★','red']].forEach(([ch, color]) => {
+        const btn = document.createElement('button');
+        btn.textContent = ch;
+        btn.style.padding = '4px 6px';
+        btn.style.color = color;
+        btn.onclick = () => {
+            onSelect(ch, color);
+            saveHistory(); // 保存历史
+        };
+        special.appendChild(btn);
+    });
+
+    const numbers = createGrid('10px');
+    for (let i = 0; i <= 7; i++) {
+        const ch = num[i];
+        const btn = document.createElement('button');
+        btn.textContent = ch;
+        btn.style.padding = '4px 6px';
+        btn.onclick = () => {
+            onSelect(ch);
+            saveHistory(); // 保存历史
+        };
+        numbers.appendChild(btn);
+    }
+
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = '清除标记';
+    clearBtn.style.width = '100px';
+    clearBtn.style.display = 'block';
+    clearBtn.style.marginTop = '10px';
+    clearBtn.style.marginLeft = 'auto';
+    clearBtn.style.marginRight = 'auto';
+    clearBtn.onclick = () => {
+        onSelect('__CLEAR__');
+        saveHistory(); // 保存历史
+    };
+
+    panel.appendChild(title);
+    panel.appendChild(special);
+    panel.appendChild(numbers);
+    panel.appendChild(clearBtn);
+    document.body.appendChild(panel);
+
+    setTimeout(() => {
+        adjustElementPosition(panel, e);
+    }, 0);
+}
+
+function getMarkerContainer(cell) {
+    let ctr = cell.querySelector('.marker-container');
+    if (ctr) return ctr;
+    ctr = document.createElement('div');
+    ctr.className = 'marker-container';
+    Object.assign(ctr.style, {
+        position: 'absolute',
+        top:      '0',
+        left:     '0',
+        right:    '0',
+        bottom:   '0',
+        display:          'flex',
+        flexWrap:         'wrap',
+        justifyContent:   'center',
+        alignItems:       'center',
+        gap:              '2px',
+        pointerEvents:    'none',
+    });
+    cell.appendChild(ctr);
+    return ctr;
 }
 
 function initKeyboardControls() {
@@ -194,142 +413,6 @@ function movePlayer(direction) {
     }
 
     saveHistory(); // 保存历史
-}
-
-function showSelector(e, options, callback) {
-    const sel = document.createElement('div');
-    sel.className = 'selector';
-    sel.style.left = e.clientX + 'px';
-    sel.style.top = e.clientY + 'px';
-
-    const ul = document.createElement('ul');
-    ul.className = 'option-list';
-
-    options.forEach(([name, val]) => {
-        const li = document.createElement('li');
-        li.className = 'option-item';
-
-        if (val.endsWith('.png') || val.endsWith('.jpg')) {
-            const img = document.createElement('img');
-            img.className = 'color-box';
-            img.src = `./img/${val}`;
-            img.alt = name;
-            li.appendChild(img);
-        } else {
-            const box = document.createElement('span');
-            box.className = 'color-box';
-            box.style.backgroundColor = val;
-            li.appendChild(box);
-        }
-
-        li.appendChild(document.createTextNode(name));
-        li.onclick = () => {
-            callback(val);
-            saveHistory(); // 保存历史
-            removeSelector();
-        };
-        ul.appendChild(li);
-    });
-
-    sel.appendChild(ul);
-    document.body.appendChild(sel);
-
-    setTimeout(() => {
-        adjustElementPosition(sel, e);
-    }, 0);
-}
-
-function showPlayerSelector(e, onSelect) {
-    const panel = document.createElement('div');
-    panel.className = 'selector';
-    panel.style.left = `${e.clientX}px`;
-    panel.style.top = `${e.clientY}px`;
-
-    function createGrid(marginTop = '0px') {
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-        grid.style.gap = '4px';
-        grid.style.marginTop = marginTop;
-        return grid;
-    }
-
-    const title = document.createElement('div');
-    title.textContent = '标记玩家';
-    title.style.textAlign = 'center';
-    title.style.fontWeight = 'bold';
-    title.style.fontSize = '16px';
-    title.style.marginBottom = '8px';
-
-    const special = createGrid('10px');
-    [['🧍','black'], ['★','red']].forEach(([ch, color]) => {
-        const btn = document.createElement('button');
-        btn.textContent = ch;
-        btn.style.padding = '4px 6px';
-        btn.style.color = color;
-        btn.onclick = () => {
-            onSelect(ch, color);
-            saveHistory(); // 保存历史
-        };
-        special.appendChild(btn);
-    });
-
-    const numbers = createGrid('10px');
-    for (let i = 0; i <= 7; i++) {
-        const ch = num[i];
-        const btn = document.createElement('button');
-        btn.textContent = ch;
-        btn.style.padding = '4px 6px';
-        btn.onclick = () => {
-            onSelect(ch);
-            saveHistory(); // 保存历史
-        };
-        numbers.appendChild(btn);
-    }
-
-    const clearBtn = document.createElement('button');
-    clearBtn.textContent = '清除标记';
-    clearBtn.style.width = '100px';
-    clearBtn.style.display = 'block';
-    clearBtn.style.marginTop = '10px';
-    clearBtn.style.marginLeft = 'auto';
-    clearBtn.style.marginRight = 'auto';
-    clearBtn.onclick = () => {
-        onSelect('__CLEAR__');
-        saveHistory(); // 保存历史
-    };
-
-    panel.appendChild(title);
-    panel.appendChild(special);
-    panel.appendChild(numbers);
-    panel.appendChild(clearBtn);
-    document.body.appendChild(panel);
-
-    setTimeout(() => {
-        adjustElementPosition(panel, e);
-    }, 0);
-}
-
-function getMarkerContainer(cell) {
-    let ctr = cell.querySelector('.marker-container');
-    if (ctr) return ctr;
-    ctr = document.createElement('div');
-    ctr.className = 'marker-container';
-    Object.assign(ctr.style, {
-        position: 'absolute',
-        top:      '0',
-        left:     '0',
-        right:    '0',
-        bottom:   '0',
-        display:          'flex',
-        flexWrap:         'wrap',
-        justifyContent:   'center',
-        alignItems:       'center',
-        gap:              '2px',
-        pointerEvents:    'none',
-    });
-    cell.appendChild(ctr);
-    return ctr;
 }
 
 function addMarker(cell, marker, color = 'black') {

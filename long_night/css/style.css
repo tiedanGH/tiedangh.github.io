@@ -15,6 +15,7 @@ html, body {
     -webkit-touch-callout: none;
     -webkit-overflow-scrolling: touch; /* 移动端优化 */
 }
+/* 地图网格样式 */
 .cell {
     position: absolute;
     box-sizing: border-box;
@@ -48,6 +49,16 @@ html, body {
     height: 11px;
     background-color: #000;
     border: 1px solid #000;
+    z-index: 3;
+}
+/* 附着图层样式 */
+.attachment-layer {
+    position: absolute;
+    inset: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
     z-index: 3;
 }
 
@@ -101,12 +112,22 @@ html, body {
     pointer-events: none;
 }
 .selector .preview td {
+    position: relative;
     width: 12px;
     height: 12px;
     padding: 0;
     margin: 0;
     box-sizing: border-box;
     background-color: #ffffff;
+}
+.selector .preview .attach {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
 }
 .option-list {
     list-style: none;
@@ -127,6 +148,9 @@ html, body {
     height: 12px;
     margin-right: 8px;
     border: 1px solid #000;
+}
+.marker-container {
+    z-index: 5;
 }
 
 /* 帮助提示框样式 */
@@ -365,6 +389,10 @@ html, body {
         height: 27px;
     }
     .selector .preview td {
+        width: 9px;
+        height: 9px;
+    }
+    .selector .preview .attach {
         width: 9px;
         height: 9px;
     }

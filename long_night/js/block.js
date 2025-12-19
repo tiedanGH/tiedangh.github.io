@@ -73,8 +73,10 @@ function blockCellEvent(map) {
                 const square = map.cells.get(key);
                 if (!square || square.dataset.type !== 'square') return;
 
-                const imgFile = squareOptions.find(([name]) => name === cellInfo.ground.type)?.[1];
+                const imgFile = gridOptions.find(([name]) => name === cellInfo.ground.type)?.[1];
                 square.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;
+                const attImgFile = attachOptions.find(([name]) => name === cellInfo.ground.attach)?.[1];
+                setAttachment(square, attImgFile);
 
                 ['top', 'right', 'bottom', 'left'].forEach(dir => {
                     if (cellInfo[dir].wall) {
@@ -242,7 +244,7 @@ function createPreview(block) {
 
             const info = block.find(b => b.pos.x === x && b.pos.y === y);
             if (info) {
-                const imgFile = squareOptions.find(([name]) => name === info.ground.type)?.[1];
+                const imgFile = gridOptions.find(([name]) => name === info.ground.type)?.[1];
                 td.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;
                 td.style.backgroundSize = 'cover';
 
@@ -251,6 +253,16 @@ function createPreview(block) {
                 td.style.borderRight  = r.wall ? `2px solid ${getWallColor(r.type)}` : '1px solid white';
                 td.style.borderBottom = b.wall ? `2px solid ${getWallColor(b.type)}` : '1px solid white';
                 td.style.borderLeft   = l.wall ? `2px solid ${getWallColor(l.type)}` : '1px solid white';
+
+                if (info.ground.attach) {
+                    const attachImg = attachOptions.find(([name]) => name === info.ground.attach)?.[1];
+                    if (attachImg) {
+                        const attachEl = document.createElement('img');
+                        attachEl.className = 'attach';
+                        attachEl.src = `./img/${attachImg}`;
+                        td.appendChild(attachEl);
+                    }
+                }
             }
 
             tr.appendChild(td);

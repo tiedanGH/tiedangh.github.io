@@ -62,7 +62,8 @@ class HistoryManager {
                     backgroundColor: cell.style.backgroundColor,
                     border: cell.style.border
                 },
-                markers: []
+                markers: [],
+                attach: null
             };
 
             // 保存标记
@@ -75,6 +76,17 @@ class HistoryManager {
                         type: marker.dataset.markerType
                     });
                 });
+            }
+
+            // 保存附着
+            const attachLayer = cell.querySelector('.attachment-layer');
+            if (attachLayer && attachLayer.style.backgroundImage) {
+                const match = attachLayer.style.backgroundImage.match(/\/([^\/]+)\.(png|jpg|jpeg)/);
+                if (match) {
+                    const fileName = match[1];
+                    const attachName = attachOptions.find(([_, file]) => file.startsWith(fileName))?.[0];
+                    if (attachName) cellCopy.attach = attachName;
+                }
             }
 
             snapshot.cells.set(key, cellCopy);
@@ -111,11 +123,7 @@ class HistoryManager {
         if (snapshot.playerPosition) {
             const playerKey = `${snapshot.playerPosition.i},${snapshot.playerPosition.j}`;
             const playerCell = this.map.cells.get(playerKey);
-            if (playerCell) {
-                window.playerCell = playerCell;
-            } else {
-                window.playerCell = null;
-            }
+            window.playerCell = playerCell || null;
         } else {
             window.playerCell = null;
         }
@@ -124,10 +132,14 @@ class HistoryManager {
         snapshot.cells.forEach((cellData, key) => {
             const existingCell = this.map.cells.get(key);
             if (existingCell) {
-                // 恢复样式
+                // 恢复地形
                 existingCell.style.backgroundImage = cellData.style.backgroundImage;
                 existingCell.style.backgroundColor = cellData.style.backgroundColor;
                 existingCell.style.border = cellData.style.border;
+
+                // 恢复附着
+                const attImgFile = attachOptions.find(([name]) => name === cellData.attach)?.[1];
+                setAttachment(existingCell, attImgFile);
 
                 // 恢复标记
                 if (cellData.markers && cellData.markers.length > 0) {
@@ -158,9 +170,7 @@ class HistoryManager {
                         span.style.color = markerData.color;
                         span.style.fontSize = '14px';
                         span.style.lineHeight = '1';
-                        if (markerData.type) {
-                            span.dataset.markerType = markerData.type;
-                        }
+                        if (markerData.type) span.dataset.markerType = markerData.type;
                         container.appendChild(span);
 
                         // 如果是玩家标记，更新全局引用
@@ -200,6 +210,6 @@ class HistoryManager {
     clearHistory() {
         this.history = [];
         this.currentIndex = -1;
-        this.saveState(); // 保存初始状态
+        this.saveState();
     }
 }
