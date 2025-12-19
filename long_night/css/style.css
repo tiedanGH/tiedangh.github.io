@@ -99,7 +99,7 @@ html, body {
 }
 .selector .clear-btn {
     width: 120px;
-    margin-top: 12px;
+    margin-top: 8px;
     padding: 2px;
     display: block;
     margin-left: auto;
@@ -380,7 +380,7 @@ html, body {
     }
     .selector .clear-btn {
         width: 100px;
-        margin-top: 6px;
+        margin-top: 5px;
         padding: 1px;
         font-size: 12px;
     }

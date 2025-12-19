@@ -93,11 +93,11 @@ function blockCellEvent(map) {
             setTimeout(() => {
                 if (window.historyManager) window.historyManager.saveState(); // 区块放置后保存历史
             }, 10);
-        });
+        }, map, i0, j0);
     });
 }
 
-function showBlockSelector(e, onSelect) {
+function showBlockSelector(e, onSelect, map, i0, j0) {
     removeBlockSelector();
 
     const panel = document.createElement('div');
@@ -151,6 +151,33 @@ function showBlockSelector(e, onSelect) {
         }
     });
 
+    // 预设地图边框按钮
+    const borderSizes = [
+        { label: '9×9', gridWidth: 9, gridHeight: 9 },
+        { label: '10×10', gridWidth: 10, gridHeight: 10 },
+        { label: '12×12', gridWidth: 12, gridHeight: 12 }
+    ];
+    const borderContainer = document.createElement('div');
+    borderContainer.style.display = 'flex';
+    borderContainer.style.marginTop = '5px';
+
+    borderSizes.forEach(border => {
+        const borderBtn = document.createElement('button');
+        borderBtn.textContent = border.label;
+        borderBtn.style.flex = '1';
+        borderBtn.style.margin = '0 2px';
+
+        borderBtn.onclick = () => {
+            createMapBorder(map, i0, j0, border.gridWidth, border.gridHeight);
+            removeBlockSelector();
+            setTimeout(() => {
+                if (window.historyManager) window.historyManager.saveState();
+            }, 10);
+        };
+
+        borderContainer.appendChild(borderBtn);
+    });
+
     const clearBtn = document.createElement('button');
     clearBtn.className = 'clear-btn';
     clearBtn.textContent = '清除区块';
@@ -163,6 +190,7 @@ function showBlockSelector(e, onSelect) {
     if (specialGrid.children.length > 0) {
         container.appendChild(specialGrid);
     }
+    container.appendChild(borderContainer);
     container.appendChild(clearBtn);
 
     panel.appendChild(container);
@@ -171,6 +199,39 @@ function showBlockSelector(e, onSelect) {
     setTimeout(() => {
         adjustElementPosition(panel, e);
     }, 0);
+}
+
+// 创建地图边框
+function createMapBorder(map, startI, startJ, gridWidth, gridHeight) {
+    const wallsX = gridWidth + 1;
+    const wallsY = gridHeight + 1;
+
+    const endI = startI + (wallsX - 1) * 2;
+    const endJ = startJ + (wallsY - 1) * 2;
+
+    const size = window.innerWidth > 600 ? 40 : 30;
+    const wall = window.innerWidth > 600 ? 11 : 9;
+
+    function ensureWhiteWall(map, i, j, size, wall) {
+        map.ensureCell(i, j, size, wall);
+        const wallCell = map.cells.get(`${i},${j}`);
+
+        if (wallCell && wallCell.dataset.type === 'wall') {
+            const currentColor = wallCell.style.backgroundColor;
+            if (!currentColor || currentColor === '#D9D9D9') {
+                wallCell.style.backgroundColor = '#FFFFFF';
+            }
+        }
+    }
+
+    for (let i = startI; i <= endI; i++) {
+        ensureWhiteWall(map, i, startJ, size, wall); // 上
+        ensureWhiteWall(map, i, endJ, size, wall);   // 下
+    }
+    for (let j = startJ; j <= endJ; j++) {
+        ensureWhiteWall(map, startI, j, size, wall); // 左
+        ensureWhiteWall(map, endI, j, size, wall);   // 右
+    }
 }
 
 // 边界检查：确保菜单不会超出屏幕
