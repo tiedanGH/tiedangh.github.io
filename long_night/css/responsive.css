@@ -1,0 +1,104 @@
+/* 响应式处理：适配小屏设备 */
+@media (max-width: 600px) {
+    #mode-change-alert {
+        padding: 20px;
+        font-size: 15px;
+        width: 300px;
+    }
+
+    #mode-change-alert h2 {
+        font-size: 20px;
+    }
+
+    .close-help-button {
+        font-size: 15px;
+        padding: 10px 20px;
+        width: 100%;
+    }
+
+    .cell.square {
+        width: 30px;
+        height: 30px;
+    }
+
+    .cell.wall.vertical {
+        width: 9px;
+        height: 30px;
+    }
+
+    .cell.wall.horizontal {
+        width: 30px;
+        height: 9px;
+    }
+
+    .cell.center {
+        width: 9px;
+        height: 9px;
+    }
+
+    .selector {
+        padding: 0 3px 3px 3px;
+        border-radius: 4px;
+        max-height: 60vh;
+    }
+
+    .selector .title {
+        font-size: 14px;
+        padding: 2px 0;
+    }
+
+    .selector button {
+        width: 28px;
+        padding: 1px;
+        margin-bottom: 1px;
+        font-size: 12px;
+    }
+
+    .selector .clear-btn {
+        width: 100px;
+        margin-top: 5px;
+        padding: 1px;
+        font-size: 12px;
+    }
+
+    .selector .preview {
+        width: 27px;
+        height: 27px;
+    }
+    .selector .preview td {
+        width: 9px;
+        height: 9px;
+    }
+    .selector .preview .attach {
+        width: 9px;
+        height: 9px;
+    }
+
+    .back-home {
+        font-size: 12px;
+        padding: 5px 10px;
+        top: 8px;
+        left: 8px;
+    }
+
+    .control-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+        top: 8px;
+    }
+    .help-button {
+        right: 8px;
+    }
+    .redo-button {
+        right: 48px;
+    }
+    .undo-button {
+        right: 88px;
+    }
+
+    /* 按钮仅在移动端显示 */
+    .direction-controls {
+        display: flex;
+    }
+}

@@ -15,11 +15,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 帮助弹窗
     const closeAlertBtn = document.getElementById('close-alert');
     closeAlertBtn.addEventListener('click', () => {
-        document.getElementById('mode-change-alert').style.display = 'none';
+        document.getElementById('help-container').style.display = 'none';
     });
 
     const helpButton = document.getElementById('help-button');
     helpButton.addEventListener('click', () => {
-        document.getElementById('mode-change-alert').style.display = 'block';
+        document.getElementById('help-container').style.display = 'block';
     });
 });

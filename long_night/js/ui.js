@@ -320,21 +320,25 @@ function getMarkerContainer(cell) {
 }
 
 function initKeyboardControls() {
-    document.addEventListener('keydown', (e) => {
-        if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    const keyMap = {
+        ArrowUp: 'up',
+        ArrowDown: 'down',
+        ArrowLeft: 'left',
+        ArrowRight: 'right',
+        w: 'up',
+        s: 'down',
+        a: 'left',
+        d: 'right'
+    };
 
+    document.addEventListener('keydown', (e) => {
         if (!window.playerCell) return;
 
+        const direction = keyMap[e.key];
+
+        if (!direction) return;
+
         e.preventDefault();
-
-        let direction;
-        switch(e.key) {
-            case 'ArrowUp': direction = 'up'; break;
-            case 'ArrowDown': direction = 'down'; break;
-            case 'ArrowLeft': direction = 'left'; break;
-            case 'ArrowRight': direction = 'right'; break;
-        }
-
         movePlayer(direction);
     });
 }

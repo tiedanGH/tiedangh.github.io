@@ -4,8 +4,9 @@ class HistoryManager {
         this.map = map;
         this.history = [];
         this.currentIndex = -1;
-        this.maxHistory = 50; // 最大历史记录数
+        this.maxHistory = 50;
         this.undoButton = document.getElementById('undo-button');
+        this.redoButton = document.getElementById('redo-button');
 
         this.init();
     }
@@ -13,14 +14,25 @@ class HistoryManager {
     init() {
         this.saveState();
 
+        // 绑定按钮事件
         if (this.undoButton) {
             this.undoButton.addEventListener('click', () => this.undo());
         }
-
+        if (this.redoButton) {
+            this.redoButton.addEventListener('click', () => this.redo());
+        }
+        // 绑定键盘快捷键
         document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+            const key = e.key.toLowerCase();
+            // Ctrl+Z - 撤销
+            if ((e.ctrlKey || e.metaKey) && key === 'z' && !e.shiftKey) {
                 e.preventDefault();
                 this.undo();
+            }
+            // Ctrl+Y 或 Ctrl+Shift+Z - 重做
+            if ((e.ctrlKey && key === 'y') || ((e.ctrlKey || e.metaKey) && key === 'z' && e.shiftKey)) {
+                e.preventDefault();
+                this.redo();
             }
         });
     }
@@ -97,8 +109,10 @@ class HistoryManager {
 
     // 保存当前状态到历史记录
     saveState() {
-        // 清除当前索引之后的历史
-        this.history = this.history.slice(0, this.currentIndex + 1);
+        // 如果有重做历史，清除当前索引之后的历史
+        if (this.currentIndex < this.history.length - 1) {
+            this.history = this.history.slice(0, this.currentIndex + 1);
+        }
 
         // 限制历史记录数量
         if (this.history.length >= this.maxHistory) {
@@ -110,7 +124,7 @@ class HistoryManager {
         this.history.push(snapshot);
         this.currentIndex++;
 
-        this.updateUndoButton();
+        this.updateButtons();
         console.log(`Saving history, currently ${this.history.length}, index ${this.currentIndex}`);
     }
 
@@ -118,6 +132,9 @@ class HistoryManager {
     restoreState(snapshot) {
         // 清除当前所有标记
         document.querySelectorAll('.marker').forEach(marker => marker.remove());
+
+        // 清除当前所有附着层
+        document.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
 
         // 恢复玩家位置全局变量
         if (snapshot.playerPosition) {
@@ -182,7 +199,7 @@ class HistoryManager {
             }
         });
 
-        this.updateUndoButton();
+        this.updateButtons();
     }
 
     // 撤销操作
@@ -198,11 +215,28 @@ class HistoryManager {
         this.restoreState(previousState);
     }
 
-    // 更新撤销按钮状态
-    updateUndoButton() {
+    // 重做操作
+    redo() {
+        if (this.currentIndex >= this.history.length - 1) {
+            console.log('Cannot redo: No more redo records available.');
+            return;
+        }
+
+        this.currentIndex++;
+        const nextState = this.history[this.currentIndex];
+        console.log(`Redo to history ${this.currentIndex}`);
+        this.restoreState(nextState);
+    }
+
+    // 更新按钮状态
+    updateButtons() {
         if (this.undoButton) {
             this.undoButton.disabled = this.currentIndex <= 0;
-            this.undoButton.title = `撤销 (Ctrl+Z)`;
+            this.undoButton.title = `撤销 (Ctrl+Z) - ${this.currentIndex}/${this.history.length - 1}`;
+        }
+        if (this.redoButton) {
+            this.redoButton.disabled = this.currentIndex >= this.history.length - 1;
+            this.redoButton.title = `重做 (Ctrl+Y) - ${this.history.length - 1 - this.currentIndex} 步可用`;
         }
     }
 

@@ -1,0 +1,71 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+#map-container {
+    width: 100vw;
+    height: 100vh;
+    cursor: grab;
+    position: relative;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 地图网格样式 */
+.cell {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.cell.square {
+    width: 40px;
+    height: 40px;
+    background-image: url('../img/unknown.png');
+    background-size: cover;
+    z-index: 1;
+}
+
+.cell.wall {
+    background-color: #D9D9D9;
+    z-index: 2;
+}
+
+.cell.wall.vertical {
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+    width: 11px;
+    height: 40px;
+}
+
+.cell.wall.horizontal {
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    width: 40px;
+    height: 11px;
+}
+
+.cell.center {
+    cursor: pointer;
+    width: 11px;
+    height: 11px;
+    background-color: #000;
+    border: 1px solid #000;
+    z-index: 3;
+}
+
+/* 附着图层样式 */
+.attachment-layer {
+    position: absolute;
+    inset: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 3;
+}

@@ -1,8 +1,10 @@
 
+const BLOCKS_VERSION = '20251221';
+
 let blocksData = {};
 
 function loadBlocks() {
-    fetch('blocks.json')
+    fetch(`blocks.json?v=${BLOCKS_VERSION}`)
         .then(res => {
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             return res.json();
