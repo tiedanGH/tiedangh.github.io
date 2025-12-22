@@ -12,6 +12,7 @@ const gridOptions = [
 ];
 const attachOptions = [
     ['按钮', 'button.png'],
+    ['炸弹', 'bomb.png'],
     ['无', 'transparent.png'],
 ];
 const wallOptions = [
