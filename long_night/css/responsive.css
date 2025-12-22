@@ -1,13 +1,15 @@
 /* 响应式处理：适配小屏设备 */
 @media (max-width: 600px) {
-    #mode-change-alert {
+    #help-container {
         padding: 20px;
         font-size: 15px;
         width: 300px;
     }
-
-    #mode-change-alert h2 {
-        font-size: 20px;
+    #help-container h2 {
+        font-size: 18px;
+    }
+    #help-container p {
+        font-size: 14px;
     }
 
     .close-help-button {
