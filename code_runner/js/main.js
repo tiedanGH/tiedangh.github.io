@@ -323,7 +323,8 @@ document.addEventListener('DOMContentLoaded', function() {
             );
 
             if (!response.ok) {
-                throw new Error(`获取代码失败: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`HTTP错误: ${response.status} - ${errorText}`);
             }
 
             let content = await response.text();
