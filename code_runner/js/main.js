@@ -263,7 +263,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 检查是否是CORS错误
             if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
-                displayError('由于 CORS 限制，尝试请求 Glot API 失败。请尝试再次执行，或者安装用户脚本代替公共代理。');
+                displayError(
+                    error.message + '\n\n' +
+                    '由于 CORS 限制，尝试请求 Glot API 失败。请尝试再次执行，或者安装用户脚本代替公共代理。'
+                );
+            } else if (error.message.includes('corsdemo')) {
+                displayError(
+                    error.message + '\n\n' +
+                    '第三方CORS代理服务提示需手动激活，请访问' +
+                    ' <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank"">https://cors-anywhere.herokuapp.com/corsdemo</a> ' +
+                    '点击 `Request temporary access to the demo server` 按钮获取临时访问权限后，再返回本页面重新请求执行。\n' +
+                    '\n' +
+                    '或者安装用户脚本代替公共代理。'
+                );
             } else {
                 displayError(error.message);
             }
@@ -542,7 +554,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (data.apiKey) {
                     apiKeyInput.value = decrypt(data.apiKey);
-                    console.log(apiKeyInput.value);
                 } else {
                     apiKeyInput.value = '';
                 }
