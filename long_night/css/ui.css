@@ -86,9 +86,15 @@
     background-color: #eee;
 }
 
-.color-box {
+.square-box {
     width: 12px;
     height: 12px;
+    margin-right: 8px;
+    border: 1px solid #000;
+}
+.wall-box {
+    width: 32px;
+    height: 7px;
     margin-right: 8px;
     border: 1px solid #000;
 }

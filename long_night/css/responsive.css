@@ -76,6 +76,11 @@
         height: 9px;
     }
 
+    .wall-box {
+        width: 22px;
+        height: 5px;
+    }
+
     .back-home {
         font-size: 12px;
         padding: 5px 10px;

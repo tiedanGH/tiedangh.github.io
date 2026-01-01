@@ -114,6 +114,7 @@ class InfiniteMap {
             cell = document.createElement('div');
             cell.className = `cell wall ${orientation}`;
             cell.dataset.type = 'wall';
+            cell.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
         }
 
         cell.style.left = x + 'px';

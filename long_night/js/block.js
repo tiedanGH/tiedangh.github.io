@@ -20,7 +20,20 @@ function loadBlocks() {
 }
 
 function getWallColor(type) {
-    return wallOptions.find(([name]) => name === type)?.[1] || '#D9D9D9';
+    const option = wallOptions.find(([name]) => name === type);
+    return option ? option[3] : '#D9D9D9';
+}
+
+function getWallImage(type, orientation) {
+    const option = wallOptions.find(([name]) => name === type);
+    if (!option) {
+        return orientation === 'horizontal'
+            ? './img/walls/unknown_row.png'
+            : './img/walls/unknown_col.png';
+    }
+    return orientation === 'horizontal'
+        ? `./img/${option[1]}`
+        : `./img/${option[2]}`;
 }
 
 function blockCellEvent(map) {
@@ -45,6 +58,7 @@ function blockCellEvent(map) {
             const block = blocksData[blockId];
             if (!block) return;
 
+            // 先清空区域
             for (let dx = 0; dx < 3; dx++) {
                 for (let dy = 0; dy < 3; dy++) {
                     const i = i0 + dx * 2 + 1;
@@ -61,13 +75,15 @@ function blockCellEvent(map) {
                             const key = `${wi},${wj}`;
                             const wall = map.cells.get(key);
                             if (wall?.dataset.type === 'wall') {
-                                wall.style.backgroundColor = '#FFFFFF';
+                                const orientation = wall.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                                wall.style.backgroundImage = `url('${getWallImage('空', orientation)}')`;
                             }
                         }
                     });
                 }
             }
 
+            // 然后放置区块
             block.forEach(cellInfo => {
                 const i = i0 + cellInfo.pos.x * 2 + 1;
                 const j = j0 + cellInfo.pos.y * 2 + 1;
@@ -86,7 +102,8 @@ function blockCellEvent(map) {
                         let wj = j + (dir === 'top'  ? -1 : dir === 'bottom'? 1 : 0);
                         const wallCell = map.cells.get(`${wi},${wj}`);
                         if (wallCell && wallCell.dataset.type === 'wall') {
-                            wallCell.style.backgroundColor = getWallColor(cellInfo[dir].type);
+                            const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                            wallCell.style.backgroundImage = `url('${getWallImage(cellInfo[dir].type, orientation)}')`;
                         }
                     }
                 });
@@ -280,7 +297,14 @@ function clearArea(map, i0, j0) {
             const j = j0 + dy * 2 + 1;
             const square = map.cells.get(`${i},${j}`);
             if (square?.dataset.type === 'square') {
+                // 清除地形
                 square.style.backgroundImage = 'url(./img/unknown.png)';
+                // 清除附着
+                const attachmentLayer = square.querySelector('.attachment-layer');
+                if (attachmentLayer) {
+                    attachmentLayer.style.backgroundImage = '';
+                    attachmentLayer.remove();
+                }
             }
 
             const directions = [
@@ -289,7 +313,8 @@ function clearArea(map, i0, j0) {
             directions.forEach(([wi, wj]) => {
                 const wall = map.cells.get(`${wi},${wj}`);
                 if (wall?.dataset.type === 'wall') {
-                    wall.style.backgroundColor = '#D9D9D9';
+                    const orientation = wall.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                    wall.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
                 }
             });
         }

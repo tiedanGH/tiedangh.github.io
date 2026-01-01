@@ -32,7 +32,6 @@ html, body {
 }
 
 .cell.wall {
-    background-color: #D9D9D9;
     z-index: 2;
 }
 

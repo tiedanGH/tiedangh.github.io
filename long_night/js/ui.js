@@ -16,11 +16,11 @@ const attachOptions = [
     ['无', 'transparent.png'],
 ];
 const wallOptions = [
-    ['空', '#FFFFFF'],
-    ['普通', '#000000'],
-    ['门', '#EA68A2'],
-    ['门 (开)', '#F8CDE1'],
-    ['未知', '#D9D9D9'],
+    ['空', 'walls/empty_row.png', 'walls/empty_col.png', '#FFFFFF'],
+    ['普通', 'walls/wall_row.png', 'walls/wall_col.png', '#000000'],
+    ['门', 'walls/door_row.png', 'walls/door_col.png', '#EA68A2'],
+    ['门 (开)', 'walls/dooropen_row.png', 'walls/dooropen_col.png', '#F8CDE1'],
+    ['未知', 'walls/unknown_row.png', 'walls/unknown_col.png', '#D9D9D9'],
 ];
 const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
 const MARKER_TYPE = {
@@ -92,8 +92,10 @@ function uiCellEvents(map) {
         if (type === 'square') {
             showSquareAttachSelector(e, cell);
         } else if (type === 'wall') {
-            showSelector(e, wallOptions, c => {
-                cell.style.backgroundColor = c;
+            const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+            showSelector(e, wallOptions, wallType => {
+                const wallImage = getWallImage(wallType, orientation);
+                cell.style.backgroundImage = `url('${wallImage}')`;
             });
         }
     });
@@ -128,7 +130,7 @@ function showSquareAttachSelector(e, cell) {
             li.className = 'option-item';
 
             const img = document.createElement('img');
-            img.className = 'color-box';
+            img.className = 'square-box';
             img.src = `./img/${val}`;
             img.alt = name;
 
@@ -176,27 +178,21 @@ function showSelector(e, options, callback) {
     const ul = document.createElement('ul');
     ul.className = 'option-list';
 
-    options.forEach(([name, val]) => {
+    options.forEach(([name, hImg, _]) => {
         const li = document.createElement('li');
         li.className = 'option-item';
 
-        if (val.endsWith('.png') || val.endsWith('.jpg')) {
-            const img = document.createElement('img');
-            img.className = 'color-box';
-            img.src = `./img/${val}`;
-            img.alt = name;
-            li.appendChild(img);
-        } else {
-            const box = document.createElement('span');
-            box.className = 'color-box';
-            box.style.backgroundColor = val;
-            li.appendChild(box);
-        }
+        // 显示水平墙壁的预览图
+        const img = document.createElement('img');
+        img.className = 'wall-box';
+        img.src = `./img/${hImg}`;
+        img.alt = name;
+        li.appendChild(img);
 
         li.appendChild(document.createTextNode(name));
         li.onclick = () => {
-            callback(val);
-            saveHistory(); // 保存历史
+            callback(name);
+            saveHistory();
             removeSelector();
         };
         ul.appendChild(li);
