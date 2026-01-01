@@ -410,7 +410,8 @@ function movePlayer(direction) {
     }
 
     if (wallCell.dataset.type === 'wall') {
-        wallCell.style.backgroundColor = '#FFFFFF';
+        const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+        wallCell.style.backgroundImage = `url('${getWallImage('空', orientation)}')`;
     }
 
     saveHistory(); // 保存历史
