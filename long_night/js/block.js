@@ -48,6 +48,21 @@ function compareWallPriority(typeA, typeB) {
     return priorityA > priorityB ? typeA : typeB;
 }
 
+// 从墙壁元素中解析当前墙壁类型
+function getCurrentWallType(wallCell) {
+    const currentBg = wallCell.style.backgroundImage;
+    if (!currentBg || currentBg === 'none') {
+        return '未知';
+    }
+    const url = currentBg.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+    const fileName = url.split('/').pop();
+    const wallOption = wallOptions.find(option =>
+        option[1] === `walls/${fileName}` ||
+        option[2] === `walls/${fileName}`
+    );
+    return wallOption ? wallOption[0] : '未知';
+}
+
 function blockCellEvent(map) {
     map.container.addEventListener('click', e => {
         const center = e.target.closest('.cell.center');
@@ -122,21 +137,8 @@ function blockCellEvent(map) {
                             return;
                         }
 
-                        // 获取当前墙壁类型
-                        const currentBg = wallCell.style.backgroundImage;
-                        let currentWallType = '未知';
-                        if (currentBg && currentBg !== 'none') {
-                            const url = currentBg.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
-                            const fileName = url.split('/').pop();
-                            const wallOption = wallOptions.find(option =>
-                                option[1] === `walls/${fileName}` || option[2] === `walls/${fileName}`
-                            );
-                            if (wallOption) {
-                                currentWallType = wallOption[0];
-                            }
-                        }
                         // 比较优先级，仅当新墙壁优先级更高时才更新
-                        const higherPriorityType = compareWallPriority(currentWallType, newWallType);
+                        const higherPriorityType = compareWallPriority(getCurrentWallType(wallCell), newWallType);
                         if (higherPriorityType === newWallType) {
                             wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
                         }
@@ -271,9 +273,9 @@ function createMapBorder(map, startI, startJ, gridWidth, gridHeight) {
         const wallCell = map.cells.get(`${i},${j}`);
 
         if (wallCell && wallCell.dataset.type === 'wall') {
-            const currentColor = wallCell.style.backgroundColor;
-            if (!currentColor || currentColor === '#D9D9D9') {
-                wallCell.style.backgroundColor = '#FFFFFF';
+            if (getCurrentWallType(wallCell) === '未知') {
+                const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                wallCell.style.backgroundImage = `url('${getWallImage('空', orientation)}')`;
             }
         }
     }
