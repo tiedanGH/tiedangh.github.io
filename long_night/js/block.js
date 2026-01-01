@@ -94,7 +94,7 @@ function blockCellEvent(map) {
                 const imgFile = gridOptions.find(([name]) => name === cellInfo.ground.type)?.[1];
                 square.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;
                 const attImgFile = attachOptions.find(([name]) => name === cellInfo.ground.attach)?.[1];
-                setAttachment(square, attImgFile);
+                if (attImgFile) setAttachment(square, attImgFile);
 
                 ['top', 'right', 'bottom', 'left'].forEach(dir => {
                     if (cellInfo[dir].wall) {
