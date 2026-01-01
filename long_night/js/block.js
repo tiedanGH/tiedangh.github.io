@@ -36,6 +36,18 @@ function getWallImage(type, orientation) {
         : `./img/${option[2]}`;
 }
 
+// 墙壁类型的优先级：越靠后优先级越高
+function getWallPriority(type) {
+    if (type === "未知") return -1;
+    return wallOptions.findIndex(([name]) => name === type);
+}
+
+function compareWallPriority(typeA, typeB) {
+    const priorityA = getWallPriority(typeA);
+    const priorityB = getWallPriority(typeB);
+    return priorityA > priorityB ? typeA : typeB;
+}
+
 function blockCellEvent(map) {
     map.container.addEventListener('click', e => {
         const center = e.target.closest('.cell.center');
@@ -101,9 +113,32 @@ function blockCellEvent(map) {
                         let wi = i + (dir === 'left' ? -1 : dir === 'right' ? 1 : 0);
                         let wj = j + (dir === 'top'  ? -1 : dir === 'bottom'? 1 : 0);
                         const wallCell = map.cells.get(`${wi},${wj}`);
-                        if (wallCell && wallCell.dataset.type === 'wall') {
-                            const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
-                            wallCell.style.backgroundImage = `url('${getWallImage(cellInfo[dir].type, orientation)}')`;
+                        if (!wallCell || wallCell.dataset.type !== 'wall') return;
+
+                        const newWallType = cellInfo[dir].type;
+                        const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                        if (wi > i0 && wi < i0 + 6 && wj > j0 && wj < j0 + 6) {
+                            wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
+                            return;
+                        }
+
+                        // 获取当前墙壁类型
+                        const currentBg = wallCell.style.backgroundImage;
+                        let currentWallType = '未知';
+                        if (currentBg && currentBg !== 'none') {
+                            const url = currentBg.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+                            const fileName = url.split('/').pop();
+                            const wallOption = wallOptions.find(option =>
+                                option[1] === `walls/${fileName}` || option[2] === `walls/${fileName}`
+                            );
+                            if (wallOption) {
+                                currentWallType = wallOption[0];
+                            }
+                        }
+                        // 比较优先级，仅当新墙壁优先级更高时才更新
+                        const higherPriorityType = compareWallPriority(currentWallType, newWallType);
+                        if (higherPriorityType === newWallType) {
+                            wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
                         }
                     }
                 });
