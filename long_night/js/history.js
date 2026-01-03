@@ -75,7 +75,8 @@ class HistoryManager {
                     border: cell.style.border
                 },
                 markers: [],
-                attach: null
+                attach: null,
+                customAttach: null
             };
 
             // 保存标记
@@ -92,12 +93,28 @@ class HistoryManager {
 
             // 保存附着
             const attachLayer = cell.querySelector('.attachment-layer');
-            if (attachLayer && attachLayer.style.backgroundImage) {
-                const match = attachLayer.style.backgroundImage.match(/\/([^\/]+)\.(png|jpg|jpeg)/);
-                if (match) {
-                    const fileName = match[1];
-                    const attachName = attachOptions.find(([_, file]) => file.startsWith(fileName))?.[0];
-                    if (attachName) cellCopy.attach = attachName;
+            if (attachLayer) {
+                if (attachLayer.classList.contains('custom-attachment-circle') || attachLayer.style.backgroundColor) {
+                    // 保存自定义附着
+                    cellCopy.customAttach = {
+                        type: 'custom-circle',
+                        color: attachLayer.style.backgroundColor,
+                        borderRadius: attachLayer.style.borderRadius,
+                        width: attachLayer.style.width,
+                        height: attachLayer.style.height,
+                        position: attachLayer.style.position,
+                        top: attachLayer.style.top,
+                        left: attachLayer.style.left,
+                        transform: attachLayer.style.transform
+                    };
+                } else if (attachLayer.style.backgroundImage && attachLayer.style.backgroundImage !== 'none') {
+                    // 保存图片附着
+                    const match = attachLayer.style.backgroundImage.match(/\/([^\/]+)\.(png|jpg|jpeg)/);
+                    if (match) {
+                        const fileName = match[1];
+                        const attachName = attachOptions.find(([_, file]) => file.startsWith(fileName))?.[0];
+                        if (attachName) cellCopy.attach = attachName;
+                    }
                 }
             }
 
@@ -155,8 +172,32 @@ class HistoryManager {
                 existingCell.style.border = cellData.style.border;
 
                 // 恢复附着
-                const attImgFile = attachOptions.find(([name]) => name === cellData.attach)?.[1];
-                setAttachment(existingCell, attImgFile);
+                if (cellData.customAttach) {
+                    // 恢复自定义附着
+                    const layer = document.createElement('div');
+                    layer.className = 'attachment-layer custom-attachment-circle';
+                    layer.style.backgroundColor = cellData.customAttach.color;
+                    layer.style.borderRadius    = cellData.customAttach.borderRadius;
+                    layer.style.width           = cellData.customAttach.width;
+                    layer.style.height          = cellData.customAttach.height;
+                    layer.style.position        = cellData.customAttach.position;
+                    layer.style.top             = cellData.customAttach.top;
+                    layer.style.left            = cellData.customAttach.left;
+                    layer.style.transform       = cellData.customAttach.transform;
+                    existingCell.appendChild(layer);
+                } else if (cellData.attach) {
+                    // 恢复图片附着
+                    const attImgFile = attachOptions.find(([name]) => name === cellData.attach)?.[1];
+                    if (attImgFile) {
+                        const layer = document.createElement('div');
+                        layer.className = 'attachment-layer';
+                        layer.style.backgroundImage     = `url('./img/${attImgFile}')`;
+                        layer.style.backgroundSize      = 'contain';
+                        layer.style.backgroundRepeat    = 'no-repeat';
+                        layer.style.backgroundPosition  = 'center';
+                        existingCell.appendChild(layer);
+                    }
+                }
 
                 // 恢复标记
                 if (cellData.markers && cellData.markers.length > 0) {
@@ -241,9 +282,9 @@ class HistoryManager {
     }
 
     // 清除历史记录
-    clearHistory() {
-        this.history = [];
-        this.currentIndex = -1;
-        this.saveState();
-    }
+    // clearHistory() {
+    //     this.history = [];
+    //     this.currentIndex = -1;
+    //     this.saveState();
+    // }
 }

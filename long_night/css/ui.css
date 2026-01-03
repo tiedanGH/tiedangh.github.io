@@ -86,6 +86,69 @@
     background-color: #eee;
 }
 
+/* 自定义颜色相关样式 */
+.color-input-container {
+    position: fixed;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    min-width: 160px;
+}
+.color-input-container input {
+    padding: 6px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 80px;
+    text-transform: uppercase;
+}
+.color-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+.color-preview {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #000;
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.color-preview.valid {
+    cursor: pointer;
+}
+.color-preview.valid:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+.color-preview.invalid {
+    cursor: not-allowed;
+    background-color: transparent !important;
+}
+/* 自定义附着圆形样式 */
+.custom-attachment-circle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 50%;
+    width: 70%;
+    height: 70%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .square-box {
     width: 12px;
     height: 12px;

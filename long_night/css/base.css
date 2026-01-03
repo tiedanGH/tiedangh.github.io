@@ -26,8 +26,10 @@ html, body {
 .cell.square {
     width: 40px;
     height: 40px;
+    background-color: transparent;
     background-image: url('../img/unknown.png');
     background-size: cover;
+    background-repeat: no-repeat;
     z-index: 1;
 }
 
