@@ -1,5 +1,5 @@
 // 通用颜色输入函数
-function createColorInputPopup(title, onConfirm) {
+function createCustomColorInput(title, onConfirm) {
     const inputContainer = document.createElement('div');
     inputContainer.className = 'color-input-container';
     const titleEl = document.createElement('div');
@@ -14,7 +14,6 @@ function createColorInputPopup(title, onConfirm) {
     const preview = document.createElement('div');
     preview.className = 'color-preview invalid';
     preview.style.backgroundImage = 'url(./img/custom.png)';
-    preview.style.backgroundSize = 'cover';
     colorInput.value = '';
     let isValidColor = false;
     let currentColor = '';
@@ -70,35 +69,29 @@ function createColorInputPopup(title, onConfirm) {
     };
 }
 
-// 选择器位置调整函数
+// 选择器位置调整函数：非移动端在点击位置显示，移动端在css强制居中
 function positionSelector(container, targetElement, isMobile) {
-    if (isMobile) {
-        // 小屏幕居中
-        container.style.left = '50%';
-        container.style.top = '50%';
-        container.style.transform = 'translate(-50%, -50%)';
-    } else {
-        // 大屏幕显示在点击位置的右下方
-        const rect = targetElement.getBoundingClientRect();
-        let left = rect.right + 5;
-        let top = rect.top;
-        // 确保不超出屏幕
-        setTimeout(() => {
-            const containerRect = container.getBoundingClientRect();
-            if (left + containerRect.width > window.innerWidth) {
-                left = rect.left - containerRect.width - 5;
-            }
-            if (top + containerRect.height > window.innerHeight) {
-                top = window.innerHeight - containerRect.height - 10;
-            }
-            if (top < 10) {
-                top = 10;
-            }
-            container.style.left = left + 'px';
-            container.style.top = top + 'px';
-            container.style.transform = 'none';
-        }, 0);
-    }
+    if (isMobile) return;
+
+    const rect = targetElement.getBoundingClientRect();
+    let left = rect.right + 5;
+    let top = rect.top;
+    // 确保不超出屏幕
+    setTimeout(() => {
+        const containerRect = container.getBoundingClientRect();
+        if (left + containerRect.width > window.innerWidth) {
+            left = rect.left - containerRect.width - 5;
+        }
+        if (top + containerRect.height > window.innerHeight) {
+            top = window.innerHeight - containerRect.height - 10;
+        }
+        if (top < 10) {
+            top = 10;
+        }
+        container.style.left = left + 'px';
+        container.style.top = top + 'px';
+        container.style.transform = 'none';
+    }, 0);
 }
 
 // 创建通用选项列表项
@@ -109,7 +102,6 @@ function createOptionItem(name, imageSrc, onClick, imageClass = 'square-box') {
     const img = document.createElement('img');
     img.className = imageClass;
     img.src = imageSrc;
-    img.alt = name;
 
     li.appendChild(img);
     li.appendChild(document.createTextNode(name));
@@ -119,7 +111,7 @@ function createOptionItem(name, imageSrc, onClick, imageClass = 'square-box') {
 }
 
 // 创建自定义选项
-function createCustomOption(idGrid, cell, event, groupType = 'grid') {
+function createCustomOption(cell, event, groupType) {
     const li = document.createElement('li');
     li.className = 'option-item custom-option';
 
@@ -131,43 +123,28 @@ function createCustomOption(idGrid, cell, event, groupType = 'grid') {
     li.appendChild(document.createTextNode('自定义'));
 
     li.onclick = (e) => {
-        const title = idGrid ? '自定义地形颜色' : (groupType === 'attach' ? '自定义附着颜色' : '自定义墙壁颜色');
+        const title = groupType === 'grid' ? '自定义地形颜色' : (groupType === 'attach' ? '自定义附着颜色' : '自定义墙壁颜色');
 
-        const existingInput = document.querySelector('.color-input-container');
-        if (existingInput) {
-            document.body.removeChild(existingInput);
-        }
-        const colorInput = createColorInputPopup(title, (color) => {
+        const colorInput = createCustomColorInput(title, (color) => {
             if (groupType === 'grid') {
                 // 自定义地形
                 cell.style.backgroundImage = 'none';
                 cell.style.backgroundColor = color;
-                cell.style.backgroundSize = 'cover';
             } else if (groupType === 'attach') {
                 // 自定义附着
-                const layer = getAttachmentLayer(cell);
+                const layer = getAttachmentLayer(cell, 'attachment-layer custom-attachment-circle');
                 layer.style.backgroundImage = 'none';
-                layer.style.cssText = '';
                 layer.style.backgroundColor = color;
-                layer.style.borderRadius = '50%';
-                layer.style.width = '70%';
-                layer.style.height = '70%';
-                layer.style.position = 'absolute';
-                layer.style.top = '50%';
-                layer.style.left = '50%';
-                layer.style.transform = 'translate(-50%, -50%)';
             } else if (groupType === 'wall') {
                 // 自定义墙壁
                 cell.style.backgroundImage = 'none';
                 cell.style.backgroundColor = color;
-                cell.style.backgroundSize = 'cover';
             }
             saveHistory();
             removeSelector();
         });
 
-        const isMobile = window.innerWidth <= 600;
-        positionSelector(colorInput.container, e.target, isMobile);
+        positionSelector(colorInput.container, e.target, window.innerWidth <= 600);
 
         document.body.appendChild(colorInput.container);
         colorInput.focus();
@@ -219,11 +196,7 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
 
     const title = document.createElement('div');
     title.textContent = titleText;
-    Object.assign(title.style, {
-        fontWeight: 'bold',
-        textAlign: 'center',
-        margin: '6px 0',
-    });
+    title.className = 'option-title';
     const ul = document.createElement('ul');
     ul.className = 'option-list';
 
@@ -233,15 +206,9 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
             if (groupType === 'grid') {
                 cell.style.backgroundColor = '';
                 cell.style.backgroundImage = `url('./img/${val}')`;
-                cell.style.backgroundSize = 'cover';
             } else if (groupType === 'attach') {
                 const layer = getAttachmentLayer(cell);
-                layer.className = 'attachment-layer';
-                layer.style.cssText = '';
                 layer.style.backgroundImage = `url('./img/${val}')`;
-                layer.style.backgroundSize = 'contain';
-                layer.style.backgroundRepeat = 'no-repeat';
-                layer.style.backgroundPosition = 'center';
             }
             saveHistory();
             removeSelector();
@@ -251,8 +218,7 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
         ul.appendChild(li);
     });
     // 添加自定义选项
-    const idGrid = groupType === 'grid';
-    const customLi = createCustomOption(idGrid, cell, event, groupType);
+    const customLi = createCustomOption(cell, event, groupType);
     ul.appendChild(customLi);
 
     group.appendChild(title);
@@ -269,11 +235,7 @@ function showWallSelector(e, cell, orientation) {
 
     const title = document.createElement('div');
     title.textContent = '墙壁类型';
-    Object.assign(title.style, {
-        fontWeight: 'bold',
-        textAlign: 'center',
-        margin: '6px 0',
-    });
+    title.className = 'option-title';
 
     const ul = document.createElement('ul');
     ul.className = 'option-list';
@@ -286,7 +248,6 @@ function showWallSelector(e, cell, orientation) {
         const img = document.createElement('img');
         img.className = 'wall-box';
         img.src = `./img/${orientation === 'horizontal' ? hImg : vImg}`;
-        img.alt = name;
 
         li.appendChild(img);
         li.appendChild(document.createTextNode(name));
@@ -295,7 +256,6 @@ function showWallSelector(e, cell, orientation) {
             const wallImage = getWallImage(name, orientation);
             cell.style.backgroundImage = `url('${wallImage}')`;
             cell.style.backgroundColor = '';
-            cell.style.backgroundSize = 'cover';
             saveHistory();
             removeSelector();
         };
@@ -303,7 +263,7 @@ function showWallSelector(e, cell, orientation) {
         ul.appendChild(li);
     });
     // 添加自定义墙壁选项
-    const customLi = createCustomOption(false, cell, e, 'wall');
+    const customLi = createCustomOption(cell, e, 'wall');
     ul.appendChild(customLi);
 
     sel.appendChild(title);
@@ -332,16 +292,12 @@ function showPlayerSelector(e, onSelect) {
 
     const title = document.createElement('div');
     title.textContent = '标记玩家';
-    title.style.textAlign = 'center';
-    title.style.fontWeight = 'bold';
-    title.style.fontSize = '16px';
-    title.style.marginBottom = '8px';
+    title.className = 'option-title';
 
     const special = createGrid('10px');
     [['🧍','black'], ['★','red']].forEach(([ch, color]) => {
         const btn = document.createElement('button');
         btn.textContent = ch;
-        btn.style.padding = '4px 6px';
         btn.style.color = color;
         btn.onclick = () => {
             onSelect(ch, color);
@@ -355,7 +311,6 @@ function showPlayerSelector(e, onSelect) {
         const ch = num[i];
         const btn = document.createElement('button');
         btn.textContent = ch;
-        btn.style.padding = '4px 6px';
         btn.onclick = () => {
             onSelect(ch);
             saveHistory(); // 保存历史
@@ -365,11 +320,8 @@ function showPlayerSelector(e, onSelect) {
 
     const clearBtn = document.createElement('button');
     clearBtn.textContent = '清除标记';
+    clearBtn.className = 'clear-btn';
     clearBtn.style.width = '100px';
-    clearBtn.style.display = 'block';
-    clearBtn.style.marginTop = '10px';
-    clearBtn.style.marginLeft = 'auto';
-    clearBtn.style.marginRight = 'auto';
     clearBtn.onclick = () => {
         onSelect('__CLEAR__');
         saveHistory(); // 保存历史

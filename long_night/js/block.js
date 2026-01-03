@@ -235,8 +235,8 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
     });
 
     const clearBtn = document.createElement('button');
-    clearBtn.className = 'clear-btn';
     clearBtn.textContent = '清除区块';
+    clearBtn.className = 'clear-btn';
     clearBtn.onclick = () => onSelect('__CLEAR__');
 
     container.appendChild(normalGrid);
@@ -303,7 +303,6 @@ const adjustElementPosition = (element, e) => {
     if (rect.left < 10) {
         element.style.left = '10px';
     }
-
     // 调整垂直位置
     if (rect.bottom > windowHeight - 10) {
         const newTop = e.clientY - rect.height - 20;

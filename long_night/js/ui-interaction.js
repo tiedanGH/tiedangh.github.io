@@ -6,12 +6,12 @@ function setAttachment(cell, imgFile) {
         : '';
 }
 
-function getAttachmentLayer(cell) {
+function getAttachmentLayer(cell, className = 'attachment-layer') {
     let layer = cell.querySelector('.attachment-layer');
     if (layer) return layer;
 
     layer = document.createElement('div');
-    layer.className = 'attachment-layer';
+    layer.className = className;
     cell.appendChild(layer);
     return layer;
 }
