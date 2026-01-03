@@ -10,6 +10,10 @@ body {
 img {
     vertical-align: middle;
 }
+a {
+    color: blue;
+    text-decoration: none;
+}
 a:hover {
     filter: brightness(85%);
 }

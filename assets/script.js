@@ -8,7 +8,7 @@
         window.addEventListener("DOMContentLoaded", function() {
             const info = document.querySelector(".info");
             if (info) {
-                info.innerHTML = 'Github Page：<a href="https://page.tiedan.site">https://page.tiedan.site</a>';
+                info.innerHTML = 'Github Page 备用地址：<a href="https://page.tiedan.site" target="_blank">page.tiedan.site</a>';
             }
         });
     }
