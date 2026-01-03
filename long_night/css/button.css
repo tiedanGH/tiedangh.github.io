@@ -1,0 +1,205 @@
+/* 按钮样式 */
+.back-home {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    padding: 6px 12px;
+    background: #01b0f1;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background 0.2s;
+}
+.back-home:hover {
+    background: #1f8bff;
+}
+
+.control-btn {
+    position: fixed;
+    top: 10px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background 0.2s;
+}
+.control-btn:disabled {
+    background: #CCCCCC;
+    cursor: not-allowed;
+}
+.control-btn:not(:disabled):hover {
+    background: var(--hover-bg);
+}
+
+.help-button {
+    right: 10px;
+    background: #01b0f1;
+    --hover-bg: #1f8bff;
+}
+.redo-button {
+    right: 60px;
+    background: #4CAF50;
+    --hover-bg: #45a049;
+}
+.undo-button {
+    right: 110px;
+    background: #FF6B6B;
+    --hover-bg: #FF5252;
+}
+
+/* 方向控制按钮 */
+.direction-controls {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    pointer-events: none;
+}
+
+.direction-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.direction-btn {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    background-color: rgba(1, 176, 241, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    touch-action: manipulation;
+    user-select: none;
+    pointer-events: auto;
+}
+.direction-btn:active {
+    background-color: rgba(31, 139, 255, 0.9);
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 帮助提示框样式 */
+#help-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    text-align: center;
+    width: 370px;
+    line-height: 1.6;
+    color: #333;
+}
+
+#help-container h2 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #01b0f1;
+}
+#help-container p {
+    margin: 10px 0;
+    font-size: 16px;
+    text-align: left;
+}
+#help-container span {
+    font-size: 22px;
+}
+
+.close-help-button {
+    margin-top: 18px;
+    padding: 10px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #01b0f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+.close-help-button:hover {
+    filter: brightness(90%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .back-home {
+        font-size: 12px;
+        padding: 5px 10px;
+        top: 8px;
+        left: 8px;
+    }
+
+    .control-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+        top: 8px;
+    }
+    .help-button {
+        right: 8px;
+    }
+    .redo-button {
+        right: 48px;
+    }
+    .undo-button {
+        right: 88px;
+    }
+
+    /* 按钮仅在移动端显示 */
+    .direction-controls {
+        display: flex;
+    }
+
+    #help-container {
+        padding: 20px;
+        font-size: 15px;
+        width: 300px;
+    }
+    #help-container h2 {
+        font-size: 18px;
+    }
+    #help-container p {
+        font-size: 14px;
+    }
+
+    .close-help-button {
+        font-size: 15px;
+        padding: 10px 20px;
+        width: 100%;
+    }
+}

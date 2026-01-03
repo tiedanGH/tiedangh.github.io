@@ -75,3 +75,30 @@ html, body {
     pointer-events: none;
     z-index: 3;
 }
+
+/* 标记图层样式 */
+.marker-container {
+    z-index: 5;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .cell.square {
+        width: 30px;
+        height: 30px;
+    }
+
+    .cell.wall.vertical {
+        width: 9px;
+        height: 30px;
+    }
+    .cell.wall.horizontal {
+        width: 30px;
+        height: 9px;
+    }
+
+    .cell.center {
+        width: 9px;
+        height: 9px;
+    }
+}
