@@ -132,7 +132,8 @@ function createCustomOption(cell, event, groupType) {
                 cell.style.backgroundColor = color;
             } else if (groupType === 'attach') {
                 // 自定义附着
-                const layer = getAttachmentLayer(cell, 'attachment-layer custom-attachment-circle');
+                const layer = getAttachmentLayer(cell);
+                layer.classList.add('custom-attach-circle');
                 layer.style.backgroundImage = 'none';
                 layer.style.backgroundColor = color;
             } else if (groupType === 'wall') {
@@ -167,27 +168,6 @@ function createCustomOption(cell, event, groupType) {
     return li;
 }
 
-function showSquareAttachSelector(e, cell) {
-    const sel = document.createElement('div');
-    sel.className = 'selector';
-    sel.style.left = e.clientX + 'px';
-    sel.style.top = e.clientY + 'px';
-    sel.style.display = 'flex';
-
-    // 创建地形组
-    const gridGroup = createOptionGroup('地形', gridOptions, cell, e, 'grid');
-    // 创建附着组
-    const attachGroup = createOptionGroup('附着', attachOptions, cell, e, 'attach');
-
-    sel.appendChild(gridGroup);
-    sel.appendChild(attachGroup);
-    document.body.appendChild(sel);
-
-    setTimeout(() => {
-        adjustElementPosition(sel, e);
-    }, 0);
-}
-
 // 创建选项组
 function createOptionGroup(titleText, options, cell, event, groupType = 'grid') {
     const group = document.createElement('div');
@@ -208,6 +188,7 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
                 cell.style.backgroundImage = `url('./img/${val}')`;
             } else if (groupType === 'attach') {
                 const layer = getAttachmentLayer(cell);
+                layer.style.backgroundColor = '';
                 layer.style.backgroundImage = `url('./img/${val}')`;
             }
             saveHistory();
@@ -224,6 +205,28 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
     group.appendChild(title);
     group.appendChild(ul);
     return group;
+}
+
+// 地形与附着选择器
+function showSquareAttachSelector(e, cell) {
+    const sel = document.createElement('div');
+    sel.className = 'selector';
+    sel.style.left = e.clientX + 'px';
+    sel.style.top = e.clientY + 'px';
+    sel.style.display = 'flex';
+
+    // 创建地形组
+    const gridGroup = createOptionGroup('地形', gridOptions, cell, e, 'grid');
+    // 创建附着组
+    const attachGroup = createOptionGroup('附着', attachOptions, cell, e, 'attach');
+
+    sel.appendChild(gridGroup);
+    sel.appendChild(attachGroup);
+    document.body.appendChild(sel);
+
+    setTimeout(() => {
+        adjustElementPosition(sel, e);
+    }, 0);
 }
 
 // 墙壁选择器
@@ -275,6 +278,7 @@ function showWallSelector(e, cell, orientation) {
     }, 0);
 }
 
+// 玩家标记选择器
 function showPlayerSelector(e, onSelect) {
     const panel = document.createElement('div');
     panel.className = 'selector';

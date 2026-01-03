@@ -94,7 +94,7 @@ class HistoryManager {
             // 保存附着
             const attachLayer = cell.querySelector('.attachment-layer');
             if (attachLayer) {
-                if (attachLayer.classList.contains('custom-attachment-circle') || attachLayer.style.backgroundColor) {
+                if (attachLayer.classList.contains('custom-attach-circle') || attachLayer.style.backgroundColor) {
                     // 保存自定义附着
                     cellCopy.customAttach = {
                         type: 'custom-circle',
@@ -175,7 +175,7 @@ class HistoryManager {
                 if (cellData.customAttach) {
                     // 恢复自定义附着
                     const layer = document.createElement('div');
-                    layer.className = 'attachment-layer custom-attachment-circle';
+                    layer.className = 'attachment-layer custom-attach-circle';
                     layer.style.backgroundColor = cellData.customAttach.color;
                     layer.style.borderRadius    = cellData.customAttach.borderRadius;
                     layer.style.width           = cellData.customAttach.width;

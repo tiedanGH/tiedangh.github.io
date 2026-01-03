@@ -143,7 +143,7 @@
     background-color: transparent !important;
 }
 /* 自定义附着圆形样式 */
-.custom-attachment-circle {
+.custom-attach-circle {
     position: absolute;
     pointer-events: none;
     z-index: 3;

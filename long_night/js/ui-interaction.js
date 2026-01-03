@@ -1,18 +1,19 @@
 
 function setAttachment(cell, imgFile) {
     const layer = getAttachmentLayer(cell);
+    layer.style.backgroundColor = '';
     layer.style.backgroundImage = imgFile
         ? `url('./img/${imgFile}')`
         : '';
 }
 
-function getAttachmentLayer(cell, className = 'attachment-layer') {
+function getAttachmentLayer(cell) {
     let layer = cell.querySelector('.attachment-layer');
-    if (layer) return layer;
-
-    layer = document.createElement('div');
-    layer.className = className;
-    cell.appendChild(layer);
+    if (!layer) {
+        layer = document.createElement('div');
+        cell.appendChild(layer);
+    }
+    layer.className = 'attachment-layer';
     return layer;
 }
 
