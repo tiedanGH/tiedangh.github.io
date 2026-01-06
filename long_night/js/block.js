@@ -1,5 +1,5 @@
 
-const BLOCKS_VERSION = '20251221';
+const BLOCKS_VERSION = '20260105';
 
 let blocksData = {};
 

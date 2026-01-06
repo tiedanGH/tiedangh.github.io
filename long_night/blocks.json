@@ -1139,7 +1139,7 @@
       "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": false}
     }
   ],
-  "33": [
+  "31": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
@@ -1177,7 +1177,7 @@
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
-  "34": [
+  "32": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
@@ -1215,7 +1215,7 @@
       "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
-  "35": [
+  "33": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
@@ -1253,7 +1253,7 @@
       "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
-  "36": [
+  "34": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
@@ -1291,7 +1291,7 @@
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
-  "37": [
+  "35": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
@@ -1329,7 +1329,7 @@
       "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
-  "38": [
+  "36": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
