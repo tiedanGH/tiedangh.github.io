@@ -1,5 +1,12 @@
 
-const BLOCKS_VERSION = '20260105';
+function getScriptVersion() {
+    const script = document.currentScript;
+    if (!script) return '';
+    const url = new URL(script.src, location.href);
+    return url.searchParams.get('v') || '';
+}
+
+const BLOCKS_VERSION = getScriptVersion();
 
 let blocksData = {};
 
@@ -11,7 +18,7 @@ function loadBlocks() {
         })
         .then(data => {
             blocksData = data;
-            console.log('Blocks loaded:', blocksData);
+            console.log('Blocks loaded:', BLOCKS_VERSION, blocksData);
         })
         .catch(err => {
             console.error('Failed to load blocks:', err);
