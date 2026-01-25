@@ -1367,6 +1367,234 @@
       "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
+  "37": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "树丛", "attach": "按钮"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    }
+  ],
+  "38": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "水洼"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "水洼"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "门", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "树丛", "attach": "按钮"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "水洼"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "水洼"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "普通", "wall": false}
+    }
+  ],
+  "39": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "陷阱" , "attach": "按钮"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "门", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": true}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    }
+  ],
+  "40": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "陷阱", "attach": "按钮"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    }
+  ],
+  "41": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "门", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "树丛", "attach": "按钮"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门 (开)", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门", "wall": true}
+    }
+  ],
+  "42": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "树丛", "attach": "按钮"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
+    }
+  ],
   "E1": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
