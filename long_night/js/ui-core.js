@@ -22,9 +22,20 @@ const wallOptions = [
     ['门 (开)', 'walls/dooropen_row.png', 'walls/dooropen_col.png', '#F8CDE1'],
     ['未知', 'walls/unknown_row.png', 'walls/unknown_col.png', '#D9D9D9'],
 ];
+
 const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
+
+const markerEmojis = [
+    { emoji: '🧍', color: 'black', name: '玩家' },
+    { emoji: '👹', color: 'orange', name: '米诺陶斯' },
+    { emoji: '💣', color: 'black', name: '邦邦' },
+    { emoji: '★', color: 'red', name: '星星' },
+];
+// 不允许重复的标记类型
 const MARKER_TYPE = {
     '🧍': 'player',
+    '👹': 'minotaur',
+    '💣': 'bangbang',
 };
 
 // 玩家移动相关

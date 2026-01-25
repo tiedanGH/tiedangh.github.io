@@ -134,7 +134,23 @@ function movePlayer(direction) {
 
     if (wallCell.dataset.type === 'wall') {
         const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
-        wallCell.style.backgroundImage = `url('${getWallImage('空', orientation)}')`;
+
+        const currentWallType = getCurrentWallType(wallCell);
+        let newWallType = '空';
+
+        if (currentWallType === '门') {
+            newWallType = '门 (开)';  // 如果是关闭的门，设为打开的门
+        } else if (currentWallType === '门 (开)') {
+            newWallType = '门 (开)';  // 如果是打开的门，保持为打开的门
+        } else if (currentWallType === '未知') {
+            newWallType = '空';  // 如果是未知墙壁，设为空墙
+        } else if (currentWallType === '空') {
+            newWallType = '空';  // 如果是空墙，保持为空
+        } else if (currentWallType === '普通') {
+            newWallType = '空';  // 如果是普通墙，设为空墙
+        }
+
+        wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
     }
 
     saveHistory(); // 保存历史

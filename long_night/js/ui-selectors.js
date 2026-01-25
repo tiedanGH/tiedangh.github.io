@@ -298,13 +298,15 @@ function showPlayerSelector(e, onSelect) {
     title.textContent = '标记玩家';
     title.className = 'option-title';
 
+    // emoji标记
     const special = createGrid('10px');
-    [['🧍','black'], ['★','red']].forEach(([ch, color]) => {
+    markerEmojis.forEach(({emoji, color, name}) => {
         const btn = document.createElement('button');
-        btn.textContent = ch;
+        btn.textContent = emoji;
         btn.style.color = color;
+        btn.title = name; // 悬停提示
         btn.onclick = () => {
-            onSelect(ch, color);
+            onSelect(emoji, color);
             saveHistory(); // 保存历史
         };
         special.appendChild(btn);
