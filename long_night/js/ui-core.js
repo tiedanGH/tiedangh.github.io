@@ -6,13 +6,13 @@ const gridOptions = [
     ['传送门', 'portal.png'],
     ['陷阱', 'trap.png'],
     ['热源', 'heat.png'],
-    ['箱子', 'box.png'],
     ['逃生舱', 'exit.png'],
     ['未知', 'unknown.png'],
 ];
 const attachOptions = [
     ['按钮', 'button.png'],
     ['炸弹', 'bomb.png'],
+    ['箱子', 'box.png'],
     ['无', 'transparent.png'],
 ];
 const wallOptions = [

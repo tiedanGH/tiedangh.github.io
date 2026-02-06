@@ -60,8 +60,9 @@ html, body {
     cursor: pointer;
     width: 11px;
     height: 11px;
-    background-color: #000;
-    border: 1px solid #000;
+    background-image: url('../img/walls/corner.png');
+    background-size: cover;
+    background-repeat: no-repeat;
     z-index: 3;
 }
 

@@ -1005,7 +1005,7 @@
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     },
     {
-      "pos": {"y": 1, "x": 1}, "ground": {"type": "箱子"},
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "空地", "attach": "箱子"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     },
     {
@@ -1027,7 +1027,7 @@
   ],
   "28": [
     {
-      "pos": {"y": 0, "x": 0}, "ground": {"type": "箱子"},
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地", "attach": "箱子"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     },
     {
@@ -1059,7 +1059,7 @@
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     },
     {
-      "pos": {"y": 2, "x": 2}, "ground": {"type": "箱子"},
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地", "attach": "箱子"},
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
