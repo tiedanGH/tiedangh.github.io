@@ -58,6 +58,10 @@ function compareWallPriority(typeA, typeB) {
 // 从墙壁元素中解析当前墙壁类型
 function getCurrentWallType(wallCell) {
     const currentBg = wallCell.style.backgroundImage;
+    const currentColor = wallCell.style.backgroundColor;
+    if (currentColor && currentColor !== '') {
+        return '自定义';
+    }
     if (!currentBg || currentBg === 'none') {
         return '未知';
     }

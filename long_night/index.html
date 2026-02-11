@@ -17,14 +17,16 @@
     <link rel="stylesheet" href="css/base.css?v=20260205">
     <link rel="stylesheet" href="css/selector.css?v=20260104">
     <link rel="stylesheet" href="css/button.css?v=20260104">
+    <link rel="stylesheet" href="css/save.css?v=20260210">
 
     <script src="js/main.js?v=20251222"></script>
     <script src="js/map.js?v=20251231"></script>
     <script src="js/ui-selectors.js?v=20260125"></script>
     <script src="js/ui-interaction.js?v=20260125"></script>
     <script src="js/ui-core.js?v=20260205"></script>
-    <script src="js/block.js?v=20260205"></script>
+    <script src="js/block.js?v=20260210"></script>
     <script src="js/history.js?v=20260104"></script>
+    <script src="js/save.js?v=20260210"></script>
 </head>
 <body>
 
@@ -33,17 +35,53 @@
     <p>🖱️ <b>[左键] 点击</b>格子或墙壁以设置地形</p>
     <p>🖱️ <b>[右键]或[双击]</b> 格子来标记玩家位置</p>
     <p><span>▪️</span> <b>[左键] 点击</b>格子角落的<b>黑点</b>，可选择区块进行放置</p>
-    <p>🔼🔽◀️▶️ <b>[移动]</b> 玩家来自动更新地图</p>
+    <p>🔼🔽◀️▶️ <b>[移动]</b> 玩家 🧍 来自动更新地图</p>
     <p>↶ <b>[撤销]或[Ctrl+Z]</b> 最多可撤销 50 步操作</p>
     <p>↷ <b>[重做]或[Ctrl+Y]</b> 恢复撤销的操作</p>
     <p>⌨️ <b>[Shift]+[右键]</b> 快速清除格子所有标记</p>
     <p>✋ <b>拖动</b>来拓展地图，<b>刷新</b>将重置草稿本</p>
+    <p>📁 <b>[存档管理]</b> 可保存最多5个地图，支持导入导出</p>
     <button id="close-alert" class="close-help-button">我知道了</button>
+</div>
+
+<div id="save-manager" class="save-manager">
+    <div class="save-header">
+        <h3>存档管理</h3>
+        <button id="close-save-manager" class="close-save-btn">×</button>
+    </div>
+
+    <div class="save-controls">
+        <div class="save-stats">
+            <span class="save-count">存档：<span id="current-save-count">0</span> / 5</span>
+        </div>
+        <div class="save-buttons">
+            <button id="create-new-save" class="action-btn create-btn">+ 新建存档</button>
+            <button id="import-save" class="action-btn import-btn">⬇ 导入存档</button>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
+        </div>
+    </div>
+
+    <div class="save-slots">
+        <div class="empty-slot-message" id="empty-slot-message">
+            <div class="empty-icon">📁</div>
+            <div class="empty-text"><b>暂无存档</b><br>点击上方"新建存档"按钮保存当前地图</div>
+        </div>
+    </div>
+</div>
+<div id="custom-alert-overlay" class="custom-alert-overlay"></div>
+<div id="custom-alert" class="custom-alert">
+    <div class="custom-alert-header">
+        <span id="custom-alert-title">提示</span>
+        <button class="close-save-btn" id="custom-alert-close">×</button>
+    </div>
+    <div class="custom-alert-content" id="custom-alert-message"></div>
+    <div class="custom-alert-buttons" id="custom-alert-buttons"></div>
 </div>
 
 <a href="../" class="back-home">返回主页</a>
 <button id="undo-button" class="control-btn undo-button">↶</button>
 <button id="redo-button" class="control-btn redo-button">↷</button>
+<button id="save-button" class="control-btn save-button" title="存档管理">📁</button>
 <button id="help-button" class="control-btn help-button" title="查看帮助">?</button>
 
 <div id="map-container"></div>

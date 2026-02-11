@@ -46,13 +46,18 @@
     background: #01b0f1;
     --hover-bg: #1f8bff;
 }
-.redo-button {
+.save-button {
     right: 60px;
+    background: #FFA500;
+    --hover-bg: #FF8C00;
+}
+.redo-button {
+    right: 110px;
     background: #4CAF50;
     --hover-bg: #45a049;
 }
 .undo-button {
-    right: 110px;
+    right: 160px;
     background: #FF6B6B;
     --hover-bg: #FF5252;
 }
@@ -173,11 +178,14 @@
     .help-button {
         right: 8px;
     }
-    .redo-button {
+    .save-button {
         right: 48px;
     }
-    .undo-button {
+    .redo-button {
         right: 88px;
+    }
+    .undo-button {
+        right: 128px;
     }
 
     /* 按钮仅在移动端显示 */

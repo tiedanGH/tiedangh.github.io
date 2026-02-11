@@ -1,0 +1,312 @@
+/* 存档管理弹窗 */
+.save-manager {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+}
+
+.save-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: #01b0f1;
+    color: white;
+}
+.save-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.close-save-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+.close-save-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 存档控制栏 */
+.save-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eaeaea;
+}
+.save-stats {
+    font-size: 14px;
+    color: #666;
+}
+.save-count {
+    font-weight: 500;
+}
+.save-count span {
+    color: #01b0f1;
+    font-weight: bold;
+}
+.save-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.create-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+.create-btn:hover {
+    background-color: #45a049;
+}
+.import-btn {
+    background-color: #607D8B;
+    color: white;
+}
+.import-btn:hover {
+    background-color: #455A64;
+}
+
+/* 存档槽位区域 */
+.save-slots {
+    padding: 10px 15px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 200px;
+}
+.save-slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: white;
+    transition: border-color 0.2s;
+}
+.save-slot:hover {
+    border-color: #01b0f1;
+}
+
+.save-info {
+    flex: 1;
+}
+.save-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 4px;
+}
+.save-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: #888;
+}
+.save-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.slot-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+.load-btn {
+    background-color: #2196F3;
+    color: white;
+}
+.load-btn:hover {
+    background-color: #1976D2;
+}
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+.export-btn {
+    background-color: #FF9800;
+    color: white;
+}
+.export-btn:hover {
+    background-color: #F57C00;
+}
+
+/* 空存档提示 */
+.empty-slot-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: #aaa;
+    text-align: center;
+}
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+.empty-text {
+    font-size: 15px;
+    color: #888;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+/* 自定义弹窗样式 */
+.custom-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+    width: 350px;
+    max-width: 90vw;
+    padding: 0;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+}
+
+.custom-alert-header {
+    padding: 8px 22px;
+    background-color: #01b0f1;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-alert-content {
+    padding: 10px 10px;
+    line-height: 1.6;
+    color: #333;
+    text-align: center;
+    font-size: 16px;
+}
+
+.custom-alert-buttons {
+    padding: 0 24px 15px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.custom-alert-btn {
+    padding:8px 28px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+.custom-alert-confirm {
+    background-color: #4CAF50;
+    color: white;
+}
+.custom-alert-confirm:hover {
+    background-color: #45a049;
+}
+.custom-alert-cancel {
+    background-color: #f44336;
+    color: white;
+}
+.custom-alert-cancel:hover {
+    background-color: #d32f2f;
+}
+.custom-alert-neutral {
+    background-color: #2196F3;
+    color: white;
+}
+.custom-alert-neutral:hover {
+    background-color: #1976D2;
+}
+
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2999;
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .save-manager {
+        width: 95vw;
+        max-height: 85vh;
+    }
+
+    .save-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .save-buttons {
+        justify-content: flex-start;
+    }
+
+    .action-btn {
+        flex: 1;
+    }
+
+    .save-slot {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .save-actions {
+        justify-content: flex-start;
+    }
+}
