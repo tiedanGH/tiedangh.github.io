@@ -53,7 +53,7 @@ function uiCellEvents(map) {
         const cell = e.target.closest('.cell');
         if (!cell || cell.classList.contains('center') || cell.dataset.type !== 'square') return;
 
-        if (now - lastClickTime < 500) {
+        if (now - lastClickTime < 800) {
             e.preventDefault();
             removeSelector();
             showPlayerSelector(e, (choice, color) => {
