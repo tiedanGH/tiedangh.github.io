@@ -22,21 +22,44 @@ function getMarkerContainer(cell) {
     if (ctr) return ctr;
     ctr = document.createElement('div');
     ctr.className = 'marker-container';
-    Object.assign(ctr.style, {
-        position: 'absolute',
-        top:      '0',
-        left:     '0',
-        right:    '0',
-        bottom:   '0',
-        display:          'flex',
-        flexWrap:         'wrap',
-        justifyContent:   'center',
-        alignItems:       'center',
-        gap:              '2px',
-        pointerEvents:    'none',
-    });
     cell.appendChild(ctr);
     return ctr;
+}
+
+// 根据格子的地形和附着获取特殊颜色（附着 > 地形）
+function getGroundSpecialColor(cell) {
+    if (!cell || cell.dataset.type !== 'square') return null;
+
+    const getFileName = bg =>
+        bg?.includes('none')
+            ? null
+            : bg?.match(/\/([^\/]+\.(png|jpg|jpeg))/)?.[1] ?? null;
+    const isTarget = (fileName, options, target) =>
+        fileName && options.find(([, file]) => file === fileName)?.[0] === target;
+
+    // 检查附着
+    const attachLayer = cell.querySelector('.attachment-layer');
+    if (attachLayer && !attachLayer.classList.contains('custom-attach-circle')) {
+        const fileName = getFileName(attachLayer.style.backgroundImage);
+        if (isTarget(fileName, attachOptions, '炸弹')) return '#FFFF00';
+    }
+    // 检查地形
+    const fileName = getFileName(cell.style.backgroundImage);
+    if (isTarget(fileName, gridOptions, '传送门')) return '#FFFF00';
+
+    return null;
+}
+
+// 刷新指定格子内所有标记的颜色
+function refreshMarkerColors(cell) {
+    if (!cell || cell.dataset.type !== 'square') return;
+    const markers = cell.querySelectorAll('.marker');
+    markers.forEach(marker => {
+        const text = marker.textContent;
+        if (num.includes(text)) {
+            marker.style.color = getGroundSpecialColor(cell) || 'black';
+        }
+    });
 }
 
 function initKeyboardControls() {
@@ -158,7 +181,6 @@ function movePlayer(direction) {
 
 function addMarker(cell, marker, color = 'black') {
     const type = MARKER_TYPE[marker];
-
     if (type) {
         document.querySelectorAll('.marker').forEach(m => {
             if (m.dataset.markerType === type) {
@@ -170,19 +192,15 @@ function addMarker(cell, marker, color = 'black') {
     const ctr = getMarkerContainer(cell);
     const span = document.createElement('span');
     span.className = 'marker';
+    span.style.color = color;
     span.textContent = marker;
-
     if (type) {
         span.dataset.markerType = type;
     }
 
-    Object.assign(span.style, {
-        color,
-        fontSize: '14px',
-        lineHeight: '1',
-    });
-
     ctr.appendChild(span);
+
+    refreshMarkerColors(cell);  // 刷新标记颜色
 
     if (marker === '🧍') {
         const currentBg = cell.style.backgroundImage;

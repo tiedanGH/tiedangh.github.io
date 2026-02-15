@@ -134,6 +134,8 @@ function blockCellEvent(map) {
                 const attImgFile = attachOptions.find(([name]) => name === cellInfo.ground.attach)?.[1];
                 if (attImgFile) setAttachment(square, attImgFile);
 
+                refreshMarkerColors(square);  // 刷新标记颜色
+
                 ['top', 'right', 'bottom', 'left'].forEach(dir => {
                     if (cellInfo[dir].wall) {
                         let wi = i + (dir === 'left' ? -1 : dir === 'right' ? 1 : 0);

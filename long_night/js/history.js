@@ -226,8 +226,6 @@ class HistoryManager {
                         span.className = 'marker';
                         span.textContent = markerData.text;
                         span.style.color = markerData.color;
-                        span.style.fontSize = '14px';
-                        span.style.lineHeight = '1';
                         if (markerData.type) span.dataset.markerType = markerData.type;
                         container.appendChild(span);
 

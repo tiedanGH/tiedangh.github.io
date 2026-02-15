@@ -141,6 +141,7 @@ function createCustomOption(cell, event, groupType) {
                 cell.style.backgroundImage = 'none';
                 cell.style.backgroundColor = color;
             }
+            refreshMarkerColors(cell);  // 刷新标记颜色
             saveHistory();
             removeSelector();
         });
@@ -191,6 +192,7 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
                 layer.style.backgroundColor = '';
                 layer.style.backgroundImage = `url('./img/${val}')`;
             }
+            refreshMarkerColors(cell);  // 刷新标记颜色
             saveHistory();
             removeSelector();
         };

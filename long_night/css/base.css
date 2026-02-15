@@ -80,6 +80,23 @@ html, body {
 /* 标记图层样式 */
 .marker-container {
     z-index: 5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+}
+
+/* 标记样式 */
+.marker {
+    font-size: 14px;
+    line-height: 1;
 }
 
 /* 响应式设计 */
@@ -101,5 +118,9 @@ html, body {
     .cell.center {
         width: 9px;
         height: 9px;
+    }
+
+    .marker {
+        font-size: 12px;
     }
 }
