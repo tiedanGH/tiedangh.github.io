@@ -14,11 +14,16 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/output.js"></script>
+    <script src="js/executor.js"></script>
     <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -44,6 +49,7 @@
         <div class="content-wrapper">
             <div class="form-container">
                 <form id="codeForm">
+                    <!-- API Key -->
                     <div class="form-group">
                         <label for="apiKey">
                             Glot API Key
@@ -74,33 +80,36 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="language">编程语言</label>
-                        <select id="language" required>
-                            <option value="">请选择语言</option>
-                            <option value="python">Python</option>
-                            <option value="javascript">JavaScript</option>
-                            <option value="java">Java</option>
-                            <option value="c">C</option>
-                            <option value="cpp">C++</option>
-                            <option value="go">Go</option>
-                            <option value="rust">Rust</option>
-                            <option value="ruby">Ruby</option>
-                            <option value="php">PHP</option>
-                            <option value="swift">Swift</option>
-                            <option value="typescript">TypeScript</option>
-                            <option value="bash">Bash</option>
-                        </select>
+                    <!-- 编程语言 + 代码来源 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="language">编程语言</label>
+                            <select id="language" required>
+                                <option value="">请选择语言</option>
+                                <option value="python">Python</option>
+                                <option value="c">C</option>
+                                <option value="cpp">C++</option>
+                                <option value="java">Java</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="typescript">TypeScript</option>
+                                <option value="go">Go</option>
+                                <option value="rust">Rust</option>
+                                <option value="ruby">Ruby</option>
+                                <option value="php">PHP</option>
+                                <option value="swift">Swift</option>
+                                <option value="bash">Bash</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="codeSource">代码来源</label>
+                            <select id="codeSource">
+                                <option value="textarea">在文本框内输入代码</option>
+                                <option value="url">从 URL 获取代码</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="codeSource">代码来源</label>
-                        <select id="codeSource">
-                            <option value="textarea">在文本框内输入代码</option>
-                            <option value="url">从 URL 获取代码</option>
-                        </select>
-                    </div>
-
+                    <!-- URL输入 -->
                     <div class="form-group" id="urlGroup" style="display: none;">
                         <label for="codeUrl">
                             代码 URL
@@ -121,17 +130,58 @@
                         <input type="url" id="codeUrl" placeholder="请输入代码 URL">
                     </div>
 
+                    <!-- 代码输入 -->
                     <div class="form-group" id="codeGroup">
                         <label for="code">代码</label>
                         <textarea id="code" placeholder="请输入您的代码" rows="15"></textarea>
                     </div>
 
+                    <!-- 输出格式 + 存储功能 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="outputFormat">
+                                输出格式
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="tooltip-content">
+                                        <strong>输出格式：</strong><br>
+                                        • text: 纯文本输出<br>
+                                        • markdown: 将 markdown 和 html 可视化渲染<br>
+                                        • image: 从链接直接获取图片<br>
+                                        • json: 输出为JSON格式，自定义输出格式
+                                    </div>
+                                </span>
+                            </label>
+                            <select id="outputFormat">
+                                <option value="text">text</option>
+                                <option value="markdown">markdown</option>
+                                <option value="image">image</option>
+                                <option value="json">json</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="storageOption">
+                                存储功能
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="tooltip-content">
+                                        <strong>...coming s∞n...</strong><br>
+                                    </div>
+                                </span>
+                            </label>
+                            <select id="storageOption">
+                                <option value="not-implemented">尚未实现</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 程序输入 (stdin) -->
                     <div class="form-group">
                         <label for="stdin">程序输入 (stdin)</label>
                         <textarea id="stdin" placeholder="请输入程序的标准输入（可选）" rows="3"></textarea>
                     </div>
 
-                    <!-- 调试模式开关 - 在HTTPS环境下隐藏 -->
+                    <!-- 调试模式 -->
                     <div class="form-group debug-section" id="debugSection">
                         <label class="checkbox-label">
                             <input type="checkbox" id="debugMode">
