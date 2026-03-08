@@ -7,6 +7,8 @@ on:
 jobs:
   auto-deploy:
     if: ${{ github.event.repository.fork == false }}
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 3
 
@@ -14,7 +16,7 @@ jobs:
       PROJECT_NAME: tiedan
       SERVER: ${{ secrets.SERVER }}
       TOKEN: ${{ secrets.TOKEN }}
-      
+
     steps:
       - name: Deploy
         run: |
