@@ -56,20 +56,11 @@ const GlotOutput = (() => {
     }
 
     function renderMarkdownContent(text) {
-        // Extract <style> blocks
-        const styles = [];
-        let content = text.replace(/<style[\s\S]*?<\/style>/gi, m => {
-            styles.push(m);
-            return '';
-        });
-
-        // If remaining content has HTML element tags, render as-is
-        const hasHtml = /<(?!br\s*\/?)[a-z][^>]*>/i.test(content);
-        if (!hasHtml && content.trim()) {
-            content = convertSimpleMarkdown(content);
+        const hasHtml = /<(?!br\s*\/?)[a-z][^>]*>/i.test(text);
+        if (!hasHtml && text.trim()) {
+            return convertSimpleMarkdown(text);
         }
-
-        return styles.join('\n') + content;
+        return text;
     }
 
     function appendMarkdownSection(container, text) {
