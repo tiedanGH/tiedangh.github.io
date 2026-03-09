@@ -59,6 +59,16 @@ const GlotExecutor = (() => {
             finalCode = await fetchCodeFromUrl(codeUrl);
         }
 
+        // Text语言直接返回输入内容，不调用API
+        if (language === 'text') {
+            return {
+                stdout: finalCode || '',
+                stderr: '',
+                error: '',
+                duration: 0
+            };
+        }
+
         const requestData = {
             files: [{ name: GlotUtils.getFileName(language), content: finalCode }]
         };

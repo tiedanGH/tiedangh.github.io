@@ -150,8 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
     async function runCode() {
         const data = collectFormData();
 
-        if (!data.apiKey || !data.language) {
-            alert('请填写API Key和选择编程语言'); return;
+        if (!data.language) {
+            alert('请选择编程语言'); return;
+        }
+        if (data.language !== 'text' && !data.apiKey) {
+            alert('请填写API Key'); return;
         }
         if (data.codeSource === 'url' && !data.codeUrl) {
             alert('请提供代码URL'); return;

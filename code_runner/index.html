@@ -14,16 +14,17 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/output.css">
+    <link rel="stylesheet" href="css/base.css?v=20260305">
+    <link rel="stylesheet" href="css/output.css?v=20260305">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/output.js"></script>
-    <script src="js/executor.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/utils.js?v=20260305"></script>
+    <script src="js/storage.js?v=20260305"></script>
+    <script src="js/output.js?v=20260309"></script>
+    <script src="js/executor.js?v=20260309"></script>
+    <script src="js/main.js?v=20260309"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -38,7 +39,7 @@
         <div class="warning-content">
             <i class="fas fa-exclamation-triangle"></i>
             <div class="warning-text">
-                <strong>安全警告：</strong>当前页面未使用HTTPS协议，您的API Key存在泄露风险！
+                <strong>安全警告：</strong>当前页面未使用HTTPS协议，您的API Token存在泄露风险！
                 <br>建议使用安全链接：<a href="https://page.tiedan.site/code_runner" target="_blank">https://page.tiedan.site/code_runner</a>
                 ，或访问官方网站：<a href="https://glot.io" target="_blank">https://glot.io</a>
             </div>
@@ -49,10 +50,10 @@
         <div class="content-wrapper">
             <div class="form-container">
                 <form id="codeForm">
-                    <!-- API Key -->
+                    <!-- API Token -->
                     <div class="form-group">
                         <label for="apiKey">
-                            Glot API Key
+                            Glot API Token
                             <span class="tooltip">
                                 <i class="fas fa-info-circle"></i>
                                 <div class="tooltip-content">
@@ -60,23 +61,23 @@
                                     • 请求默认通过第三方代理服务器(cors-anywhere)发送<br>
                                     • 建议安装用户脚本替代中间服务器，以建立安全连接<br>
                                     • 在HTTPS环境下使用更安全<br>
-                                    • 定期轮换您的API Key
+                                    • 定期轮换您的API Token
                                 </div>
                             </span>
                         </label>
                         <div id="apiKeyHint" class="api-key-hint" style="display: none;">
                             <i class="fas fa-info-circle"></i>
-                            <span>没有API Key？<a href="https://glot.io/account/token" target="_blank">前往官网3分钟注册一个</a></span>
+                            <span>没有API Token？<a href="https://glot.io/account/token" target="_blank">前往官网3分钟注册一个</a></span>
                         </div>
                         <div class="password-container">
-                            <input type="password" id="apiKey" placeholder="请输入您的 Glot API Key" required>
+                            <input type="password" id="apiKey" placeholder="请输入您的 Glot API Token" required>
                             <button type="button" id="togglePassword" class="password-toggle">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                         <div id="security-notice" class="security-notice">
                             <i id="security-notice-icon" class="fas fa-shield-alt"></i>
-                            <span id="security-notice-text">API Key将通过第三方代理服务器发送，建议使用专用Key，或者<a href="userscript/cors/dist/main.user.js">安装用户脚本</a></span>
+                            <span id="security-notice-text">API Token将通过第三方代理服务器发送，建议使用专用Token，或者<a href="userscript/cors/dist/main.user.js">安装用户脚本</a></span>
                         </div>
                     </div>
 
@@ -98,6 +99,7 @@
                                 <option value="php">PHP</option>
                                 <option value="swift">Swift</option>
                                 <option value="bash">Bash</option>
+                                <option value="text">Text</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -186,11 +188,11 @@
                         <label class="checkbox-label">
                             <input type="checkbox" id="debugMode">
                             <span class="checkmark"></span>
-                            调试模式（允许在非HTTPS环境下执行）
+                            调试模式：允许在非HTTPS环境下执行
                         </label>
                         <div class="debug-notice">
                             <i class="fas fa-bug"></i>
-                            启用后可在HTTP环境下执行代码，但API Key安全性无法保证
+                            启用后可在HTTP环境下执行代码，但API Token安全性无法保证
                         </div>
                     </div>
 

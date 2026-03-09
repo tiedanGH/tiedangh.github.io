@@ -16,7 +16,14 @@ const GlotOutput = (() => {
         duration: 'fa-clock'
     };
 
-    // Append a plain text section
+    function setSectionHeader(sec, type, title) {
+        sec.className = `output-section ${type}`;
+        const h3 = sec.querySelector('h3');
+        if (h3) {
+            h3.innerHTML = `<i class="fas ${ICONS[type] || 'fa-info-circle'}"></i> ${GlotUtils.escapeHtml(title)}`;
+        }
+    }
+
     function appendTextSection(container, type, title, text) {
         const sec = createSection(type, title, ICONS[type] || 'fa-info-circle');
         sec.querySelector('.content').textContent = text;
@@ -32,39 +39,13 @@ const GlotOutput = (() => {
     }
 
     // --- Markdown rendering ---
-    function convertSimpleMarkdown(text) {
-        let html = text;
-        // Headings
-        html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
-        html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
-        html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
-        html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
-        html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
-        // Bold + italic
-        html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-        // Unordered lists
-        html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-        html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-        // Paragraphs (double newline)
-        html = html.replace(/\n\n/g, '</p><p>');
-        // Single newlines to <br> only outside html tags
-        html = html.replace(/\n/g, '<br>');
-        return '<p>' + html + '</p>';
-    }
-
     function renderMarkdownContent(text) {
-        const hasHtml = /<(?!br\s*\/?)[a-z][^>]*>/i.test(text);
-        if (!hasHtml && text.trim()) {
-            return convertSimpleMarkdown(text);
-        }
-        return text;
+        // Use marked library to render markdown
+        return marked.parse(text);
     }
 
-    function appendMarkdownSection(container, text) {
-        const sec = createSection('stdout', 'Stdout', ICONS.stdout);
+    function appendMarkdownSection(container, text, title = 'Stdout') {
+        const sec = createSection('stdout', title, ICONS.stdout);
         const contentDiv = sec.querySelector('.content');
         contentDiv.classList.add('markdown-rendered');
         contentDiv.innerHTML = renderMarkdownContent(text);
@@ -72,27 +53,181 @@ const GlotOutput = (() => {
     }
 
     // --- Image rendering ---
-    function appendImageSection(container, text) {
+    function appendImageContent(target, text) {
+        const url = text.trim();
+        if (!GlotUtils.isValidUrl(url)) {
+            target.innerHTML = '<div class="image-error"><i class="fas fa-times-circle"></i> 输出内容不是有效的URL: ' + GlotUtils.escapeHtml(url) + '</div>';
+            return false;
+        }
+
+        target.classList.add('image-rendered');
+        target.innerHTML = '<div class="image-loading"><i class="fas fa-spinner fa-spin"></i> 图片加载中...</div>';
+
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'output image';
+        img.onload = () => { target.innerHTML = ''; target.appendChild(img); };
+        img.onerror = () => { target.innerHTML = '<div class="image-error"><i class="fas fa-times-circle"></i> 图片加载失败: ' + GlotUtils.escapeHtml(url) + '</div>'; };
+        return true;
+    }
+
+    function appendImageSection(container, text, title = 'Stdout') {
         const url = text.trim();
         if (!GlotUtils.isValidUrl(url)) {
             appendTextSection(container, 'error', '错误', '输出内容不是有效的URL: ' + url);
-            return;
+            return false;
         }
-        const sec = createSection('stdout', 'Stdout', ICONS.stdout);
+
+        const sec = createSection('info', '图片加载中', ICONS.info);
         const contentDiv = sec.querySelector('.content');
         contentDiv.classList.add('image-rendered');
         contentDiv.innerHTML = '<div class="image-loading"><i class="fas fa-spinner fa-spin"></i> 图片加载中...</div>';
 
         const img = document.createElement('img');
         img.src = url;
-        img.alt = 'Program output image';
-        img.onload = () => { contentDiv.innerHTML = ''; contentDiv.appendChild(img); };
-        img.onerror = () => { contentDiv.innerHTML = '<div class="image-error"><i class="fas fa-times-circle"></i> 图片加载失败: ' + GlotUtils.escapeHtml(url) + '</div>'; };
+        img.alt = 'output image';
+        img.onload = () => {
+            setSectionHeader(sec, 'stdout', title);
+            contentDiv.innerHTML = '';
+            contentDiv.appendChild(img);
+        };
+        img.onerror = () => {
+            setSectionHeader(sec, 'error', '错误');
+            contentDiv.innerHTML = '<div class="image-error"><i class="fas fa-times-circle"></i> 图片加载失败: ' + GlotUtils.escapeHtml(url) + '</div>';
+        };
+
+        container.appendChild(sec);
+        return true;
+    }
+
+    // --- MessageChain ---
+    function appendMessageChainSection(container, title, parts) {
+        const sec = createSection('stdout', title, ICONS.stdout);
+        const contentDiv = sec.querySelector('.content');
+        contentDiv.classList.add('message-chain-rendered');
+        contentDiv.innerHTML = '';
+
+        parts.forEach((part, index) => {
+            const block = document.createElement('div');
+            block.className = 'message-chain-block';
+
+            if (part.type === 'text') {
+                block.textContent = part.content;
+            } else if (part.type === 'markdown') {
+                block.classList.add('markdown-rendered');
+                block.innerHTML = renderMarkdownContent(part.content);
+            } else if (part.type === 'image') {
+                appendImageContent(block, part.content);
+            }
+
+            contentDiv.appendChild(block);
+            if (index !== parts.length - 1) {
+                contentDiv.appendChild(document.createElement('br'));
+            }
+        });
 
         container.appendChild(sec);
     }
 
-    // --- JSON output parsing ---
+    function collectUnknownFieldWarnings(obj, knownFields, debugLines) {
+        for (const key of Object.keys(obj)) {
+            if (!knownFields.has(key)) {
+                debugLines.push('[WARN] 不支持的字段：' + key);
+            }
+        }
+    }
+
+    // --- SingleJsonMessage ---
+    function renderSingleJsonMessage(container, msg, title, debugLines, errorPrefix = '') {
+        const knownFields = new Set(['content', 'format', 'width']);
+        collectUnknownFieldWarnings(msg, knownFields, debugLines);
+
+        const format = msg.format || 'text';
+        const content = msg.content !== undefined ? String(msg.content) : '';
+
+        switch (format) {
+            case 'text':
+                appendTextSection(container, 'stdout', title, content);
+                return true;
+            case 'markdown':
+                if (msg.width !== undefined) debugLines.push('[DEBUG] width: ' + msg.width);
+                appendMarkdownSection(container, content, title);
+                return true;
+            case 'image':
+                return appendImageSection(container, content, title);
+            default: {
+                const message = errorPrefix
+                    ? `${errorPrefix}不支持在JsonSingleMessage内使用 ${format} 输出格式`
+                    : `不支持的输出格式 ${format}`;
+                if (errorPrefix) debugLines.push('[ERROR] ' + message);
+                else appendTextSection(container, 'error', '错误', message);
+                return false;
+            }
+        }
+    }
+
+    function handleMessageChain(container, json, title, debugLines, errorPrefix = '') {
+        const knownFields = new Set(['format', 'messageList']);
+        collectUnknownFieldWarnings(json, knownFields, debugLines);
+
+        if (!Array.isArray(json.messageList)) {
+            appendTextSection(container, 'error', '错误', 'messageList 必须是数组');
+            return;
+        }
+
+        const parts = [];
+        json.messageList.forEach(msg => {
+            const knownMsgFields = new Set(['content', 'format', 'width']);
+            collectUnknownFieldWarnings(msg, knownMsgFields, debugLines);
+
+            const format = msg.format || 'text';
+            const content = msg.content !== undefined ? String(msg.content) : '';
+
+            switch (format) {
+                case 'text':
+                    parts.push({ type: 'text', content });
+                    break;
+                case 'markdown':
+                    if (msg.width !== undefined) debugLines.push('[DEBUG] width: ' + msg.width);
+                    parts.push({ type: 'markdown', content });
+                    break;
+                case 'image':
+                    parts.push({ type: 'image', content });
+                    break;
+                case 'MessageChain':
+                    debugLines.push('[ERROR] ' + (errorPrefix || '') + '不支持在JsonSingleMessage内使用 MessageChain 输出格式');
+                    break;
+                default:
+                    debugLines.push('[ERROR] ' + (errorPrefix || '') + `不支持在JsonSingleMessage内使用 ${format} 输出格式`);
+                    break;
+            }
+        });
+
+        appendMessageChainSection(container, title, parts);
+    }
+
+    function handleMultipleMessage(container, json, debugLines) {
+        const knownFields = new Set(['format', 'messageList']);
+        collectUnknownFieldWarnings(json, knownFields, debugLines);
+
+        if (!Array.isArray(json.messageList)) {
+            appendTextSection(container, 'error', '错误', 'JSON解析失败：messageList 必须是数组');
+            return;
+        }
+
+        json.messageList.forEach((msg, index) => {
+            const title = `Stdout ${index + 1}`;
+            const format = msg.format || 'text';
+
+            if (format === 'MessageChain') {
+                handleMessageChain(container, msg, title, debugLines, `第${index + 1}条：`);
+                return;
+            }
+
+            renderSingleJsonMessage(container, msg, title, debugLines);
+        });
+    }
+
     function handleJsonOutput(container, rawText) {
         let json;
         try {
@@ -102,44 +237,28 @@ const GlotOutput = (() => {
             return;
         }
 
-        const knownFields = new Set(['content', 'format', 'width']);
         const debugLines = [];
-
-        if (json.format) {
-            debugLines.push('[DEBUG] format: ' + json.format);
-        }
-
-        // Check for width
-        if (json.width !== undefined) {
-            debugLines.push('[DEBUG] width: ' + json.width);
-        }
-
-        // Check for unknown fields
-        for (const key of Object.keys(json)) {
-            if (!knownFields.has(key)) {
-                debugLines.push('[WARN] 不支持的字段：' + key);
-            }
-        }
+        if (json.format) debugLines.push('[DEBUG] format: ' + json.format);
 
         const format = json.format || 'text';
-        const content = json.content !== undefined ? String(json.content) : '';
-
         switch (format) {
             case 'text':
-                appendTextSection(container, 'stdout', 'Stdout', content);
-                break;
             case 'markdown':
-                appendMarkdownSection(container, content);
-                break;
             case 'image':
-                appendImageSection(container, content);
+                renderSingleJsonMessage(container, json, 'Stdout', debugLines);
+                break;
+            case 'MessageChain':
+                handleMessageChain(container, json, 'Stdout', debugLines);
+                break;
+            case 'MultipleMessage':
+                handleMultipleMessage(container, json, debugLines);
                 break;
             default:
-                appendTextSection(container, 'error', '错误', '不支持的输出格式：' + format);
-                return; // Don't parse
+                appendTextSection(container, 'error', '错误', '不支持的输出格式 ' + format);
+                break;
         }
 
-        // Show debug section if needed
+        // Show debug section
         appendDebugSection(container, debugLines);
     }
 
@@ -148,12 +267,9 @@ const GlotOutput = (() => {
         outputDiv.innerHTML = '';
         resultContainer.style.display = 'block';
 
-        // Error from API
-        if (result.error) {
-            appendTextSection(outputDiv, 'error', 'Error', result.error);
-        }
+        if (result.error) appendTextSection(outputDiv, 'error', 'Error', result.error);
 
-        // Stdout — render based on format
+        // Main output format handling
         if (result.stdout) {
             switch (outputFormat) {
                 case 'markdown':
@@ -165,7 +281,7 @@ const GlotOutput = (() => {
                 case 'json':
                     handleJsonOutput(outputDiv, result.stdout);
                     break;
-                default: // text
+                default:
                     appendTextSection(outputDiv, 'stdout', 'Stdout', result.stdout);
                     break;
             }
