@@ -1,26 +1,39 @@
 .result-container {
-    flex: 1; min-width: 0;
-    margin-top: 0; border-top: none; padding-top: 0;
-    border-left: 1px solid #eee; padding-left: 30px;
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+    border-left: 1px solid #eee;
+    padding-left: 30px;
 }
 .result-container h2 {
-    margin-bottom: 15px; color: var(--dark-color);
+    margin-bottom: 15px;
+    color: var(--dark-color);
 }
 
 .output-section {
-    margin-bottom: 10px; padding: 15px;
-    border-radius: 5px; background: #f9f9f9;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    background: #f9f9f9;
 }
 .output-section h3 {
-    margin-bottom: 10px; font-size: 16px;
-    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 .output-section .content {
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;
-    background: white; padding: 10px;
-    border-radius: 3px; border: 1px solid #eee;
-    max-height: 500px; overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #eee;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .stdout h3 { color: var(--success-color); }
@@ -30,11 +43,10 @@
 
 /* Debug output section */
 .debug-output h3 { color: var(--debug-color); }
-.debug-output {
-    background: #f5f0ff;
-}
+.debug-output { background: #f5f0ff; }
 .debug-output .content {
-    font-size: 13px; color: #6c3483;
+    font-size: 13px;
+    color: #6c3483;
     border-color: #d7bde2;
     background: #faf5ff;
 }
@@ -61,18 +73,23 @@
 
 /* Image output */
 .output-section .content.image-rendered {
-    white-space: normal; text-align: center;
+    white-space: normal;
+    text-align: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .output-section .content.image-rendered img {
-    max-width: 100%; height: auto;
+    max-width: 100%;
+    height: auto;
     border-radius: 4px;
-    display: block; margin: 0 auto;
+    display: block;
+    margin: 0 auto;
 }
 .output-section .content .image-error {
-    color: var(--danger-color); font-weight: 600;
+    color: var(--danger-color);
+    font-weight: 600;
     padding: 10px;
 }
 .output-section .content .image-loading {
-    color: var(--gray-color); padding: 10px;
+    color: var(--gray-color);
+    padding: 10px;
 }
