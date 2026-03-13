@@ -104,6 +104,7 @@ function initMobileDirectionControls() {
 }
 
 function movePlayer(direction) {
+    if (window.moveEditModeManager?.isActive()) return;
     if (!window.playerCell) return;
 
     const i = parseInt(window.playerCell.dataset.i, 10);

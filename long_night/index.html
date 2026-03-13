@@ -26,6 +26,7 @@
     <script src="js/ui-core.js?v=20260215"></script>
     <script src="js/block.js?v=20260215"></script>
     <script src="js/history.js?v=20260215"></script>
+    <script src="js/edit-move-mode.js?v=20260313"></script>
     <script src="js/save.js?v=20260210"></script>
 </head>
 <body>
@@ -38,6 +39,8 @@
     <p>🔼🔽◀️▶️ <b>[移动]</b> 玩家 🧍 来自动更新地图</p>
     <p>↶ <b>[撤销]或[Ctrl+Z]</b> 最多可撤销 50 步操作</p>
     <p>↷ <b>[重做]或[Ctrl+Y]</b> 恢复撤销的操作</p>
+    <p>✂️ <b>[移动编辑]</b> 可框选后预览并整体移动有效区域</p>
+    <p>⌨️ <b>[M]</b> 快速进入/退出编辑模式，<b>[Enter]</b>确认，<b>[Esc]</b>取消</p>
     <p>⌨️ <b>[Shift]+[右键]</b> 快速清除格子所有标记</p>
     <p>✋ <b>拖动</b>来拓展地图，<b>刷新</b>将重置草稿本</p>
     <p>📁 <b>[存档管理]</b> 可保存最多5个地图，支持导入导出</p>
@@ -81,6 +84,7 @@
 <a href="../" class="back-home">返回主页</a>
 <button id="undo-button" class="control-btn undo-button">↶</button>
 <button id="redo-button" class="control-btn redo-button">↷</button>
+<button id="move-mode-button" class="control-btn move-mode-button" title="编辑移动模式">✂️</button>
 <button id="save-button" class="control-btn save-button" title="存档管理">📁</button>
 <button id="help-button" class="control-btn help-button" title="查看帮助">?</button>
 
