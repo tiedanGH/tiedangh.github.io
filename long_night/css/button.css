@@ -61,6 +61,18 @@
     background: #FF6B6B;
     --hover-bg: #FF5252;
 }
+.edit-mode-button {
+    right: 210px;
+    background: #8A63D2;
+    --hover-bg: #764fbd;
+    font-size: 20px;
+}
+.edit-mode-button.active {
+    background: #D9C8FF;
+    color: #4A2E86;
+    box-shadow: 0 0 0 3px rgba(138, 99, 210, 0.35), 0 2px 6px rgba(0,0,0,0.15);
+    transform: scale(1.04);
+}
 
 /* 方向控制按钮 */
 .direction-controls {
@@ -186,6 +198,9 @@
     }
     .undo-button {
         right: 128px;
+    }
+    .edit-mode-button {
+        right: 168px;
     }
 
     /* 按钮仅在移动端显示 */

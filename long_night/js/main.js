@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.historyManager = new HistoryManager(gameMap);
     // 存档管理器
     window.saveManager = new SaveManager(gameMap);
+    // 编辑管理器
+    window.editModeManager = new EditModeManager(gameMap);
 
     uiCellEvents(gameMap);
     blockCellEvent(gameMap);

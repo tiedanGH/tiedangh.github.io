@@ -76,6 +76,7 @@ function getCurrentWallType(wallCell) {
 
 function blockCellEvent(map) {
     map.container.addEventListener('click', e => {
+        if (window.editModeManager?.isActive()) return;
         const center = e.target.closest('.cell.center');
         if (!center) return;
 

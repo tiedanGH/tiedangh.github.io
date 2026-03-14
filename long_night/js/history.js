@@ -5,6 +5,7 @@ class HistoryManager {
         this.history = [];
         this.currentIndex = -1;
         this.maxHistory = 50;
+        this.locked = false;
         this.undoButton = document.getElementById('undo-button');
         this.redoButton = document.getElementById('redo-button');
 
@@ -23,6 +24,7 @@ class HistoryManager {
         }
         // 绑定键盘快捷键
         document.addEventListener('keydown', (e) => {
+            if (this.locked) return;
             const key = e.key.toLowerCase();
             // Ctrl+Z - 撤销
             if ((e.ctrlKey || e.metaKey) && key === 'z' && !e.shiftKey) {
@@ -243,6 +245,7 @@ class HistoryManager {
 
     // 撤销操作
     undo() {
+        if (this.locked) return;
         if (this.currentIndex <= 0) {
             console.warn('Cannot undo: No more history available.');
             return;
@@ -256,6 +259,7 @@ class HistoryManager {
 
     // 重做操作
     redo() {
+        if (this.locked) return;
         if (this.currentIndex >= this.history.length - 1) {
             console.log('Cannot redo: No more redo records available.');
             return;
@@ -270,13 +274,18 @@ class HistoryManager {
     // 更新按钮状态
     updateButtons() {
         if (this.undoButton) {
-            this.undoButton.disabled = this.currentIndex <= 0;
+            this.undoButton.disabled = this.locked || this.currentIndex <= 0;
             this.undoButton.title = `撤销 (Ctrl+Z) - ${this.currentIndex}/${this.history.length - 1}`;
         }
         if (this.redoButton) {
-            this.redoButton.disabled = this.currentIndex >= this.history.length - 1;
+            this.redoButton.disabled = this.locked || this.currentIndex >= this.history.length - 1;
             this.redoButton.title = `重做 (Ctrl+Y) - ${this.history.length - 1 - this.currentIndex} 步可用`;
         }
+    }
+
+    setLocked(locked) {
+        this.locked = locked;
+        this.updateButtons();
     }
 
     // 清除历史记录
