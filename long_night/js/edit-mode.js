@@ -1,7 +1,7 @@
-class MoveEditModeManager {
+class EditModeManager {
     constructor(map) {
         this.map = map;
-        this.button = document.getElementById('move-mode-button');
+        this.button = document.getElementById('edit-mode-button');
         this.active = false;
 
         this.stage = 'idle'; // idle | selecting | selection-ready | choosing-target | preview-ready
@@ -70,7 +70,7 @@ class MoveEditModeManager {
         this.active = true;
         this.stage = 'selecting';
         this.button.classList.add('active');
-        this.map.container.classList.add('move-edit-active');
+        this.map.container.classList.add('edit-mode-active');
         this.hideConfirmBar();
         this.banner.classList.add('show');
         if (window.historyManager?.setLocked) {
@@ -84,7 +84,7 @@ class MoveEditModeManager {
         this.stage = 'idle';
         this.draggingSelection = false;
         this.button.classList.remove('active');
-        this.map.container.classList.remove('move-edit-active');
+        this.map.container.classList.remove('edit-mode-active');
 
         this.clearPreview();
         this.clearSelection();
@@ -257,9 +257,22 @@ class MoveEditModeManager {
     }
 
     clearPreview() {
-        this.map.container.querySelectorAll('.move-preview-target').forEach(cell => {
+        this.map.container.querySelectorAll('.move-preview-target, .move-preview-overwrite').forEach(cell => {
             cell.classList.remove('move-preview-target');
+            cell.classList.remove('move-preview-overwrite');
         });
+    }
+
+    hasEffectiveCellContent(cell) {
+        if (!cell || cell.classList.contains('center')) return false;
+
+        if (cell.dataset.type === 'square') {
+            return !this.isUnknownSquare(cell);
+        }
+        if (cell.dataset.type === 'wall') {
+            return !this.isUnknownWall(cell);
+        }
+        return false;
     }
 
     cancelTargetPreview() {
@@ -374,6 +387,7 @@ class MoveEditModeManager {
 
         const size = window.innerWidth > 600 ? 40 : 30;
         const wall = window.innerWidth > 600 ? 11 : 9;
+        const sourceKeys = new Set(this.payload.map(item => `${item.i},${item.j}`));
 
         this.payload.forEach(item => {
             const ti = item.i + this.previewDelta.i;
@@ -381,7 +395,9 @@ class MoveEditModeManager {
             this.map.ensureCell(ti, tj, size, wall);
             const targetCell = this.map.cells.get(`${ti},${tj}`);
             if (targetCell && !targetCell.classList.contains('center')) {
-                targetCell.classList.add('move-preview-target');
+                const targetKey = `${ti},${tj}`;
+                const willOverwrite = !sourceKeys.has(targetKey) && this.hasEffectiveCellContent(targetCell);
+                targetCell.classList.add(willOverwrite ? 'move-preview-overwrite' : 'move-preview-target');
             }
         });
     }

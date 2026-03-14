@@ -49,7 +49,7 @@ function uiCellEvents(map) {
     // 移动端双击支持
     let lastClickTime = 0;
     map.container.addEventListener('click', e => {
-        if (window.moveEditModeManager?.isActive()) return;
+        if (window.editModeManager?.isActive()) return;
         const now = Date.now();
         const cell = e.target.closest('.cell');
         if (!cell || cell.classList.contains('center') || cell.dataset.type !== 'square') return;
@@ -73,7 +73,7 @@ function uiCellEvents(map) {
 
     // 右键：标记玩家 / 清空标记
     map.container.addEventListener('mousedown', e => {
-        if (window.moveEditModeManager?.isActive()) return;
+        if (window.editModeManager?.isActive()) return;
         if (e.button !== 2) return;
         removeSelector();
         const cell = e.target.closest('.cell');
@@ -96,7 +96,7 @@ function uiCellEvents(map) {
 
     // 左键：设置方块 / 墙
     map.container.addEventListener('mousedown', e => {
-        if (window.moveEditModeManager?.isActive()) return;
+        if (window.editModeManager?.isActive()) return;
         if (e.button !== 0) return;
         removeSelector();
         const cell = e.target.closest('.cell');

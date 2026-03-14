@@ -51,13 +51,13 @@
     background: #FFA500;
     --hover-bg: #FF8C00;
 }
-.move-mode-button {
+.edit-mode-button {
     right: 210px;
     background: #8A63D2;
     --hover-bg: #764fbd;
     font-size: 20px;
 }
-.move-mode-button.active {
+.edit-mode-button.active {
     background: #D9C8FF;
     color: #4A2E86;
     box-shadow: 0 0 0 3px rgba(138, 99, 210, 0.35), 0 2px 6px rgba(0,0,0,0.15);
@@ -193,7 +193,7 @@
     .save-button {
         right: 48px;
     }
-    .move-mode-button {
+    .edit-mode-button {
         right: 168px;
     }
     .redo-button {
