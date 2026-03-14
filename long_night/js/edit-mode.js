@@ -1,3 +1,4 @@
+
 class EditModeManager {
     constructor(map) {
         this.map = map;
@@ -65,6 +66,7 @@ class EditModeManager {
         return this.active;
     }
 
+    // 进入编辑模式：清理弹窗，锁定历史记录，显示横幅
     enterMode() {
         this.clearOtherPopups();
         this.active = true;
@@ -76,9 +78,9 @@ class EditModeManager {
         if (window.historyManager?.setLocked) {
             window.historyManager.setLocked(true);
         }
-        this.showTip('拖拽框选矩形区域');
     }
 
+    // 退出编辑模式：清理状态，解锁历史记录，隐藏横幅
     exitMode() {
         this.active = false;
         this.stage = 'idle';
@@ -108,6 +110,7 @@ class EditModeManager {
         return tag === 'input' || tag === 'textarea' || target.isContentEditable;
     }
 
+    // 清理其他弹窗
     clearOtherPopups() {
         document.querySelectorAll('.selector, .color-input-container').forEach(el => el.remove());
 
@@ -162,11 +165,11 @@ class EditModeManager {
 
         this.capturePayload();
 
+        // 选区内没有有效地形/墙壁可移动
         if (this.payload.length === 0) {
             this.clearSelection();
             this.selectedRange = null;
             this.sourceAnchor = null;
-            this.showTip('选区内没有有效地形/墙壁可移动');
             return;
         }
 
@@ -186,11 +189,11 @@ class EditModeManager {
         e.stopPropagation();
     }
 
+    // 确认选区，进入选目标阶段
     confirmSelection() {
         if (this.stage !== 'selection-ready' || this.payload.length === 0) return;
         this.stage = 'choosing-target';
         this.hideConfirmBar();
-        this.showTip('选区已确认，请点击目标锚点');
     }
 
     onClickTarget(e) {
@@ -208,10 +211,8 @@ class EditModeManager {
         const deltaI = targetI - this.sourceAnchor.i;
         const deltaJ = targetJ - this.sourceAnchor.j;
 
-        if (deltaI % 2 !== 0 || deltaJ % 2 !== 0) {
-            this.showTip('位移需为偶数（保证墙壁和地形类型对齐）');
-            return;
-        }
+        // 位移需为偶数（保证墙壁和地形类型对齐）
+        if (deltaI % 2 !== 0 || deltaJ % 2 !== 0) return;
 
         this.previewDelta = { i: deltaI, j: deltaJ };
         this.renderPreview();
@@ -221,7 +222,7 @@ class EditModeManager {
             text: '已生成目标预览，确认后执行移动',
             confirmText: '确认位置并移动',
             onConfirm: () => this.confirmMove(),
-            cancelText: '返回选目标',
+            cancelText: '重选目标',
             onCancel: () => this.cancelTargetPreview()
         });
     }
@@ -275,12 +276,12 @@ class EditModeManager {
         return false;
     }
 
+    // 取消目标预览，回到选目标阶段
     cancelTargetPreview() {
         this.clearPreview();
         this.previewDelta = null;
         this.stage = 'choosing-target';
         this.hideConfirmBar();
-        this.showTip('请继续选择目标锚点');
     }
 
     backToSelection() {
@@ -293,7 +294,6 @@ class EditModeManager {
         this.selectionStart = null;
         this.selectionEnd = null;
         this.stage = 'selecting';
-        this.showTip('已返回框选阶段，请重新框选');
     }
 
     isUnknownSquare(cell) {
@@ -402,6 +402,7 @@ class EditModeManager {
         });
     }
 
+    // 确认栏
     showConfirmBar({ text, confirmText, onConfirm, cancelText, onCancel }) {
         const textEl = this.confirmBar.querySelector('.move-confirm-text');
         const confirmBtn = this.confirmBar.querySelector('.confirm-btn');
@@ -454,6 +455,7 @@ class EditModeManager {
         cell.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
     }
 
+    // 应用到目标单元格
     applySquareState(cell, state) {
         this.resetSquareCell(cell);
         cell.style.backgroundImage = state.backgroundImage;
@@ -503,6 +505,7 @@ class EditModeManager {
         }
     }
 
+    // 确认移动：将预览状态应用到地图，并保存历史记录
     confirmMove() {
         if (this.stage !== 'preview-ready') return;
         if (!this.previewDelta || this.payload.length === 0) return;
@@ -536,10 +539,5 @@ class EditModeManager {
         }
 
         this.exitMode();
-        this.showTip('移动完成，已保存一条历史记录');
-    }
-
-    showTip(text) {
-        this.button.title = text;
     }
 }
