@@ -34,6 +34,11 @@ class EditModeManager {
         window.addEventListener('mouseup', e => this.onMouseUp(e));
         this.map.container.addEventListener('click', e => this.onClickTarget(e));
 
+        this.map.container.addEventListener('touchstart', e => this.onTouchStart(e), { passive: false });
+        window.addEventListener('touchmove', e => this.onTouchMove(e), { passive: false });
+        window.addEventListener('touchend', e => this.onTouchEnd(e));
+        window.addEventListener('touchcancel', e => this.onTouchEnd(e));
+
         document.addEventListener('keydown', e => {
             if (e.key.toLowerCase() === 'm' && !this.isTypingTarget(e.target)) {
                 e.preventDefault();
@@ -126,6 +131,7 @@ class EditModeManager {
         if (customAlertOverlay) customAlertOverlay.style.display = 'none';
     }
 
+    // 鼠标事件处理
     onMouseDown(e) {
         if (!this.active || e.button !== 0) return;
         if (this.stage !== 'selecting') return;
@@ -187,6 +193,54 @@ class EditModeManager {
         });
 
         e.stopPropagation();
+    }
+
+    createMouseEventFromTouch(originalEvent, type, touch) {
+        if (!touch) return null;
+        return new MouseEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            screenX: touch.screenX,
+            screenY: touch.screenY,
+            button: 0
+        });
+    }
+
+    // 触摸事件处理
+    onTouchStart(e) {
+        if (!this.active) return;
+        if (!e.touches || e.touches.length === 0) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const simulated = this.createMouseEventFromTouch(e, 'mousedown', touch);
+        if (simulated) {
+            this.onMouseDown(simulated);
+        }
+    }
+
+    onTouchMove(e) {
+        if (!this.active) return;
+        if (!e.touches || e.touches.length === 0) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const simulated = this.createMouseEventFromTouch(e, 'mousemove', touch);
+        if (simulated) {
+            this.onMouseMove(simulated);
+        }
+    }
+
+    onTouchEnd(e) {
+        if (!this.active) return;
+        // changedTouches在touchend事件中包含了结束的触点，而touches可能已经不包含任何触点了，所以优先使用changedTouches
+        const touchList = (e.changedTouches && e.changedTouches.length > 0) ? e.changedTouches : e.touches;
+        const touch = touchList && touchList.length > 0 ? touchList[0] : null;
+        const simulated = this.createMouseEventFromTouch(e, 'mouseup', touch || { clientX: 0, clientY: 0, screenX: 0, screenY: 0 });
+        if (simulated) {
+            this.onMouseUp(simulated);
+        }
     }
 
     // 确认选区，进入选目标阶段
@@ -445,8 +499,11 @@ class EditModeManager {
     resetSquareCell(cell) {
         cell.style.backgroundImage = `url('./img/unknown.png')`;
         cell.style.backgroundColor = '';
-        cell.querySelectorAll('.marker').forEach(marker => marker.remove());
         cell.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
+        cell.querySelectorAll('.marker').forEach(marker => marker.remove());
+        if (window.playerCell === cell) {
+            window.playerCell = null;
+        }
     }
 
     resetWallCell(cell) {
