@@ -131,40 +131,44 @@ class EditModeManager {
         if (customAlertOverlay) customAlertOverlay.style.display = 'none';
     }
 
-    // 鼠标事件处理
-    onMouseDown(e) {
-        if (!this.active || e.button !== 0) return;
-        if (this.stage !== 'selecting') return;
+    getCellFromPoint(clientX, clientY) {
+        const el = document.elementFromPoint(clientX, clientY);
+        return el?.closest?.('.cell') || null;
+    }
 
-        const cell = e.target.closest('.cell');
+    startSelectionFromCell(cell, originalEvent = null) {
+        if (!this.active) return;
+        if (this.stage !== 'selecting') return;
         if (!cell || cell.classList.contains('center')) return;
 
-        e.preventDefault();
-        e.stopPropagation();
+        originalEvent?.preventDefault?.();
+        originalEvent?.stopPropagation?.();
 
         this.clearPreview();
 
         const i = parseInt(cell.dataset.i, 10);
         const j = parseInt(cell.dataset.j, 10);
+
         this.draggingSelection = true;
         this.selectionStart = { i, j };
         this.selectionEnd = { i, j };
         this.updateSelection();
     }
 
-    onMouseMove(e) {
+    updateSelectionFromCell(cell) {
         if (!this.active || !this.draggingSelection) return;
-        const cell = e.target.closest?.('.cell');
         if (!cell || cell.classList.contains('center')) return;
 
         const i = parseInt(cell.dataset.i, 10);
         const j = parseInt(cell.dataset.j, 10);
+
         this.selectionEnd = { i, j };
         this.updateSelection();
     }
 
-    onMouseUp(e) {
+    finishSelection(originalEvent = null) {
         if (!this.active || !this.draggingSelection) return;
+
         this.draggingSelection = false;
 
         if (!this.selectedRange) return;
@@ -183,6 +187,7 @@ class EditModeManager {
             i: this.selectedRange.minI,
             j: this.selectedRange.minJ
         };
+
         this.stage = 'selection-ready';
         this.showConfirmBar({
             text: '已框选区域，先确认选区后再选择目标位置',
@@ -192,73 +197,73 @@ class EditModeManager {
             onCancel: () => this.backToSelection()
         });
 
-        e.stopPropagation();
+        originalEvent?.stopPropagation?.();
     }
 
-    createMouseEventFromTouch(originalEvent, type, touch) {
-        if (!touch) return null;
-        return new MouseEvent(type, {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-            clientX: touch.clientX,
-            clientY: touch.clientY,
-            screenX: touch.screenX,
-            screenY: touch.screenY,
-            button: 0
-        });
+    // 鼠标事件处理
+    onMouseDown(e) {
+        if (!this.active || e.button !== 0) return;
+        const cell = e.target.closest?.('.cell');
+        this.startSelectionFromCell(cell, e);
+    }
+
+    onMouseMove(e) {
+        if (!this.active || !this.draggingSelection) return;
+        const cell = e.target.closest?.('.cell');
+        this.updateSelectionFromCell(cell);
+    }
+
+    onMouseUp(e) {
+        this.finishSelection(e);
     }
 
     // 触摸事件处理
     onTouchStart(e) {
         if (!this.active) return;
         if (!e.touches || e.touches.length === 0) return;
+
         e.preventDefault();
+
         const touch = e.touches[0];
-        const simulated = this.createMouseEventFromTouch(e, 'mousedown', touch);
-        if (simulated) {
-            this.onMouseDown(simulated);
+        const cell = this.getCellFromPoint(touch.clientX, touch.clientY);
+
+        // 如果当前还在框选阶段，就开始框选
+        if (this.stage === 'selecting') {
+            this.startSelectionFromCell(cell, e);
+            return;
+        }
+
+        // 如果已经在选目标阶段，触摸直接当成点目标
+        if (this.stage === 'choosing-target' || this.stage === 'preview-ready') {
+            this.selectTargetFromCell(cell, e);
         }
     }
 
     onTouchMove(e) {
         if (!this.active) return;
         if (!e.touches || e.touches.length === 0) return;
+        if (!this.draggingSelection) return;
+
         e.preventDefault();
+
         const touch = e.touches[0];
-        const simulated = this.createMouseEventFromTouch(e, 'mousemove', touch);
-        if (simulated) {
-            this.onMouseMove(simulated);
-        }
+        const cell = this.getCellFromPoint(touch.clientX, touch.clientY);
+        this.updateSelectionFromCell(cell);
     }
 
     onTouchEnd(e) {
         if (!this.active) return;
-        // changedTouches在touchend事件中包含了结束的触点，而touches可能已经不包含任何触点了，所以优先使用changedTouches
-        const touchList = (e.changedTouches && e.changedTouches.length > 0) ? e.changedTouches : e.touches;
-        const touch = touchList && touchList.length > 0 ? touchList[0] : null;
-        const simulated = this.createMouseEventFromTouch(e, 'mouseup', touch || { clientX: 0, clientY: 0, screenX: 0, screenY: 0 });
-        if (simulated) {
-            this.onMouseUp(simulated);
-        }
+        this.finishSelection(e);
     }
 
-    // 确认选区，进入选目标阶段
-    confirmSelection() {
-        if (this.stage !== 'selection-ready' || this.payload.length === 0) return;
-        this.stage = 'choosing-target';
-        this.hideConfirmBar();
-    }
-
-    onClickTarget(e) {
+    selectTargetFromCell(cell, originalEvent = null) {
         if (!this.active || this.draggingSelection) return;
         if (this.stage !== 'choosing-target' && this.stage !== 'preview-ready') return;
-
-        const cell = e.target.closest('.cell');
         if (!cell || cell.classList.contains('center')) return;
+        if (!this.sourceAnchor) return;
 
-        e.preventDefault();
-        e.stopPropagation();
+        originalEvent?.preventDefault?.();
+        originalEvent?.stopPropagation?.();
 
         const targetI = parseInt(cell.dataset.i, 10);
         const targetJ = parseInt(cell.dataset.j, 10);
@@ -274,11 +279,23 @@ class EditModeManager {
 
         this.showConfirmBar({
             text: '已生成目标预览，确认后执行移动',
-            confirmText: '确认位置并移动',
+            confirmText: '确认并移动',
             onConfirm: () => this.confirmMove(),
             cancelText: '重选目标',
             onCancel: () => this.cancelTargetPreview()
         });
+    }
+
+    // 确认选区，进入选目标阶段
+    confirmSelection() {
+        if (this.stage !== 'selection-ready' || this.payload.length === 0) return;
+        this.stage = 'choosing-target';
+        this.hideConfirmBar();
+    }
+
+    onClickTarget(e) {
+        const cell = e.target.closest?.('.cell');
+        this.selectTargetFromCell(cell, e);
     }
 
     updateSelection() {
