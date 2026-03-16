@@ -155,6 +155,13 @@
 .load-btn:hover {
     background-color: #1976D2;
 }
+.overwrite-btn {
+    background-color: #9C27B0;
+    color: white;
+}
+.overwrite-btn:hover {
+    background-color: #7B1FA2;
+}
 .delete-btn {
     background-color: #f44336;
     color: white;

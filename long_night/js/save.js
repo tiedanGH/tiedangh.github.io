@@ -232,7 +232,7 @@ class SaveManager {
         });
     }
 
-    // 修改loadFromSlot函数
+    // 加载存档
     loadFromSlot(slotIndex) {
         const saves = this.getAllSaves();
         const save = saves[slotIndex];
@@ -251,6 +251,36 @@ class SaveManager {
         );
     }
 
+    // 覆盖保存存档
+    overwriteSlot(slotIndex) {
+        const saves = this.getAllSaves();
+        const save = saves[slotIndex];
+        if (!save) return;
+
+        this.customAlert.confirm(
+            `确定要用当前地图覆盖存档 "${save.name}" 吗？原存档内容将被替换。`,
+            '确认覆盖',
+            () => {
+                const mapState = this.getCurrentMapState();
+
+                saves[slotIndex] = {
+                    ...save,
+                    data: mapState,
+                    timestamp: Date.now(),
+                    version: '1.0'
+                };
+
+                this.saveSaves(saves);
+                this.renderSaveSlots();
+                this.customAlert.alert(`存档 "${save.name}" 已覆盖保存！`);
+            },
+            () => {
+                // 取消操作
+            }
+        );
+    }
+
+    // 删除存档
     deleteFromSlot(slotIndex) {
         const saves = this.getAllSaves();
         if (!saves[slotIndex]) return;
@@ -375,6 +405,7 @@ class SaveManager {
         }, 200);
     }
 
+    // 导出存档
     exportSlot(slotIndex) {
         const saves = this.getAllSaves();
         const save = saves[slotIndex];
@@ -520,6 +551,14 @@ class SaveManager {
                 e.stopPropagation();
                 this.loadFromSlot(index);
             };
+            // 覆盖按钮
+            const overwriteBtn = document.createElement('button');
+            overwriteBtn.className = 'slot-btn overwrite-btn';
+            overwriteBtn.textContent = '覆盖';
+            overwriteBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.overwriteSlot(index);
+            };
             // 删除按钮
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'slot-btn delete-btn';
@@ -538,6 +577,7 @@ class SaveManager {
             };
 
             actions.appendChild(loadBtn);
+            actions.appendChild(overwriteBtn);
             actions.appendChild(deleteBtn);
             actions.appendChild(exportBtn);
 
