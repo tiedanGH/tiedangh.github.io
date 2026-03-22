@@ -13,6 +13,8 @@ const attachOptions = [
     ['按钮', 'button.png'],
     ['炸弹', 'bomb.png'],
     ['箱子', 'box.png'],
+    ['小太阳', 'heat_box.png'],
+    ['屏蔽器', 'jammer_box.png'],
     ['无', 'transparent.png'],
 ];
 const wallOptions = [
@@ -22,6 +24,8 @@ const wallOptions = [
     ['门 (开)', 'walls/dooropen_row.png', 'walls/dooropen_col.png', '#F8CDE1'],
     ['未知', 'walls/unknown_row.png', 'walls/unknown_col.png', '#D9D9D9'],
 ];
+const pushableTypes = ['箱子', '小太阳', '屏蔽器'];
+const blockingWallTypes = ['普通', '门', '自定义'];
 
 const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
 

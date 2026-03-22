@@ -1595,6 +1595,82 @@
       "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "门 (开)", "wall": true}, "right": {"type": "门 (开)", "wall": true}
     }
   ],
+  "43": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "空地", "attach": "小太阳"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    }
+  ],
+  "44": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "空地", "attach": "屏蔽器"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    }
+  ],
   "E1": [
     {
       "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
@@ -2049,6 +2125,82 @@
     {
       "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
       "top": {"wall": true, "type": "普通"}, "bottom": {"wall": false, "type": "普通"}, "left": {"wall": false, "type": "普通"}, "right": {"wall": false, "type": "普通"}
+    }
+  ],
+  "E13": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "传送门"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地", "attach": "按钮"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "逃生舱", "attach": "屏蔽器"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "门", "wall": true}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地", "attach": "按钮"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地"},
+      "top": {"type": "门", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "传送门"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    }
+  ],
+  "E14": [
+    {
+      "pos": {"y": 0, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 1}, "ground": {"type": "空地", "attach": "箱子"},
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 0, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "逃生舱", "attach": "箱子"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 1, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
+    },
+    {
+      "pos": {"y": 2, "x": 0}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 1}, "ground": {"type": "空地", "attach": "箱子"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
+    },
+    {
+      "pos": {"y": 2, "x": 2}, "ground": {"type": "空地"},
+      "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     }
   ],
   "S1": [

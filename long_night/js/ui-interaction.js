@@ -62,6 +62,90 @@ function refreshMarkerColors(cell) {
     });
 }
 
+function getAttachmentFileName(cell) {
+    const layer = cell?.querySelector('.attachment-layer');
+    if (!layer || layer.classList.contains('custom-attach-circle')) return null;
+    const bg = layer.style.backgroundImage;
+    if (!bg || bg === 'none') return null;
+    return bg.match(/\/([^\/]+\.(png|jpg|jpeg))/)?.[1] ?? null;
+}
+
+function getAttachmentType(cell) {
+    const fileName = getAttachmentFileName(cell);
+    if (!fileName) return null;
+    return attachOptions.find(([, file]) => file === fileName)?.[0] ?? null;
+}
+
+function isPushableBoxAttachment(cell) {
+    const type = getAttachmentType(cell);
+    return !!type && pushableTypes.includes(type);
+}
+
+function clearAttachment(cell) {
+    cell?.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
+}
+
+function ensureKnownSquare(square) {
+    if (!square || square.dataset.type !== 'square') return;
+    const currentBg = square.style.backgroundImage;
+    const isUnknown = !currentBg || currentBg.includes('unknown.png');
+    if (isUnknown) {
+        square.style.backgroundImage = `url('./img/empty.png')`;
+    }
+}
+
+function canBoxMoveTo(direction, fromI, fromJ, size, wall) {
+    let boxTargetI = fromI;
+    let boxTargetJ = fromJ;
+    let boxWallI = fromI;
+    let boxWallJ = fromJ;
+
+    switch(direction) {
+        case 'up':
+            boxTargetJ -= 2;
+            boxWallJ = fromJ - 1;
+            break;
+        case 'down':
+            boxTargetJ += 2;
+            boxWallJ = fromJ + 1;
+            break;
+        case 'left':
+            boxTargetI -= 2;
+            boxWallI = fromI - 1;
+            break;
+        case 'right':
+            boxTargetI += 2;
+            boxWallI = fromI + 1;
+            break;
+    }
+
+    currentMap.ensureCell(boxTargetI, boxTargetJ, size, wall);
+    currentMap.ensureCell(boxWallI, boxWallJ, size, wall);
+
+    const boxTargetSquare = currentMap.cells.get(`${boxTargetI},${boxTargetJ}`);
+    const boxWallCell = currentMap.cells.get(`${boxWallI},${boxWallJ}`);
+
+    if (!boxTargetSquare || boxTargetSquare.dataset.type !== 'square') {
+        return { movable: false, boxTargetSquare: null, boxWallCell: null };
+    }
+
+    if (boxWallCell?.dataset.type === 'wall') {
+        const boxWallType = getCurrentWallType(boxWallCell);
+        const isBlockedWall = blockingWallTypes.includes(boxWallType);
+
+        if (isBlockedWall) {
+            return { movable: false, boxTargetSquare, boxWallCell };
+        }
+    }
+
+    const hasOtherAttachment = !!getAttachmentType(boxTargetSquare);
+    if (hasOtherAttachment) {
+        return { movable: false, boxTargetSquare, boxWallCell };
+    }
+
+    return { movable: true, boxTargetSquare, boxWallCell };
+}
+
 function initKeyboardControls() {
     const keyMap = {
         ArrowUp: 'up',
@@ -145,39 +229,58 @@ function movePlayer(direction) {
 
     if (!targetSquare || !wallCell) return;
 
+    let pushedBox = false;
+    let pushedBoxWallCell = null;
+
+    if (isPushableBoxAttachment(targetSquare)) {
+        const attachFileName = getAttachmentFileName(targetSquare);
+        const { movable, boxTargetSquare, boxWallCell } = canBoxMoveTo(direction, targetI, targetJ, size, wall);
+
+        if (movable && attachFileName && boxTargetSquare) {
+            clearAttachment(targetSquare);
+            setAttachment(boxTargetSquare, attachFileName);
+            ensureKnownSquare(boxTargetSquare);
+            pushedBox = true;
+            pushedBoxWallCell = boxWallCell;
+        }
+    }
+
     // 移动玩家标记
     addMarker(targetSquare, '🧍', 'black');
     window.playerCell = targetSquare;
+    // 替换未知区域为已知
+    ensureKnownSquare(targetSquare);
+    // 更新经过的墙壁状态
+    updatePassedWall(wallCell);
 
-    // 仅替换未知区域
-    const currentBg = targetSquare.style.backgroundImage;
-    const isUnknown = !currentBg || currentBg.includes('unknown.png');
-    if (isUnknown) {
-        targetSquare.style.backgroundImage = `url('./img/empty.png')`;
-    }
-
-    if (wallCell.dataset.type === 'wall') {
-        const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
-
-        const currentWallType = getCurrentWallType(wallCell);
-        let newWallType = '空';
-
-        if (currentWallType === '门') {
-            newWallType = '门 (开)';  // 如果是关闭的门，设为打开的门
-        } else if (currentWallType === '门 (开)') {
-            newWallType = '门 (开)';  // 如果是打开的门，保持为打开的门
-        } else if (currentWallType === '未知') {
-            newWallType = '空';  // 如果是未知墙壁，设为空墙
-        } else if (currentWallType === '空') {
-            newWallType = '空';  // 如果是空墙，保持为空
-        } else if (currentWallType === '普通') {
-            newWallType = '空';  // 如果是普通墙，设为空墙
-        }
-
-        wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
+    // 推动成功时，人物和箱子间的墙也要变成空
+    if (pushedBox && pushedBoxWallCell && pushedBoxWallCell.dataset.type === 'wall') {
+        updatePassedWall(pushedBoxWallCell);
     }
 
     saveHistory(); // 保存历史
+}
+
+function updatePassedWall(wallCell) {
+    if (!wallCell || wallCell.dataset.type !== 'wall') return;
+
+    const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+    const currentWallType = getCurrentWallType(wallCell);
+    let newWallType = '空';
+
+    if (currentWallType === '门') {
+        newWallType = '门 (开)';  // 如果是关闭的门，设为打开的门
+    } else if (currentWallType === '门 (开)') {
+        newWallType = '门 (开)';  // 如果是打开的门，保持为打开的门
+    } else if (currentWallType === '未知') {
+        newWallType = '空';  // 如果是未知墙壁，设为空墙
+    } else if (currentWallType === '空') {
+        newWallType = '空';  // 如果是空墙，保持为空
+    } else if (currentWallType === '普通') {
+        newWallType = '空';  // 如果是普通墙，设为空墙
+    }
+
+    wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
 }
 
 function addMarker(cell, marker, color = 'black') {
