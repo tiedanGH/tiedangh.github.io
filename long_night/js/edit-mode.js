@@ -13,6 +13,7 @@ class EditModeManager {
 
         this.payload = [];
         this.sourceAnchor = null;
+        this.previewAnchor = null;
         this.previewDelta = null;
 
         this.confirmBar = this.createConfirmBar();
@@ -100,6 +101,7 @@ class EditModeManager {
 
         this.payload = [];
         this.sourceAnchor = null;
+        this.previewAnchor = null;
         this.previewDelta = null;
         this.selectionStart = null;
         this.selectionEnd = null;
@@ -274,6 +276,7 @@ class EditModeManager {
         if (deltaI % 2 !== 0 || deltaJ % 2 !== 0) return;
 
         this.previewDelta = { i: deltaI, j: deltaJ };
+        this.previewAnchor = { i: targetI, j: targetJ };
         this.renderPreview();
         this.stage = 'preview-ready';
 
@@ -329,9 +332,10 @@ class EditModeManager {
     }
 
     clearPreview() {
-        this.map.container.querySelectorAll('.move-preview-target, .move-preview-overwrite').forEach(cell => {
+        this.map.container.querySelectorAll('.move-preview-target, .move-preview-overwrite, .move-preview-anchor').forEach(cell => {
             cell.classList.remove('move-preview-target');
             cell.classList.remove('move-preview-overwrite');
+            cell.classList.remove('move-preview-anchor');
         });
     }
 
@@ -351,6 +355,7 @@ class EditModeManager {
     cancelTargetPreview() {
         this.clearPreview();
         this.previewDelta = null;
+        this.previewAnchor = null;
         this.stage = 'choosing-target';
         this.hideConfirmBar();
     }
@@ -360,6 +365,7 @@ class EditModeManager {
         this.clearSelection();
         this.hideConfirmBar();
         this.previewDelta = null;
+        this.previewAnchor = null;
         this.payload = [];
         this.sourceAnchor = null;
         this.selectionStart = null;
@@ -471,6 +477,13 @@ class EditModeManager {
                 targetCell.classList.add(willOverwrite ? 'move-preview-overwrite' : 'move-preview-target');
             }
         });
+
+        if (this.previewAnchor) {
+            const anchorCell = this.map.cells.get(`${this.previewAnchor.i},${this.previewAnchor.j}`);
+            if (anchorCell && !anchorCell.classList.contains('center')) {
+                anchorCell.classList.add('move-preview-anchor');
+            }
+        }
     }
 
     // 确认栏
