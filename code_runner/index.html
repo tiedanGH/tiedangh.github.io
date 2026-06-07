@@ -14,13 +14,13 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/base.css?v=20260305">
-    <link rel="stylesheet" href="css/output.css?v=20260305">
+    <link rel="stylesheet" href="css/base.css?v=20260309">
+    <link rel="stylesheet" href="css/output.css?v=20260607">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="js/utils.js?v=20260305"></script>
+    <script src="js/utils.js?v=20260607"></script>
     <script src="js/storage.js?v=20260305"></script>
-    <script src="js/output.js?v=20260309"></script>
+    <script src="js/output.js?v=20260607"></script>
     <script src="js/executor.js?v=20260309"></script>
     <script src="js/main.js?v=20260309"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
@@ -149,6 +149,7 @@
                                         <strong>输出格式：</strong><br>
                                         • text: 纯文本输出<br>
                                         • markdown: 将 markdown 和 html 可视化渲染<br>
+                                        • base64: 按类型自动转换（图片/音频/视频/文本）<br>
                                         • image: 从链接直接获取图片<br>
                                         • json: 输出为JSON格式，自定义输出格式
                                     </div>
@@ -157,6 +158,7 @@
                             <select id="outputFormat">
                                 <option value="text">text</option>
                                 <option value="markdown">markdown</option>
+                                <option value="base64">base64</option>
                                 <option value="image">image</option>
                                 <option value="json">json</option>
                             </select>

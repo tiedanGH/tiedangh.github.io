@@ -93,3 +93,37 @@
     color: var(--gray-color);
     padding: 10px;
 }
+
+/* Base64 audio/video output */
+.output-section .content.media-rendered {
+    white-space: normal;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.output-section .content.media-rendered audio {
+    width: 100%;
+}
+.output-section .content.media-rendered video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+}
+.base64-download {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 14px;
+    background: var(--primary-color);
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+}
+.base64-download:hover { background: var(--secondary-color); }
+
+/* Base64 media inside a message chain block */
+.message-chain-block audio { width: 100%; }
+.message-chain-block video,
+.message-chain-block img { max-width: 100%; height: auto; }

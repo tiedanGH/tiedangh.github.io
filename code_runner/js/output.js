@@ -100,6 +100,73 @@ const GlotOutput = (() => {
         return true;
     }
 
+    // --- Base64 (data URI) rendering, mirrors bot Base64Processor ---
+    // supportAll=false (inside MessageChain) blocks audio/video, matching the bot's fileToMessage
+    function mountBase64(targetDiv, rawText, supportAll) {
+        const parsed = GlotUtils.parseBase64(rawText);
+        if (!parsed.ok) {
+            showBase64Error(targetDiv, parsed.error);
+            return false;
+        }
+        if ((parsed.fileType === 'audio' || parsed.fileType === 'video') && !supportAll) {
+            showBase64Error(targetDiv, '[错误] base64在MessageChain输出格式下不兼容此文件格式，请更换其他输出格式');
+            return false;
+        }
+        if (parsed.fileType === 'text') {
+            targetDiv.classList.add('base64-text');
+            targetDiv.textContent = GlotUtils.bytesToText(parsed.bytes);
+            return true;
+        }
+        if (parsed.fileType === 'image') {
+            targetDiv.classList.add('image-rendered');
+            const img = document.createElement('img');
+            img.src = parsed.dataUri;
+            img.alt = 'base64 image';
+            img.onerror = () => showMediaError(targetDiv, '图片', parsed);
+            targetDiv.appendChild(img);
+            return true;
+        }
+        // audio / video
+        targetDiv.classList.add('media-rendered');
+        const tag = parsed.fileType === 'audio' ? 'audio' : 'video';
+        const media = document.createElement(tag);
+        media.controls = true;
+        media.src = parsed.dataUri;
+        media.onerror = () => showMediaError(targetDiv, tag === 'audio' ? '音频' : '视频', parsed);
+        targetDiv.appendChild(media);
+        return true;
+    }
+
+    function showBase64Error(targetDiv, message) {
+        targetDiv.innerHTML =
+            '<div class="image-error"><i class="fas fa-times-circle"></i> ' +
+            GlotUtils.escapeHtml(message) + '</div>';
+    }
+
+    function showMediaError(targetDiv, label, parsed) {
+        targetDiv.innerHTML = '';
+        const err = document.createElement('div');
+        err.className = 'image-error';
+        err.innerHTML = '<i class="fas fa-times-circle"></i> ' +
+            GlotUtils.escapeHtml(label) + '加载失败：浏览器可能不支持此格式（' +
+            GlotUtils.escapeHtml(parsed.extension) + '）';
+        targetDiv.appendChild(err);
+        const a = document.createElement('a');
+        a.className = 'base64-download';
+        a.href = parsed.dataUri;
+        a.download = 'output.' + parsed.extension;
+        a.innerHTML = '<i class="fas fa-download"></i> 下载文件';
+        targetDiv.appendChild(a);
+    }
+
+    function appendBase64Section(container, rawText, title = 'Stdout', supportAll = true) {
+        const sec = createSection('stdout', title, ICONS.stdout);
+        const ok = mountBase64(sec.querySelector('.content'), rawText, supportAll);
+        if (!ok) setSectionHeader(sec, 'error', '错误');
+        container.appendChild(sec);
+        return ok;
+    }
+
     // --- MessageChain ---
     function appendMessageChainSection(container, title, parts) {
         const sec = createSection('stdout', title, ICONS.stdout);
@@ -118,6 +185,8 @@ const GlotOutput = (() => {
                 block.innerHTML = renderMarkdownContent(part.content);
             } else if (part.type === 'image') {
                 appendImageContent(block, part.content);
+            } else if (part.type === 'base64') {
+                mountBase64(block, part.content, false);
             }
 
             contentDiv.appendChild(block);
@@ -155,6 +224,8 @@ const GlotOutput = (() => {
                 return true;
             case 'image':
                 return appendImageSection(container, content, title);
+            case 'base64':
+                return appendBase64Section(container, content, title, true);
             default: {
                 const message = errorPrefix
                     ? `${errorPrefix}不支持在JsonSingleMessage内使用 ${format} 输出格式`
@@ -193,6 +264,9 @@ const GlotOutput = (() => {
                     break;
                 case 'image':
                     parts.push({ type: 'image', content });
+                    break;
+                case 'base64':
+                    parts.push({ type: 'base64', content });
                     break;
                 case 'MessageChain':
                     debugLines.push('[ERROR] ' + (errorPrefix || '') + '不支持在JsonSingleMessage内使用 MessageChain 输出格式');
@@ -245,6 +319,7 @@ const GlotOutput = (() => {
             case 'text':
             case 'markdown':
             case 'image':
+            case 'base64':
                 renderSingleJsonMessage(container, json, 'Stdout', debugLines);
                 break;
             case 'MessageChain':
@@ -277,6 +352,9 @@ const GlotOutput = (() => {
                     break;
                 case 'image':
                     appendImageSection(outputDiv, result.stdout);
+                    break;
+                case 'base64':
+                    appendBase64Section(outputDiv, result.stdout, 'Stdout', true);
                     break;
                 case 'json':
                     handleJsonOutput(outputDiv, result.stdout);
