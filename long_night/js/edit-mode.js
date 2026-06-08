@@ -444,6 +444,13 @@ class EditModeManager {
         const layer = cell.querySelector('.attachment-layer');
         if (!layer) return null;
 
+        if (layer.classList.contains('custom-attach-text')) {
+            return {
+                kind: 'text',
+                text: layer.textContent
+            };
+        }
+
         if (layer.classList.contains('custom-attach-circle')) {
             return {
                 kind: 'custom',
@@ -548,7 +555,12 @@ class EditModeManager {
 
         if (state.attachment) {
             const layer = getAttachmentLayer(cell);
-            if (state.attachment.kind === 'custom') {
+            if (state.attachment.kind === 'text') {
+                layer.classList.add('custom-attach-text');
+                layer.style.backgroundImage = 'none';
+                layer.style.backgroundColor = '';
+                layer.textContent = state.attachment.text || '';
+            } else if (state.attachment.kind === 'custom') {
                 layer.classList.add('custom-attach-circle');
                 layer.style.backgroundImage = 'none';
                 layer.style.backgroundColor = state.attachment.color;

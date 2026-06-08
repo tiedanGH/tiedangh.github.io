@@ -111,6 +111,14 @@ class SaveManager {
                                 color: attachment.style.backgroundColor
                             });
                             hasCustomData = true;
+                        } else if (attachment.classList.contains('custom-attach-text')) {
+                            // 自定义文本附着
+                            if (!cellData.attachments) cellData.attachments = [];
+                            cellData.attachments.push({
+                                type: 'text',
+                                text: attachment.textContent
+                            });
+                            hasCustomData = true;
                         } else if (attachment.style.backgroundImage && attachment.style.backgroundImage !== 'none') {
                             // 图片附着
                             if (!cellData.attachments) cellData.attachments = [];
@@ -367,6 +375,9 @@ class SaveManager {
                         if (attachmentData.type === 'custom') {
                             layer.classList.add('custom-attach-circle');
                             layer.style.backgroundColor = attachmentData.color;
+                        } else if (attachmentData.type === 'text') {
+                            layer.classList.add('custom-attach-text');
+                            layer.textContent = attachmentData.text || '';
                         } else if (attachmentData.type === 'image') {
                             layer.style.backgroundImage = `url(${attachmentData.url})`;
                             layer.style.backgroundSize = 'contain';

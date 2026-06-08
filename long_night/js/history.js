@@ -78,7 +78,8 @@ class HistoryManager {
                 },
                 markers: [],
                 attach: null,
-                customAttach: null
+                customAttach: null,
+                textAttach: null
             };
 
             // 保存标记
@@ -96,7 +97,10 @@ class HistoryManager {
             // 保存附着
             const attachLayer = cell.querySelector('.attachment-layer');
             if (attachLayer) {
-                if (attachLayer.classList.contains('custom-attach-circle') || attachLayer.style.backgroundColor) {
+                if (attachLayer.classList.contains('custom-attach-text')) {
+                    // 保存自定义文本附着
+                    cellCopy.textAttach = attachLayer.textContent;
+                } else if (attachLayer.classList.contains('custom-attach-circle') || attachLayer.style.backgroundColor) {
                     // 保存自定义附着
                     cellCopy.customAttach = {
                         type: 'custom-circle',
@@ -174,7 +178,13 @@ class HistoryManager {
                 existingCell.style.border = cellData.style.border;
 
                 // 恢复附着
-                if (cellData.customAttach) {
+                if (cellData.textAttach != null) {
+                    // 恢复自定义文本附着
+                    const layer = document.createElement('div');
+                    layer.className = 'attachment-layer custom-attach-text';
+                    layer.textContent = cellData.textAttach;
+                    existingCell.appendChild(layer);
+                } else if (cellData.customAttach) {
                     // 恢复自定义附着
                     const layer = document.createElement('div');
                     layer.className = 'attachment-layer custom-attach-circle';

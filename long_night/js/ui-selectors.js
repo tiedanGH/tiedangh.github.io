@@ -69,6 +69,56 @@ function createCustomColorInput(title, onConfirm) {
     };
 }
 
+// 通用自定义文本输入函数
+function createCustomTextInput(title, initialValue, onConfirm) {
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'color-input-container';
+
+    const titleEl = document.createElement('div');
+    titleEl.textContent = title;
+    titleEl.style.fontWeight = 'bold';
+
+    const row = document.createElement('div');
+    row.className = 'color-preview-box';
+
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'text-attach-input';
+    textInput.placeholder = '输入文本';
+    textInput.maxLength = 12;
+    textInput.value = initialValue || '';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'text-confirm-btn';
+    confirmBtn.textContent = '确定';
+
+    const confirm = () => {
+        const value = textInput.value.trim();
+        if (!value) return;
+        onConfirm(value);
+        if (document.body.contains(inputContainer)) {
+            document.body.removeChild(inputContainer);
+        }
+    };
+
+    confirmBtn.onclick = confirm;
+    textInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') confirm();
+    });
+
+    row.appendChild(textInput);
+    row.appendChild(confirmBtn);
+    inputContainer.appendChild(titleEl);
+    inputContainer.appendChild(row);
+
+    return {
+        container: inputContainer,
+        input: textInput,
+        focus: () => textInput.focus()
+    };
+}
+
 // 选择器位置调整函数：非移动端在点击位置显示，移动端在css强制居中
 function positionSelector(container, targetElement, isMobile) {
     if (isMobile) return;
@@ -169,6 +219,49 @@ function createCustomOption(cell, event, groupType) {
     return li;
 }
 
+// 创建自定义文本选项（仅附着组）
+function createCustomTextOption(cell, event) {
+    const li = document.createElement('li');
+    li.className = 'option-item custom-option';
+
+    const box = document.createElement('span');
+    box.className = 'text-box';
+    box.textContent = 'A';
+
+    li.appendChild(box);
+    li.appendChild(document.createTextNode('文本'));
+
+    li.onclick = (e) => {
+        const textInput = createCustomTextInput('自定义文本', getCurrentAttachText(cell), (text) => {
+            setCustomTextAttachment(cell, text);
+            refreshMarkerColors(cell);
+            saveHistory();
+            removeSelector();
+        });
+
+        positionSelector(textInput.container, e.currentTarget, window.innerWidth <= 600);
+
+        document.body.appendChild(textInput.container);
+        textInput.focus();
+
+        // 点击外部关闭
+        const handleOutsideClick = (event) => {
+            if (!textInput.container.contains(event.target)) {
+                if (document.body.contains(textInput.container)) {
+                    document.body.removeChild(textInput.container);
+                }
+                document.removeEventListener('mousedown', handleOutsideClick);
+            }
+        };
+
+        setTimeout(() => {
+            document.addEventListener('mousedown', handleOutsideClick);
+        }, 0);
+    };
+
+    return li;
+}
+
 // 创建选项组
 function createOptionGroup(titleText, options, cell, event, groupType = 'grid') {
     const group = document.createElement('div');
@@ -203,6 +296,10 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
     // 添加自定义选项
     const customLi = createCustomOption(cell, event, groupType);
     ul.appendChild(customLi);
+    // 附着组额外添加“自定义文本”选项（位于最下方）
+    if (groupType === 'attach') {
+        ul.appendChild(createCustomTextOption(cell, event));
+    }
 
     group.appendChild(title);
     group.appendChild(ul);

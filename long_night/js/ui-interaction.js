@@ -14,7 +14,28 @@ function getAttachmentLayer(cell) {
         cell.appendChild(layer);
     }
     layer.className = 'attachment-layer';
+    layer.textContent = '';   // 清除可能残留的自定义文本
     return layer;
+}
+
+// 设置自定义文本附着（空文本则清除附着）
+function setCustomTextAttachment(cell, text) {
+    const value = (text ?? '').trim();
+    if (!value) {
+        clearAttachment(cell);
+        return;
+    }
+    const layer = getAttachmentLayer(cell);
+    layer.classList.add('custom-attach-text');
+    layer.style.backgroundImage = 'none';
+    layer.style.backgroundColor = '';
+    layer.textContent = value;
+}
+
+// 读取单元格当前的自定义文本（用于编辑时回填）
+function getCurrentAttachText(cell) {
+    const layer = cell?.querySelector('.attachment-layer.custom-attach-text');
+    return layer ? layer.textContent : '';
 }
 
 function getMarkerContainer(cell) {
