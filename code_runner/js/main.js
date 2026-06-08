@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
     updateCodeSourceUI();
     checkApiKeyHint();
+    setupTooltipClamping();
 
     // --- Event listeners ---
     el.apiKey.addEventListener('mousedown', e => e.stopPropagation());
@@ -106,6 +107,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkApiKeyHint() {
         el.apiKeyHint.style.display = el.apiKey.value.trim() ? 'none' : 'block';
+    }
+
+    // Keep hover tooltips fully inside the viewport
+    function setupTooltipClamping() {
+        const margin = 8;
+        document.querySelectorAll('.tooltip').forEach(tip => {
+            const content = tip.querySelector('.tooltip-content');
+            if (!content) return;
+            tip.addEventListener('mouseenter', () => {
+                content.style.marginLeft = '0px';   // reset previous nudge before measuring the default position
+                const rect = content.getBoundingClientRect();
+                const vw = window.innerWidth || document.documentElement.clientWidth;
+                let shift = 0;
+                if (rect.left < margin) {
+                    shift = margin - rect.left;             // overflowing left edge -> move right
+                } else if (vw && rect.right > vw - margin) {
+                    shift = (vw - margin) - rect.right;     // overflowing right edge -> move left
+                }
+                if (shift) content.style.marginLeft = shift + 'px';
+            });
+        });
     }
 
     function collectFormData() {

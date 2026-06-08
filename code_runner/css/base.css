@@ -72,6 +72,15 @@ header a {
     text-decoration: underline;
 }
 
+/* Header subtitle */
+.subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.9em;
+}
+
 /* HTTPS Warning */
 .warning-banner {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
@@ -151,6 +160,18 @@ input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+}
+
+/* Custom dropdown arrow */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px 20px;
 }
 
 .password-container {
@@ -364,6 +385,10 @@ button:disabled:hover {
     }
     header h1 {
         font-size: 1.8rem;
+    }
+    .subtitle {
+        flex-direction: column;
+        gap: 0;
     }
     main {
         padding: 6px 15px 8px 15px;
