@@ -20,7 +20,7 @@
 
     <script src="js/utils.js?v=20260607"></script>
     <script src="js/storage.js?v=20260305"></script>
-    <script src="js/output.js?v=20260607"></script>
+    <script src="js/output.js?v=20260607b"></script>
     <script src="js/executor.js?v=20260309"></script>
     <script src="js/main.js?v=20260309"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
@@ -151,7 +151,8 @@
                                         • markdown: 将 markdown 和 html 可视化渲染<br>
                                         • base64: 按类型自动转换（图片/音频/视频/文本）<br>
                                         • image: 从链接直接获取图片<br>
-                                        • json: 输出为JSON格式，自定义输出格式
+                                        • json: 输出为JSON格式，自定义输出格式<br>
+                                        • ForwardMessage: 转发消息，按节点输出多条
                                     </div>
                                 </span>
                             </label>
@@ -161,6 +162,7 @@
                                 <option value="base64">base64</option>
                                 <option value="image">image</option>
                                 <option value="json">json</option>
+                                <option value="ForwardMessage">ForwardMessage</option>
                             </select>
                         </div>
                         <div class="form-group">
