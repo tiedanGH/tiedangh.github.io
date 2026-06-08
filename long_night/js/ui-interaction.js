@@ -218,8 +218,7 @@ function movePlayer(direction) {
             break;
     }
 
-    const size = window.innerWidth > 600 ? 40 : 30;
-    const wall = window.innerWidth > 600 ? 11 : 9;
+    const { size, wall } = getCellMetrics();
 
     currentMap.ensureCell(targetI, targetJ, size, wall);
     currentMap.ensureCell(wallI, wallJ, size, wall);

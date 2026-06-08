@@ -6,8 +6,7 @@ class InfiniteMap {
         this.initDrag();
         // 浏览器窗口大小变化时重新渲染可视区域
         window.addEventListener('resize', () => {
-            const size = window.innerWidth > 600 ? 40 : 30;
-            const wall = window.innerWidth > 600 ? 11 : 9;
+            const { size, wall } = applyCellMetricsVars();
             this.updateCellPositions(size, wall);
             this.renderViewport();
         });
@@ -72,8 +71,7 @@ class InfiniteMap {
     }
 
     renderViewport() {
-        const size = window.innerWidth > 600 ? 40 : 30;
-        const wall = window.innerWidth > 600 ? 11 : 9;
+        const { size, wall } = getCellMetrics();
         const base = size + wall;
 
         // 计算需要渲染的行列数

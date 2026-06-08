@@ -1,8 +1,9 @@
 /* 按钮样式 */
 .back-home {
     position: fixed;
-    top: 10px;
+    top: 30px;
     left: 10px;
+    transform: translateY(-50%);
     z-index: 1000;
     padding: 6px 12px;
     background: #01b0f1;
@@ -42,27 +43,27 @@
 }
 
 .help-button {
-    right: 10px;
+    left: 100px;
     background: #01b0f1;
     --hover-bg: #1f8bff;
 }
 .save-button {
-    right: 60px;
+    right: 10px;
     background: #FFA500;
     --hover-bg: #FF8C00;
 }
 .redo-button {
-    right: 110px;
+    right: 60px;
     background: #4CAF50;
     --hover-bg: #45a049;
 }
 .undo-button {
-    right: 160px;
+    right: 110px;
     background: #FF6B6B;
     --hover-bg: #FF5252;
 }
 .edit-mode-button {
-    right: 210px;
+    right: 160px;
     background: #8A63D2;
     --hover-bg: #764fbd;
     font-size: 20px;
@@ -72,6 +73,20 @@
     color: #4A2E86;
     box-shadow: 0 0 0 3px rgba(138, 99, 210, 0.35), 0 2px 6px rgba(0,0,0,0.15);
     transform: scale(1.04);
+}
+
+/* 缩放按钮（第二排） */
+.zoom-in-button {
+    top: 60px;
+    right: 10px;
+    background: #00B8A9;
+    --hover-bg: #009b8e;
+}
+.zoom-out-button {
+    top: 60px;
+    right: 60px;
+    background: #00B8A9;
+    --hover-bg: #009b8e;
 }
 
 /* 方向控制按钮 */
@@ -177,7 +192,7 @@
     .back-home {
         font-size: 12px;
         padding: 5px 10px;
-        top: 8px;
+        top: 25.5px;
         left: 8px;
     }
 
@@ -188,19 +203,27 @@
         top: 8px;
     }
     .help-button {
-        right: 8px;
+        left: 84px;
     }
     .save-button {
-        right: 48px;
+        right: 8px;
     }
     .redo-button {
-        right: 88px;
+        right: 48px;
     }
     .undo-button {
-        right: 128px;
+        right: 88px;
     }
     .edit-mode-button {
-        right: 168px;
+        right: 128px;
+    }
+    .zoom-in-button {
+        top: 51px;
+        right: 8px;
+    }
+    .zoom-out-button {
+        top: 51px;
+        right: 48px;
     }
 
     /* 按钮仅在移动端显示 */

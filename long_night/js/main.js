@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     uiCellEvents(gameMap);
     blockCellEvent(gameMap);
+    // 地图缩放控制
+    initZoomControls(gameMap);
 
     // 帮助弹窗
     const closeAlertBtn = document.getElementById('close-alert');

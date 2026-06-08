@@ -279,8 +279,7 @@ function createMapBorder(map, startI, startJ, gridWidth, gridHeight) {
     const endI = startI + (wallsX - 1) * 2;
     const endJ = startJ + (wallsY - 1) * 2;
 
-    const size = window.innerWidth > 600 ? 40 : 30;
-    const wall = window.innerWidth > 600 ? 11 : 9;
+    const { size, wall } = getCellMetrics();
 
     function ensureWhiteWall(map, i, j, size, wall) {
         map.ensureCell(i, j, size, wall);

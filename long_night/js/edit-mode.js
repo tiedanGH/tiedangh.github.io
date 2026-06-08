@@ -311,8 +311,7 @@ class EditModeManager {
 
         this.selectedRange = { minI, maxI, minJ, maxJ };
 
-        const size = window.innerWidth > 600 ? 40 : 30;
-        const wall = window.innerWidth > 600 ? 11 : 9;
+        const { size, wall } = getCellMetrics();
 
         for (let i = minI; i <= maxI; i++) {
             for (let j = minJ; j <= maxJ; j++) {
@@ -462,8 +461,7 @@ class EditModeManager {
         this.clearPreview();
         if (!this.previewDelta) return;
 
-        const size = window.innerWidth > 600 ? 40 : 30;
-        const wall = window.innerWidth > 600 ? 11 : 9;
+        const { size, wall } = getCellMetrics();
         const sourceKeys = new Set(this.payload.map(item => `${item.i},${item.j}`));
 
         this.payload.forEach(item => {
@@ -597,8 +595,7 @@ class EditModeManager {
         if (this.stage !== 'preview-ready') return;
         if (!this.previewDelta || this.payload.length === 0) return;
 
-        const size = window.innerWidth > 600 ? 40 : 30;
-        const wall = window.innerWidth > 600 ? 11 : 9;
+        const { size, wall } = getCellMetrics();
 
         this.payload.forEach(item => {
             const sourceCell = this.map.cells.get(item.key);

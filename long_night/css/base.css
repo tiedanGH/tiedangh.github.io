@@ -10,6 +10,13 @@ html, body {
     -ms-text-size-adjust: 100%;
 }
 
+/* 地图缩放尺寸变量（由缩放按钮动态调整） */
+:root {
+    --cell-size: 40px;
+    --wall-size: 11px;
+    --marker-font: 14px;
+}
+
 #map-container {
     width: 100vw;
     height: 100vh;
@@ -29,8 +36,8 @@ html, body {
 }
 
 .cell.square {
-    width: 40px;
-    height: 40px;
+    width: var(--cell-size);
+    height: var(--cell-size);
     background-color: transparent;
     background-image: url('../img/unknown.png');
     background-size: cover;
@@ -45,21 +52,21 @@ html, body {
 .cell.wall.vertical {
     border-left: 1px solid #000;
     border-right: 1px solid #000;
-    width: 11px;
-    height: 40px;
+    width: var(--wall-size);
+    height: var(--cell-size);
 }
 
 .cell.wall.horizontal {
     border-top: 1px solid #000;
     border-bottom: 1px solid #000;
-    width: 40px;
-    height: 11px;
+    width: var(--cell-size);
+    height: var(--wall-size);
 }
 
 .cell.center {
     cursor: pointer;
-    width: 11px;
-    height: 11px;
+    width: var(--wall-size);
+    height: var(--wall-size);
     background-image: url('../img/walls/corner.png');
     background-size: cover;
     background-repeat: no-repeat;
@@ -95,32 +102,15 @@ html, body {
 
 /* 标记样式 */
 .marker {
-    font-size: 14px;
+    font-size: var(--marker-font);
     line-height: 1;
 }
 
 /* 响应式设计 */
 @media (max-width: 600px) {
-    .cell.square {
-        width: 30px;
-        height: 30px;
-    }
-
-    .cell.wall.vertical {
-        width: 9px;
-        height: 30px;
-    }
-    .cell.wall.horizontal {
-        width: 30px;
-        height: 9px;
-    }
-
-    .cell.center {
-        width: 9px;
-        height: 9px;
-    }
-
-    .marker {
-        font-size: 12px;
+    :root {
+        --cell-size: 30px;
+        --wall-size: 9px;
+        --marker-font: 12px;
     }
 }

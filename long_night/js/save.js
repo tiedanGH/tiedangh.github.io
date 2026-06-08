@@ -318,8 +318,7 @@ class SaveManager {
                 const [i, j] = key.split(',').map(Number);
 
                 // 确保单元格存在
-                const size = window.innerWidth > 600 ? 40 : 30;
-                const wall = window.innerWidth > 600 ? 11 : 9;
+                const { size, wall } = getCellMetrics();
                 this.map.ensureCell(i, j, size, wall);
                 const cell = this.map.cells.get(key);
 
@@ -345,8 +344,6 @@ class SaveManager {
                         span.className = 'marker';
                         span.textContent = markerData.text;
                         if (markerData.color) span.style.color = markerData.color;
-                        span.style.fontSize = '14px';
-                        span.style.lineHeight = '1';
                         if (markerData.type) span.dataset.markerType = markerData.type;
 
                         const container = getMarkerContainer(cell);
