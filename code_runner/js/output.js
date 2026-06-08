@@ -167,6 +167,89 @@ const GlotOutput = (() => {
         return ok;
     }
 
+    // --- LaTeX (rendered via CodeCogs image; QuickLaTeX is CORS-blocked, CodeCogs needs no CORS) ---
+    function latexImageUrl(latex) {
+        return 'https://latex.codecogs.com/png.image?' + encodeURIComponent('\\dpi{200}' + latex);
+    }
+    function mountLatex(targetDiv, latex, onResult) {
+        targetDiv.classList.add('image-rendered');
+        targetDiv.innerHTML = '<div class="image-loading"><i class="fas fa-spinner fa-spin"></i> LaTeX 渲染中...</div>';
+        const img = document.createElement('img');
+        img.alt = 'LaTeX';
+        img.onload = () => { targetDiv.innerHTML = ''; targetDiv.appendChild(img); if (onResult) onResult(true); };
+        img.onerror = () => {
+            targetDiv.innerHTML = '<div class="image-error"><i class="fas fa-times-circle"></i> LaTeX 渲染失败：请检查公式语法或网络</div>';
+            if (onResult) onResult(false);
+        };
+        img.src = latexImageUrl(latex);
+    }
+    function appendLatexSection(container, latex, title = 'Stdout') {
+        const sec = createSection('info', 'LaTeX 渲染中', ICONS.info);
+        mountLatex(sec.querySelector('.content'), latex, ok => setSectionHeader(sec, ok ? 'stdout' : 'error', ok ? title : '错误'));
+        container.appendChild(sec);
+        return true;
+    }
+
+    // --- Audio (Baidu TTS via POST form; mirrors bot FreeTextToSpeech) ---
+    function audioErr(message) {
+        return '<div class="image-error"><i class="fas fa-times-circle"></i> ' + GlotUtils.escapeHtml(message) + '</div>';
+    }
+    async function renderAudioInto(targetDiv, rawText) {
+        let msg;
+        try { msg = JSON.parse(rawText.trim()); }
+        catch (e) { targetDiv.innerHTML = audioErr('[错误] JSON解析错误：' + e.message); return false; }
+
+        const content = msg.content !== undefined ? String(msg.content) : '';
+        if (!content.trim()) { targetDiv.innerHTML = audioErr('生成语音失败：content内容为空'); return false; }
+        // AudioMessage 支持 format:"text" 输出文本用于调试
+        if (msg.format === 'text') { targetDiv.classList.add('base64-text'); targetDiv.textContent = content; return true; }
+
+        targetDiv.innerHTML = '<div class="image-loading"><i class="fas fa-spinner fa-spin"></i> 语音合成中...</div>';
+        const params = new URLSearchParams({
+            tex: content, pdt: '301', cuid: 'bake', ctp: '1', lan: 'zh',
+            spd: String(msg.speed ?? 5), pit: String(msg.pitch ?? 5),
+            vol: String(msg.volume ?? 10), per: String(msg.person ?? 0), aue: '3'
+        });
+        try {
+            // 必须用 POST 表单体；GET+query 会被百度判为 "Not verified user"
+            const r = await fetch('https://tts.baidu.com/text2audio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            const ct = r.headers.get('content-type') || '';
+            if (ct.includes('audio')) {
+                const url = URL.createObjectURL(await r.blob());
+                targetDiv.classList.add('media-rendered');
+                targetDiv.innerHTML = '';
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = url;
+                targetDiv.appendChild(audio);
+                return true;
+            }
+            const txt = await r.text();
+            let detail = txt;
+            try {
+                const j = JSON.parse(txt);
+                detail = (j.err_msg || j.err_detail || txt) + (j.err_no !== undefined ? `（err_no=${j.err_no}）` : '');
+            } catch (_) { /* keep raw */ }
+            targetDiv.innerHTML = audioErr('生成语音失败：' + detail);
+            return false;
+        } catch (e) {
+            targetDiv.innerHTML = audioErr('请求语音接口失败：' + e.message);
+            return false;
+        }
+    }
+    function appendAudioSection(container, rawText, title = 'Stdout') {
+        const sec = createSection('info', '语音合成中', ICONS.info);
+        const contentDiv = sec.querySelector('.content');
+        contentDiv.innerHTML = '<div class="image-loading"><i class="fas fa-spinner fa-spin"></i> 语音合成中...</div>';
+        container.appendChild(sec);
+        renderAudioInto(contentDiv, rawText).then(ok => setSectionHeader(sec, ok ? 'stdout' : 'error', ok ? title : '错误'));
+        return true;
+    }
+
     // --- MessageChain ---
     function appendMessageChainSection(container, title, parts) {
         const sec = createSection('stdout', title, ICONS.stdout);
@@ -187,6 +270,8 @@ const GlotOutput = (() => {
                 appendImageContent(block, part.content);
             } else if (part.type === 'base64') {
                 mountBase64(block, part.content, false);
+            } else if (part.type === 'latex') {
+                mountLatex(block, part.content);
             }
 
             contentDiv.appendChild(block);
@@ -226,6 +311,10 @@ const GlotOutput = (() => {
                 return appendImageSection(container, content, title);
             case 'base64':
                 return appendBase64Section(container, content, title, true);
+            case 'LaTeX':
+                return appendLatexSection(container, content, title);
+            case 'Audio':
+                return appendAudioSection(container, content, title);
             default: {
                 const message = errorPrefix
                     ? `${errorPrefix}不支持在JsonSingleMessage内使用 ${format} 输出格式`
@@ -267,6 +356,9 @@ const GlotOutput = (() => {
                     break;
                 case 'base64':
                     parts.push({ type: 'base64', content });
+                    break;
+                case 'LaTeX':
+                    parts.push({ type: 'latex', content });
                     break;
                 case 'MessageChain':
                     debugLines.push('[ERROR] ' + (errorPrefix || '') + '不支持在JsonSingleMessage内使用 MessageChain 输出格式');
@@ -355,6 +447,8 @@ const GlotOutput = (() => {
             case 'markdown':
             case 'image':
             case 'base64':
+            case 'LaTeX':
+            case 'Audio':
                 renderSingleJsonMessage(container, json, 'Stdout', debugLines);
                 break;
             case 'MessageChain':
@@ -399,6 +493,12 @@ const GlotOutput = (() => {
                     break;
                 case 'ForwardMessage':
                     handleForwardMessageOutput(outputDiv, result.stdout);
+                    break;
+                case 'LaTeX':
+                    appendLatexSection(outputDiv, result.stdout);
+                    break;
+                case 'Audio':
+                    appendAudioSection(outputDiv, result.stdout);
                     break;
                 default:
                     appendTextSection(outputDiv, 'stdout', 'Stdout', result.stdout);
