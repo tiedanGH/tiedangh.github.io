@@ -1,0 +1,270 @@
+/* ===== 基础 ===== */
+:root {
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --treasure: #00b3b3;
+    --danger: #d32f2f;
+    --safe: #2e9e4f;
+    --ink: #2b3445;
+    --line: #e3e8f0;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: #eef2f7;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    padding: 12px;
+}
+.container {
+    position: relative;
+    max-width: 640px;
+    margin: auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(20, 40, 80, 0.10);
+    padding: 20px 22px 16px;
+}
+
+/* 返回主页按钮（参考 treasure_raider_calculator / rainbow_treasure_hunter） */
+.back-home {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    z-index: 2;
+    padding: 6px 12px;
+    background: #f1f5fb;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .15s;
+}
+.back-home:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+h1 {
+    text-align: center;
+    margin: 0 0 16px;
+    font-size: 22px;
+    letter-spacing: .5px;
+}
+
+/* ===== 预设地图 ===== */
+.presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.presets-label { font-size: 13px; color: #6b7686; margin-right: 2px; }
+.preset {
+    padding: 6px 12px;
+    background: #f1f5fb;
+    color: #334;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .15s;
+}
+.preset:hover { background: #e4ecf8; border-color: #c9d6ea; }
+.preset.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+/* ===== 控件 ===== */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #55617a;
+}
+.controls input {
+    width: 56px;
+    padding: 6px 8px;
+    border: 1px solid #ccd4e0;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+.controls input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+.action-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+button.primary, button.ghost {
+    padding: 9px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .15s;
+}
+button.primary { background: var(--accent); color: #fff; }
+button.primary:hover { background: var(--accent-dark); }
+button.primary:disabled { background: #9db4e6; cursor: progress; }
+button.ghost { background: #fff; color: #55617a; border-color: #ccd4e0; }
+button.ghost:hover { background: #f3f6fb; }
+
+/* ===== 状态消息 ===== */
+.message {
+    text-align: center;
+    min-height: 22px;
+    margin: 8px 0;
+    font-size: 13px;
+    color: #6b7686;
+}
+.message.busy  { color: var(--accent); }
+.message.ok    { color: #3a4a66; }
+.message.error { color: var(--danger); font-weight: 600; }
+.message.hint  { color: #9098a8; }
+
+/* ===== 棋盘 ===== */
+#boardContainer {
+    display: grid;
+    gap: 1px;
+    justify-content: safe center;
+    margin: 6px auto 4px;
+    overflow-x: auto;
+    --cell: 40px;
+    --font: 13px;
+}
+.coord-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--cell);
+    height: var(--cell);
+    font-weight: 700;
+    font-size: calc(var(--font) * .92);
+    color: #9aa6b8;
+}
+
+/* 单元格基础 */
+.cell {
+    width: var(--cell);
+    height: var(--cell);
+    background: #c9ced7;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--font);
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: background .12s;
+}
+.cell:hover { background: #bcc2cd; }
+.cell.editing {
+    background: #fffbe6;
+    outline: 2px solid var(--accent);
+    cursor: text;
+    /* 改用块级布局并以内边距垂直居中：空内容时光标也能稳定居中，且光标高度正常
+       （flex 列向布局下空 contentEditable 的光标会偏到顶部） */
+    display: block;
+    padding-top: calc((var(--cell) - var(--font)) / 2);
+}
+
+/* 标记 */
+.cell.treasure { color: var(--treasure); background: #e9fbfb; font-size: calc(var(--font) * 1.25); }
+.cell.bomb     { color: #444; background: #fff; font-size: calc(var(--font) * 1.25); }
+
+/* 线索（rule.md 配色） */
+.cell.R { color: #C91D32; background: #FADADE; }
+.cell.B { color: #0070C0; background: #D9E1F4; }
+.cell.Y { color: #BD8900; background: #FFF3CA; }
+.cell.O { color: #C55C10; background: #F9CBAA; }
+.cell.G { color: #588E31; background: #E3F2D9; }
+.cell.P { color: #7030A0; background: #F6CCFF; }
+
+/* ===== 概率格 ===== */
+.prob-cell {
+    --heat: 0;
+    background: color-mix(in srgb, var(--treasure) calc(var(--heat) * 60%), #eef1f6);
+    color: #2b3445;
+    cursor: pointer;
+    gap: 1px;
+}
+.prob-cell .line1, .prob-cell .line2 {
+    display: block;
+    width: 100%;
+    line-height: 1.05;
+}
+.prob-cell .line1 { font-size: calc(var(--font) * .96); font-weight: 700; }
+.prob-cell .line2 { font-size: calc(var(--font) * .82); color: #8a93a5; font-weight: 600; }
+.prob-cell .line2.danger { color: var(--danger); }
+.prob-cell .line2.safe   { color: var(--safe); }
+.prob-cell.best  { outline: 2px solid #f5b301; outline-offset: -2px; box-shadow: 0 0 6px rgba(245,179,1,.6); }
+.prob-cell.safe-cell { box-shadow: inset 0 0 0 1.5px rgba(46,158,79,.45); }
+
+/* ===== 帮助 / 图例 ===== */
+.help {
+    margin-top: 14px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+    font-size: 13px;
+    color: #55617a;
+}
+.help summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+}
+.help-body { margin-top: 8px; line-height: 1.7; }
+.help-body code {
+    background: #f0f3f8; padding: 1px 5px; border-radius: 4px; font-size: 12px;
+}
+.legend {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 4px 12px;
+}
+.legend li { display: flex; align-items: center; gap: 7px; }
+.chip {
+    display: inline-flex; justify-content: center; align-items: center;
+    width: 22px; height: 22px; border-radius: 4px; font-weight: 700; font-size: 13px; flex: none;
+}
+.chip.R { color: #C91D32; background: #FADADE; }
+.chip.B { color: #0070C0; background: #D9E1F4; }
+.chip.Y { color: #BD8900; background: #FFF3CA; }
+.chip.O { color: #C55C10; background: #F9CBAA; }
+.chip.G { color: #588E31; background: #E3F2D9; }
+.chip.P { color: #7030A0; background: #F6CCFF; }
+.t-color { color: var(--treasure); }
+.b-color { color: var(--danger); }
+.prob-help { margin: 6px 0 0; }
+
+@media (max-width: 480px) {
+    .container { padding: 52px 12px 12px; }   /* 顶部留白避免返回按钮与标题重叠 */
+    h1 { font-size: 19px; }
+    .back-home { left: 12px; top: 12px; }
+}

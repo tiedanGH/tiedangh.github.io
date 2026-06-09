@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>彩虹奇兵 · 概率计算器</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="favicon.ico">
+</head>
+<body>
+<div class="container">
+  <a href="../" class="back-home">返回主页</a>
+  <h1>彩虹奇兵 · 概率计算器</h1>
+
+  <div class="presets">
+    <span class="presets-label">地图</span>
+    <button class="preset" data-size="6"  data-t="6"  data-b="4">小 6×6</button>
+    <button class="preset" data-size="9"  data-t="9"  data-b="12">中 9×9</button>
+    <button class="preset" data-size="12" data-t="18" data-b="18">大 12×12</button>
+    <button class="preset" data-size="15" data-t="36" data-b="24">特大 15×15</button>
+  </div>
+
+  <div class="controls">
+    <label>边长<input id="sizeInput"     type="number" min="1" max="15" value="6"></label>
+    <label>宝藏<input id="treasureInput" type="number" min="0"          value="6"></label>
+    <label>炸弹<input id="bombInput"     type="number" min="0"          value="4"></label>
+  </div>
+
+  <div class="action-row">
+    <button id="calcBtn" class="primary">计算概率</button>
+    <button id="clearBtn" class="ghost">清空棋盘</button>
+  </div>
+
+  <div id="message" class="message"></div>
+
+  <div id="boardContainer"></div>
+
+  <details class="help">
+    <summary>输入与玩法说明</summary>
+    <div class="help-body">
+      <p>点击格子输入：<b>T</b>=宝藏★　<b>X</b>=炸弹✹　<b>颜色字母+数字</b>=线索（如 <code>R3</code>）。
+         回车确认，Esc 取消，留空表示未知。</p>
+      <ul class="legend">
+        <li><span class="chip R">R</span>红 · 周围 8 格炸弹数</li>
+        <li><span class="chip B">B</span>蓝 · 本行本列炸弹数</li>
+        <li><span class="chip Y">Y</span>黄 · 周围 8 格宝藏数</li>
+        <li><span class="chip O">O</span>橙 · 周围 8 格宝藏+炸弹</li>
+        <li><span class="chip G">G</span>绿 · 8格及行列宝藏(去重)</li>
+        <li><span class="chip P">P</span>紫 · 8格及行列炸弹(去重)</li>
+      </ul>
+      <p class="prob-help">
+        概率格<b>上行</b>=该格是<b class="t-color">宝藏</b>的概率%，
+        <b>下行</b>=是<b class="b-color">炸弹</b>的概率%。
+        金框=宝藏概率最高的最佳挖掘点，绿色=必定安全（炸弹 0%）。
+      </p>
+    </div>
+  </details>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
