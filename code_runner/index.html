@@ -14,15 +14,17 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/base.css?v=20260608c">
+    <link rel="stylesheet" href="css/base.css?v=20260608e">
+    <link rel="stylesheet" href="css/projects.css?v=20260608h">
     <link rel="stylesheet" href="css/output.css?v=20260607">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="js/utils.js?v=20260607"></script>
-    <script src="js/storage.js?v=20260305"></script>
+    <script src="js/projects.js?v=20260609"></script>
+    <script src="js/storage.js?v=20260608d"></script>
     <script src="js/output.js?v=20260608"></script>
     <script src="js/executor.js?v=20260309"></script>
-    <script src="js/main.js?v=20260608"></script>
+    <script src="js/main.js?v=20260608e"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -52,8 +54,8 @@
     <main>
         <div class="content-wrapper">
             <div class="form-container">
-                <form id="codeForm">
-                    <!-- API Token -->
+                <!-- 共享：API Token（每浏览器一份，所有项目共享） -->
+                <div class="shared-top">
                     <div class="form-group">
                         <label for="apiKey">
                             Glot API Token
@@ -83,7 +85,16 @@
                             <span id="security-notice-text">API Token将通过第三方代理服务器发送，建议使用专用Token，或者<a href="userscript/cors/dist/main.user.js">安装用户脚本</a></span>
                         </div>
                     </div>
+                </div>
 
+                <!-- 项目栏：快速切换 + 管理 -->
+                <div class="project-bar">
+                    <label for="projectSelect" class="project-bar-label">项目</label>
+                    <select id="projectSelect" class="project-select"></select>
+                    <button type="button" id="manageProjectsBtn" class="project-manage-btn"><i class="fas fa-folder-open"></i> 管理项目</button>
+                </div>
+
+                <form id="codeForm">
                     <!-- 编程语言 + 代码来源 -->
                     <div class="form-row">
                         <div class="form-group">
@@ -219,6 +230,24 @@
             </div>
         </div>
     </main>
+</div>
+
+<!-- 项目管理：隐藏文件选择 + 模态弹窗 -->
+<input type="file" id="importFileInput" accept="application/json,.json" hidden>
+<div id="projectModalOverlay" class="modal-overlay" hidden>
+    <div class="modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+        <div class="modal-header">
+            <h2 id="pmTitle">项目管理</h2>
+            <button type="button" class="modal-close" id="pmClose" aria-label="关闭">&times;</button>
+        </div>
+        <div class="modal-toolbar">
+            <button type="button" id="pmNew" class="btn-new"><i class="fas fa-plus"></i> 新建项目</button>
+            <button type="button" id="pmImportOne" class="btn-import"><i class="fas fa-file-import"></i> 导入项目</button>
+            <button type="button" id="pmImportAll" class="btn-import-all"><i class="fas fa-download"></i> 导入全部</button>
+            <button type="button" id="pmExportAll" class="btn-export-all"><i class="fas fa-upload"></i> 导出全部</button>
+        </div>
+        <ul class="project-list" id="projectList"></ul>
+    </div>
 </div>
 </body>
 </html>

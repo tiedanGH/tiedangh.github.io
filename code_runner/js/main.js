@@ -20,16 +20,29 @@ document.addEventListener('DOMContentLoaded', function() {
         httpsWarn: document.getElementById('httpsWarning'),
         debugMode: document.getElementById('debugMode'),
         debugSection: document.getElementById('debugSection'),
-        apiKeyHint: document.getElementById('apiKeyHint')
+        apiKeyHint: document.getElementById('apiKeyHint'),
+        // project management
+        projectSelect: document.getElementById('projectSelect'),
+        manageBtn: document.getElementById('manageProjectsBtn'),
+        modalOverlay: document.getElementById('projectModalOverlay'),
+        projectList: document.getElementById('projectList'),
+        importFile: document.getElementById('importFileInput'),
+        pmClose: document.getElementById('pmClose'),
+        pmNew: document.getElementById('pmNew'),
+        pmImportOne: document.getElementById('pmImportOne'),
+        pmImportAll: document.getElementById('pmImportAll'),
+        pmExportAll: document.getElementById('pmExportAll')
     };
 
     const isHttps = window.location.protocol === 'https:';
+    let importMode = 'one';   // 'one' | 'all' — which import the hidden file input is serving
 
     // --- Init ---
+    GlotProjects.init();
     initSecurity();
-    loadData();
-    updateCodeSourceUI();
-    checkApiKeyHint();
+    loadApiKey();
+    applyProjectData(GlotProjects.getProject(GlotProjects.getActiveId()));
+    syncProjectSelect();
     setupTooltipClamping();
 
     // --- Event listeners ---
@@ -37,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     el.apiKey.addEventListener('click', function(e) { e.stopPropagation(); this.focus(); });
     el.apiKey.addEventListener('keydown', e => e.stopPropagation());
     el.apiKey.addEventListener('keyup', e => { e.stopPropagation(); checkApiKeyHint(); });
+    el.apiKey.addEventListener('change', persistApiKey);   // shared token persists on blur
 
     document.querySelector('.password-container').addEventListener('click', function(e) {
         if (e.target === this) el.apiKey.focus();
@@ -65,7 +79,24 @@ document.addEventListener('DOMContentLoaded', function() {
         await runCode();
     });
 
-    // --- Functions ---
+    // Project switching + management
+    el.projectSelect.addEventListener('change', () => switchTo(el.projectSelect.value));
+    el.manageBtn.addEventListener('click', openModal);
+    el.pmClose.addEventListener('click', closeModal);
+    el.modalOverlay.addEventListener('click', e => { if (e.target === el.modalOverlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !el.modalOverlay.hidden) closeModal(); });
+    el.projectList.addEventListener('click', onListClick);
+    el.pmNew.addEventListener('click', onNewProject);
+    el.pmExportAll.addEventListener('click', onExportAll);
+    el.pmImportOne.addEventListener('click', () => triggerImport('one'));
+    el.pmImportAll.addEventListener('click', () => triggerImport('all'));
+    el.importFile.addEventListener('change', onImportFile);
+
+    // Persist edits when leaving the page (covers edits made without running)
+    window.addEventListener('beforeunload', persistAll);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') persistAll(); });
+
+    // --- Security / UI helpers (unchanged) ---
     function initSecurity() {
         if (!isHttps) {
             el.httpsWarn.style.display = 'block';
@@ -130,9 +161,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function collectFormData() {
+    // --- Shared token (one per browser, all projects) ---
+    function loadApiKey() { el.apiKey.value = GlotProjects.loadToken(); checkApiKeyHint(); }
+    function persistApiKey() { GlotProjects.saveToken(el.apiKey.value); }
+
+    // --- Per-project workspace ---
+    function collectProjectData() {
         return {
-            apiKey: el.apiKey.value,
             language: el.language.value,
             codeSource: el.codeSource.value,
             codeUrl: el.codeUrl.value,
@@ -142,18 +177,233 @@ document.addEventListener('DOMContentLoaded', function() {
             storageOption: el.storageOption.value
         };
     }
+    function applyProjectData(p) {
+        p = p || {};
+        el.language.value = p.language || '';
+        el.codeSource.value = p.codeSource || 'textarea';
+        el.codeUrl.value = p.codeUrl || '';
+        el.code.value = p.code || '';
+        el.stdin.value = p.stdin || '';
+        el.outputFormat.value = p.outputFormat || 'text';
+        el.storageOption.value = p.storageOption || 'not-implemented';
+        updateCodeSourceUI();
+    }
+    function saveActiveProject() {
+        GlotProjects.saveProjectData(GlotProjects.getActiveId(), collectProjectData());
+    }
+    function persistAll() { persistApiKey(); saveActiveProject(); }
 
-    function loadData() {
-        const d = GlotStorage.load();
-        if (!d) return;
-        el.apiKey.value = d.apiKey || '';
-        el.language.value = d.language || '';
-        el.codeSource.value = d.codeSource || 'textarea';
-        el.codeUrl.value = d.codeUrl || '';
-        el.code.value = d.code || '';
-        el.stdin.value = d.stdin || '';
-        el.outputFormat.value = d.outputFormat || 'text';
-        el.storageOption.value = d.storageOption || 'not-implemented';
+    function switchTo(id) {
+        if (id === GlotProjects.getActiveId()) return;
+        saveActiveProject();                       // flush current edits to the outgoing project
+        if (!GlotProjects.setActive(id)) { syncProjectSelect(); return; }
+        applyProjectData(GlotProjects.getProject(id));
+        syncProjectSelect();
+    }
+    function syncProjectSelect() {
+        const items = GlotProjects.list();
+        const activeId = GlotProjects.getActiveId();
+        el.projectSelect.innerHTML = items
+            .map(it => '<option value="' + it.id + '">' + GlotUtils.escapeHtml(it.name) + '</option>')
+            .join('');
+        el.projectSelect.value = activeId;
+    }
+
+    // --- Project management modal ---
+    function attrEsc(s) { return GlotUtils.escapeHtml(s).replace(/"/g, '&quot;'); }
+
+    function renderProjectList() {
+        const items = GlotProjects.list();
+        const activeId = GlotProjects.getActiveId();
+        el.projectList.innerHTML = items.map(it => {
+            const nm = GlotUtils.escapeHtml(it.name);
+            const isActive = it.id === activeId;
+            const badge = isActive ? '<span class="project-row-badge">当前</span>' : '';
+            const nameCls = it.isDefault ? 'project-row-name' : 'project-row-name editable';
+            let actions = '';
+            if (!isActive) actions += '<button type="button" class="btn-switch" data-act="switch">切换</button>';
+            actions += '<button type="button" class="btn-dup" data-act="duplicate">复制</button>';
+            if (!it.isDefault) {
+                actions += '<button type="button" class="btn-export" data-act="export">导出</button>'
+                         + '<button type="button" class="btn-del" data-act="delete">删除</button>';
+            }
+            return '<li class="project-row" data-id="' + attrEsc(it.id) + '">'
+                 + '<div class="project-row-head">'
+                 +   '<span class="' + nameCls + '" title="' + attrEsc(it.name) + '">' + nm + '</span>'
+                 +   badge
+                 + '</div>'
+                 + '<div class="project-row-actions">' + actions + '</div>'
+                 + '</li>';
+        }).join('');
+    }
+
+    function openModal() { renderProjectList(); el.modalOverlay.hidden = false; }
+    function closeModal() { el.modalOverlay.hidden = true; }
+
+    // Inline rename: click a (non-default) project name -> input; Enter/blur commits, Esc cancels
+    function startInlineRename(nameEl) {
+        if (nameEl.querySelector('input')) return;
+        const id = nameEl.closest('.project-row').getAttribute('data-id');
+        const original = (GlotProjects.getProject(id) || {}).name || '';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'project-row-name-input';
+        input.maxLength = 60;
+        input.value = original;
+        nameEl.textContent = '';
+        nameEl.appendChild(input);
+        input.focus();
+        input.select();
+        let done = false;
+        const commit = () => {
+            if (done) return; done = true;
+            const nn = input.value.trim();
+            if (!nn || nn === original) { renderProjectList(); return; }
+            const r = GlotProjects.rename(id, nn);
+            renderProjectList();
+            syncProjectSelect();
+            if (r.ok && r.name !== nn) showToast('名称重复，已重命名为 ' + r.name, 'info');
+        };
+        const cancel = () => { if (done) return; done = true; renderProjectList(); };
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', ev => {
+            ev.stopPropagation();   // keep Enter/Esc out of the modal's global key handler
+            if (ev.key === 'Enter') input.blur();
+            else if (ev.key === 'Escape') cancel();
+        });
+    }
+
+    async function onListClick(e) {
+        // click a project name (non-default) -> inline rename
+        const nameEl = e.target.closest('.project-row-name.editable');
+        if (nameEl) { startInlineRename(nameEl); return; }
+
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const id = btn.closest('.project-row').getAttribute('data-id');
+        const act = btn.getAttribute('data-act');
+
+        if (act === 'switch') {
+            switchTo(id);
+            closeModal();
+        } else if (act === 'duplicate') {
+            saveActiveProject();                   // keep active project's data current before copy
+            GlotProjects.duplicate(id);
+            renderProjectList();
+            syncProjectSelect();
+            showToast('已复制项目', 'success');
+        } else if (act === 'export') {
+            saveActiveProject();                   // ensure active project's export reflects current edits
+            const r = GlotProjects.exportOne(id);
+            if (!r.ok) { showToast(r.error, 'error'); return; }
+            downloadJson('project-' + safeFile(r.name) + '.json', r.json);
+        } else if (act === 'delete') {
+            const p = GlotProjects.getProject(id);
+            const ok = await confirmDialog('确定删除项目 “' + (p ? p.name : id) + '”？此操作不可撤销。');
+            if (!ok) return;
+            const r = GlotProjects.remove(id);
+            if (!r.ok) { showToast(r.error, 'error'); return; }
+            applyProjectData(GlotProjects.getProject(GlotProjects.getActiveId()));   // reload (may have fallen back to default)
+            renderProjectList();
+            syncProjectSelect();
+            showToast('已删除项目', 'success');
+        }
+    }
+
+    function onNewProject() {
+        saveActiveProject();
+        const id = GlotProjects.create('新项目');
+        GlotProjects.setActive(id);
+        applyProjectData(GlotProjects.getProject(id));
+        renderProjectList();
+        syncProjectSelect();
+        // auto-focus inline rename on the freshly created project
+        const row = el.projectList.querySelector('.project-row[data-id="' + id + '"]');
+        const nameEl = row && row.querySelector('.project-row-name.editable');
+        if (nameEl) startInlineRename(nameEl);
+    }
+
+    function onExportAll() {
+        const r = GlotProjects.exportAll();
+        if (r.count === 0) { showToast('没有可导出的项目（默认项目不会被导出）', 'error'); return; }
+        downloadJson('projects-all.json', r.json);
+        showToast('已导出 ' + r.count + ' 个项目', 'success');
+    }
+
+    function triggerImport(mode) {
+        importMode = mode;
+        el.importFile.value = '';   // allow re-importing the same file
+        el.importFile.click();
+    }
+
+    function onImportFile(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            let parsed;
+            try { parsed = JSON.parse(reader.result); }
+            catch (err) { showToast('无法解析文件：不是有效的 JSON', 'error'); return; }
+            const r = importMode === 'all' ? GlotProjects.importAll(parsed) : GlotProjects.importOne(parsed);
+            if (!r.ok) { showToast('导入失败：' + r.error, 'error'); return; }
+            renderProjectList();
+            syncProjectSelect();
+            showToast(importMode === 'all' ? ('成功导入 ' + r.added.length + ' 个项目') : ('成功导入项目：' + r.name), 'success');
+        };
+        reader.onerror = () => showToast('读取文件失败', 'error');
+        reader.readAsText(file);
+    }
+
+    // --- In-page toast + confirm (replace window.alert / window.confirm) ---
+    let toastWrap = null;
+    function showToast(message, type) {
+        if (!toastWrap) {
+            toastWrap = document.createElement('div');
+            toastWrap.className = 'cr-toast-wrap';
+            document.body.appendChild(toastWrap);
+        }
+        const t = document.createElement('div');
+        t.className = 'cr-toast' + (type ? ' ' + type : '');
+        t.textContent = message;
+        toastWrap.appendChild(t);
+        requestAnimationFrame(() => t.classList.add('show'));
+        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2600);
+    }
+
+    function confirmDialog(message) {
+        return new Promise(resolve => {
+            const overlay = document.createElement('div');
+            overlay.className = 'cr-confirm-overlay';
+            overlay.innerHTML =
+                '<div class="cr-confirm" role="dialog" aria-modal="true">'
+              +   '<div class="cr-confirm-msg"></div>'
+              +   '<div class="cr-confirm-btns">'
+              +     '<button type="button" class="cr-confirm-cancel">取消</button>'
+              +     '<button type="button" class="cr-confirm-ok">确定</button>'
+              +   '</div>'
+              + '</div>';
+            overlay.querySelector('.cr-confirm-msg').textContent = message;
+            const onKey = ev => { if (ev.key === 'Escape') { ev.stopPropagation(); close(false); } };
+            const close = val => { document.removeEventListener('keydown', onKey, true); overlay.remove(); resolve(val); };
+            overlay.querySelector('.cr-confirm-ok').addEventListener('click', () => close(true));
+            overlay.querySelector('.cr-confirm-cancel').addEventListener('click', () => close(false));
+            overlay.addEventListener('click', e => { if (e.target === overlay) close(false); });
+            document.body.appendChild(overlay);
+            document.addEventListener('keydown', onKey, true);
+            overlay.querySelector('.cr-confirm-ok').focus();
+        });
+    }
+
+    function safeFile(name) {
+        return (String(name || 'project').replace(/[^\w一-龥.-]+/g, '_') || 'project').slice(0, 40);
+    }
+    function downloadJson(filename, jsonString) {
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
     }
 
     function setRunning(on) {
@@ -170,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function runCode() {
-        const data = collectFormData();
+        const data = Object.assign({ apiKey: el.apiKey.value }, collectProjectData());
 
         if (!data.language) {
             alert('请选择编程语言'); return;
@@ -185,7 +435,8 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('请输入代码'); return;
         }
 
-        GlotStorage.save(data);
+        persistApiKey();
+        saveActiveProject();
         setRunning(true);
 
         try {

@@ -1,0 +1,238 @@
+/* Project management UI: shared token bar, project bar, modal, list, toast, confirm. */
+
+/* Shared token (one per browser, all projects) */
+.shared-top { margin-bottom: 10px; }
+
+/* Project bar: quick-switch dropdown + manage button */
+.project-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 12px;
+}
+.project-bar-label {
+    margin: 0;
+    font-weight: 600;
+    color: var(--dark-color);
+    white-space: nowrap;
+}
+.project-select { flex: 1; min-width: 0; }
+.project-manage-btn {
+    width: auto;
+    flex: 0 0 auto;
+    align-self: stretch;
+    line-height: 1.2;
+    padding: 11px 28px;
+    font-size: 16px;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(44, 62, 80, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+.modal-overlay[hidden] { display: none; }
+.modal {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow: auto;
+}
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+.modal-header h2 { font-size: 1.3rem; color: var(--dark-color); }
+.modal-close {
+    width: auto;
+    background: none;
+    color: var(--gray-color);
+    font-size: 26px;
+    line-height: 1;
+    padding: 0 6px;
+}
+.modal-close:hover { background: none; color: var(--dark-color); }
+
+/* Toolbar */
+.modal-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 20px;
+}
+.modal-toolbar button {
+    width: auto;
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    font-size: 14px;
+}
+
+/* Project list — one column, two columns on wide screens */
+.project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 20px 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+.project-row {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.project-row-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.project-row-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+.project-row-name.editable { cursor: text; }
+.project-row-name.editable:hover { color: var(--primary-color); }
+.project-row-name-input {
+    width: 100%;
+    padding: 4px 8px;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+}
+.project-row-badge {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: #fff;
+    background: var(--primary-color);
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+.project-row-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.project-row-actions button {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* Button colors */
+.btn-new            { background: var(--success-color); }
+.btn-new:hover      { background: #27ae60; }
+.btn-import         { background: #17a2b8; }
+.btn-import:hover   { background: #138496; }
+.btn-import-all     { background: #5c6bc0; }
+.btn-import-all:hover { background: #4a59b0; }
+.btn-export-all, .btn-export       { background: var(--warning-color); }
+.btn-export-all:hover, .btn-export:hover { background: #e08e0b; }
+.btn-switch         { background: var(--primary-color); }
+.btn-switch:hover   { background: var(--secondary-color); }
+.btn-dup            { background: #8e44ad; }
+.btn-dup:hover      { background: #793f98; }
+.btn-del            { background: var(--danger-color); }
+.btn-del:hover      { background: #c0392b; }
+
+/* Toast notifications (in-page, replaces window.alert) */
+.cr-toast-wrap {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+}
+.cr-toast {
+    background: var(--dark-color);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s, transform 0.25s;
+    max-width: 90vw;
+}
+.cr-toast.show    { opacity: 1; transform: translateY(0); }
+.cr-toast.success { background: var(--success-color); }
+.cr-toast.error   { background: var(--danger-color); }
+
+/* In-page confirm dialog (replaces window.confirm) */
+.cr-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 20px;
+}
+.cr-confirm {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    width: 360px;
+    max-width: 92vw;
+    overflow: hidden;
+}
+.cr-confirm-msg {
+    padding: 22px 20px;
+    color: var(--dark-color);
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+}
+.cr-confirm-btns {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px 18px;
+    justify-content: center;
+}
+.cr-confirm-btns button { width: auto; padding: 8px 24px; font-size: 14px; }
+.cr-confirm-cancel       { background: var(--gray-color); }
+.cr-confirm-cancel:hover { background: #7f8c8d; }
+.cr-confirm-ok           { background: var(--danger-color); }
+.cr-confirm-ok:hover     { background: #c0392b; }
+
+/* Wide screens: wider modal + two-column project list */
+@media (min-width: 900px) {
+    .modal { max-width: 860px; }
+    .project-list { grid-template-columns: 1fr 1fr; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .project-bar { flex-wrap: wrap; }
+    .project-manage-btn { width: 100%; }
+    .modal-toolbar button { flex: 1 1 auto; }
+}
