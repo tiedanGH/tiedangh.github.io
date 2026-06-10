@@ -2,6 +2,7 @@
 const GlotProjects = (() => {
     const TOKEN_KEY    = 'cr_apiKey';
     const PROJECTS_KEY = 'cr_projects';
+    const REQUEST_KEY  = 'cr_request';
     const SCHEMA       = 1;
     const DEFAULT_ID   = 'default';
     const DEFAULT_NAME = '默认项目';
@@ -26,6 +27,29 @@ const GlotProjects = (() => {
             if (plain) localStorage.setItem(TOKEN_KEY, GlotUtils.encrypt(plain));
             else localStorage.removeItem(TOKEN_KEY);
         } catch (e) { console.warn('保存 Token 失败:', e); }
+    }
+
+    /* ------------------ request config (method + docker) ------------------ */
+    function loadRequestConfig() {
+        let raw;
+        try { raw = localStorage.getItem(REQUEST_KEY); } catch (e) { raw = null; }
+        let obj = {};
+        try { obj = raw ? JSON.parse(raw) : {}; } catch (e) { obj = {}; }
+        return {
+            method: obj.method === 'docker' ? 'docker' : 'glot',
+            dockerUrl: typeof obj.dockerUrl === 'string' ? obj.dockerUrl : '',
+            dockerToken: obj.dockerToken ? GlotUtils.decrypt(obj.dockerToken) : ''   // decrypt returns '' on failure
+        };
+    }
+    function saveRequestConfig(cfg) {
+        cfg = cfg || {};
+        const out = {
+            method: cfg.method === 'docker' ? 'docker' : 'glot',
+            dockerUrl: String(cfg.dockerUrl || ''),
+            dockerToken: cfg.dockerToken ? GlotUtils.encrypt(String(cfg.dockerToken)) : ''
+        };
+        try { localStorage.setItem(REQUEST_KEY, JSON.stringify(out)); }
+        catch (e) { console.warn('保存请求配置失败:', e); }
     }
 
     /* ------------------------ helpers ------------------------ */
@@ -256,6 +280,6 @@ const GlotProjects = (() => {
         init, list, getActiveId, getProject, setActive, saveProjectData,
         create, rename, duplicate, remove, exportOne, exportAll, importOne,
         snapshot, replaceAllFull, replaceAllFromArray,
-        loadToken, saveToken, DEFAULT_ID
+        loadToken, saveToken, loadRequestConfig, saveRequestConfig, DEFAULT_ID
     };
 })();

@@ -53,7 +53,12 @@ const GlotExecutor = (() => {
         return content;
     }
 
-    async function execute({ apiKey, language, codeSource, codeUrl, code, stdin }) {
+    // glot/<lang> docker image, mirrors GlotAPI.runCode (c/cpp share the clang image)
+    function dockerImage(language) {
+        return (language === 'c' || language === 'cpp') ? 'glot/clang:latest' : 'glot/' + language + ':latest';
+    }
+
+    async function execute({ apiKey, language, codeSource, codeUrl, code, stdin, requestMethod, dockerUrl, dockerToken }) {
         let finalCode = code;
         if (codeSource === 'url') {
             finalCode = await fetchCodeFromUrl(codeUrl);
@@ -69,12 +74,39 @@ const GlotExecutor = (() => {
             };
         }
 
-        const requestData = {
-            files: [{ name: GlotUtils.getFileName(language), content: finalCode }]
-        };
-        if (stdin && stdin.trim()) requestData.stdin = stdin;
-
+        // Shared payload (files + optional stdin/command), same shape as the bot's RunCodeRequest
+        const files = [{ name: GlotUtils.getFileName(language), content: finalCode }];
         const command = GlotUtils.getCommand(language);
+
+        // Docker Run：自定义请求地址，body 为 {image, payload}，鉴权头 X-Access-Token；无需用户脚本/代理
+        if (requestMethod === 'docker') {
+            const payload = { language: language.toLowerCase(), files: files };
+            if (stdin && stdin.trim()) payload.stdin = stdin;
+            if (command) payload.command = command;
+            const headers = { 'Content-Type': 'application/json' };
+            if (dockerToken) headers['X-Access-Token'] = dockerToken;
+            console.log('(Docker Run) Sending request to:', dockerUrl, command ? ('| command: ' + command) : '');
+            const response = await GlotUtils.fetchWithTimeout(dockerUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ image: dockerImage(language), payload: payload })
+            }, 30000, true);   // true = native fetch, never via userscript
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`HTTP错误: ${response.status} - ${errText}`);
+            }
+            const result = await response.json();
+            // glotcode/docker-run reports duration in NANOSECONDS; convert to ms for display
+            // (guard: only convert implausibly-large values, leave already-ms values untouched)
+            if (typeof result.duration === 'number' && result.duration > 100000) {
+                result.duration = Math.round(result.duration / 1e6);
+            }
+            return result;
+        }
+
+        // Glot API（官网，默认）
+        const requestData = { files: files };
+        if (stdin && stdin.trim()) requestData.stdin = stdin;
         if (command) {
             requestData.command = command;
             console.log('Run Command:', command);

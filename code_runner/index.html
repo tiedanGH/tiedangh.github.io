@@ -14,19 +14,19 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/base.css?v=20260609b">
+    <link rel="stylesheet" href="css/base.css?v=20260609g">
     <link rel="stylesheet" href="css/projects.css?v=20260608h">
     <link rel="stylesheet" href="css/storage.css?v=20260609e">
     <link rel="stylesheet" href="css/output.css?v=20260609b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="js/utils.js?v=20260607"></script>
-    <script src="js/projects.js?v=20260609b"></script>
+    <script src="js/utils.js?v=20260609"></script>
+    <script src="js/projects.js?v=20260609c"></script>
     <script src="js/store.js?v=20260609d"></script>
     <script src="js/storage.js?v=20260608d"></script>
     <script src="js/output.js?v=20260609c"></script>
-    <script src="js/executor.js?v=20260309"></script>
-    <script src="js/main.js?v=20260609f"></script>
+    <script src="js/executor.js?v=20260609c"></script>
+    <script src="js/main.js?v=20260609i"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -56,31 +56,85 @@
     <main>
         <div class="content-wrapper">
             <div class="form-container">
-                <!-- 共享：API Token（每浏览器一份，所有项目共享） -->
+                <!-- 共享：请求方式 + 配置（每浏览器一份，所有项目共享，不可导出） -->
                 <div class="shared-top">
                     <div class="form-group">
-                        <label for="apiKey">
-                            Glot API Token
-                            <span class="tooltip">
-                                <i class="fas fa-info-circle"></i>
-                                <div class="tooltip-content">
-                                    <strong>安全提示：</strong><br>
-                                    • 请求默认通过第三方代理服务器(cors-anywhere)发送<br>
-                                    • 建议安装用户脚本替代中间服务器，以建立安全连接<br>
-                                    • 在HTTPS环境下使用更安全<br>
-                                    • 定期轮换您的API Token
+                        <div class="request-row">
+                            <div class="request-method">
+                                <label for="requestMethod">
+                                    请求方式
+                                    <span class="tooltip">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip-content">
+                                            <strong>请求方式：</strong><br>
+                                            • <strong>Glot API</strong>：使用 glot.io 官网接口，需填写 Glot API Token；默认经第三方代理/用户脚本发送<br>
+                                            • <strong>Docker Run</strong>：直接 POST 到自定义运行服务地址（X-Access-Token 鉴权）；需目标服务允许跨域(CORS)
+                                        </div>
+                                    </span>
+                                </label>
+                                <select id="requestMethod">
+                                    <option value="glot">Glot API</option>
+                                    <option value="docker">Docker Run</option>
+                                </select>
+                            </div>
+                            <div class="request-config">
+                                <!-- Glot API：官网接口 -->
+                                <div id="glotConfig">
+                                    <div class="glot-token-head">
+                                        <label for="apiKey">
+                                            Glot API Token
+                                            <span class="tooltip">
+                                                <i class="fas fa-info-circle"></i>
+                                                <div class="tooltip-content">
+                                                    <strong>安全提示：</strong><br>
+                                                    • 请求默认通过第三方代理服务器(cors-anywhere)发送<br>
+                                                    • 建议安装用户脚本替代中间服务器，以建立安全连接<br>
+                                                    • 在HTTPS环境下使用更安全<br>
+                                                    • 定期轮换您的API Token
+                                                </div>
+                                            </span>
+                                        </label>
+                                        <div id="apiKeyHint" class="api-key-hint" style="display: none;">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>没有API Token？<a href="https://glot.io/account/token" target="_blank">前往官网3分钟注册一个</a></span>
+                                        </div>
+                                    </div>
+                                    <div class="password-container">
+                                        <input type="password" id="apiKey" placeholder="请输入您的 Glot API Token">
+                                        <button type="button" id="togglePassword" class="password-toggle">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </span>
-                        </label>
-                        <div id="apiKeyHint" class="api-key-hint" style="display: none;">
-                            <i class="fas fa-info-circle"></i>
-                            <span>没有API Token？<a href="https://glot.io/account/token" target="_blank">前往官网3分钟注册一个</a></span>
-                        </div>
-                        <div class="password-container">
-                            <input type="password" id="apiKey" placeholder="请输入您的 Glot API Token" required>
-                            <button type="button" id="togglePassword" class="password-toggle">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                                <!-- Docker Run：自定义请求地址，无需用户脚本 -->
+                                <div id="dockerConfig" hidden>
+                                    <div class="docker-row">
+                                        <div class="docker-field">
+                                            <label for="dockerUrl">
+                                                请求地址
+                                                <span class="tooltip">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <div class="tooltip-content">
+                                                        Docker Run 自定义运行服务地址:<br>
+                                                        • 直接请求该地址，需目标服务允许跨域(CORS)<br>
+                                                        • 参考 glot docker-run 部署
+                                                    </div>
+                                                </span>
+                                            </label>
+                                            <input type="text" id="dockerUrl" placeholder="http://localhost:8088/run">
+                                        </div>
+                                        <div class="docker-field">
+                                            <label for="dockerToken">API Access Token</label>
+                                            <div class="password-container">
+                                                <input type="password" id="dockerToken" placeholder="X-Access-Token（可选）">
+                                                <button type="button" id="toggleDockerToken" class="password-toggle">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="security-notice" class="security-notice">
                             <i id="security-notice-icon" class="fas fa-shield-alt"></i>

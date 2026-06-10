@@ -21,6 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
         debugMode: document.getElementById('debugMode'),
         debugSection: document.getElementById('debugSection'),
         apiKeyHint: document.getElementById('apiKeyHint'),
+        // request method (glot api / docker run)
+        requestMethod: document.getElementById('requestMethod'),
+        glotConfig: document.getElementById('glotConfig'),
+        dockerConfig: document.getElementById('dockerConfig'),
+        dockerUrl: document.getElementById('dockerUrl'),
+        dockerToken: document.getElementById('dockerToken'),
+        toggleDockerToken: document.getElementById('toggleDockerToken'),
+        securityNotice: document.getElementById('security-notice'),
         // project management
         projectSelect: document.getElementById('projectSelect'),
         manageBtn: document.getElementById('manageProjectsBtn'),
@@ -54,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     GlotStore.init();
     initSecurity();
     loadApiKey();
+    loadRequestConfig();
     applyProjectData(GlotProjects.getProject(GlotProjects.getActiveId()));
     syncProjectSelect();
     setupTooltipClamping();
@@ -73,6 +82,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const isPwd = el.apiKey.type === 'password';
         el.apiKey.type = isPwd ? 'text' : 'password';
         const icon = el.togglePwd.querySelector('i');
+        icon.classList.toggle('fa-eye', !isPwd);
+        icon.classList.toggle('fa-eye-slash', isPwd);
+    });
+
+    // Request method (Glot API / Docker Run): switch UI + persist (browser-only, never exported)
+    el.requestMethod.addEventListener('change', () => { updateRequestMethodUI(); persistRequestConfig(); });
+    el.dockerUrl.addEventListener('change', persistRequestConfig);
+    el.dockerToken.addEventListener('change', persistRequestConfig);
+    el.toggleDockerToken.addEventListener('click', () => {
+        const isPwd = el.dockerToken.type === 'password';
+        el.dockerToken.type = isPwd ? 'text' : 'password';
+        const icon = el.toggleDockerToken.querySelector('i');
         icon.classList.toggle('fa-eye', !isPwd);
         icon.classList.toggle('fa-eye-slash', isPwd);
     });
@@ -168,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function checkApiKeyHint() {
-        el.apiKeyHint.style.display = el.apiKey.value.trim() ? 'none' : 'block';
+        el.apiKeyHint.style.display = el.apiKey.value.trim() ? 'none' : '';   // '' -> CSS inline-flex
     }
 
     // Keep hover tooltips fully inside the viewport
@@ -195,6 +216,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Shared token (one per browser, all projects) ---
     function loadApiKey() { el.apiKey.value = GlotProjects.loadToken(); checkApiKeyHint(); }
     function persistApiKey() { GlotProjects.saveToken(el.apiKey.value); }
+
+    // --- Request method + docker config (one per browser, never exported) ---
+    function loadRequestConfig() {
+        const cfg = GlotProjects.loadRequestConfig();
+        el.requestMethod.value = cfg.method;
+        el.dockerUrl.value = cfg.dockerUrl;
+        el.dockerToken.value = cfg.dockerToken;
+        updateRequestMethodUI();
+    }
+    function persistRequestConfig() {
+        GlotProjects.saveRequestConfig({
+            method: el.requestMethod.value,
+            dockerUrl: el.dockerUrl.value,
+            dockerToken: el.dockerToken.value
+        });
+    }
+    function updateRequestMethodUI() {
+        const isDocker = el.requestMethod.value === 'docker';
+        el.glotConfig.hidden = isDocker;
+        el.dockerConfig.hidden = !isDocker;
+        el.securityNotice.style.display = isDocker ? 'none' : '';   // userscript notice only for Glot API
+    }
 
     // --- Per-project workspace ---
     function collectProjectData() {
@@ -978,13 +1021,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function runCode() {
-        const data = Object.assign({ apiKey: el.apiKey.value }, collectProjectData());
+        const data = Object.assign({ apiKey: el.apiKey.value }, collectProjectData(), {
+            requestMethod: el.requestMethod.value,
+            dockerUrl: el.dockerUrl.value.trim(),
+            dockerToken: el.dockerToken.value
+        });
+        const isDocker = data.requestMethod === 'docker';
 
         if (!data.language) {
             alert('请选择编程语言'); return;
         }
-        if (data.language !== 'text' && !data.apiKey) {
-            alert('请填写API Key'); return;
+        if (data.language !== 'text') {
+            if (isDocker && !data.dockerUrl) { alert('请填写 Docker Run 请求地址'); return; }
+            if (!isDocker && !data.apiKey) { alert('请填写API Key'); return; }
         }
         if (data.codeSource === 'url' && !data.codeUrl) {
             alert('请提供代码URL'); return;
@@ -994,6 +1043,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         persistApiKey();
+        persistRequestConfig();
         saveActiveProject();
         setRunning(true);
 

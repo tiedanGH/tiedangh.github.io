@@ -141,6 +141,49 @@ main {
     flex: 1;
 }
 
+/* Request method row: select (left) + config (right) */
+.request-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+.request-method {
+    flex: 0 0 160px;
+}
+.request-config {
+    flex: 1;
+    min-width: 0;
+}
+/* Glot token: label on the left, sized to its text */
+.glot-token-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 0;
+    margin-bottom: 1px;
+}
+.glot-token-head > label {
+    flex: 0 0 auto;
+    margin: 4px 0 0 0;
+}
+.glot-token-head > .api-key-hint {
+    flex: 0 1 auto;
+    margin: 0;
+}
+/* Docker Run: Address + API Access Token on one row */
+.docker-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+.docker-field {
+    flex: 1;
+    min-width: 0;
+}
+/* userscript notice: full width below the request row */
+#security-notice { margin-top: 6px; }
+
 label {
     display: block;
     margin: 4px 0;
@@ -231,9 +274,12 @@ select {
 
 /* API Key hint */
 .api-key-hint {
+    display: inline-flex;
+    align-items: center;
     margin-bottom: 4px;
-    padding: 4px 12px;
-    gap: 8px;
+    padding: 2px 10px;
+    gap: 6px;
+    line-height: 1.4;
     background-color: #e3f2fd;
     border: 1px solid #bbdefb;
     border-radius: 4px;
@@ -413,6 +459,21 @@ button:disabled:hover {
     .form-row {
         flex-direction: column;
         gap: 0;
+    }
+    .request-row {
+        flex-direction: column;
+        gap: 4px;
+        align-items: stretch;
+    }
+    .request-method {
+        flex: none;
+        width: 100%;
+    }
+    /* docker fields stack full-width on mobile */
+    .docker-row {
+        flex-direction: column;
+        gap: 0;
+        align-items: stretch;
     }
 
     .tooltip-content {

@@ -12,10 +12,13 @@ const GlotUtils = (() => {
         } catch { return ""; }
     }
 
-    function fetchWithTimeout(url, options, timeout) {
+    // useNative=true forces the browser's own fetch
+    // Docker Run uses this so requests go straight to the custom URL, not the userscript allowlist.
+    function fetchWithTimeout(url, options, timeout, useNative) {
+        const doFetch = useNative ? (u, o) => fetch(u, o) : (u, o) => (window.corsFetch ?? fetch)(u, o);
         return new Promise((resolve, reject) => {
             const timer = setTimeout(() => reject(new Error('请求超时')), timeout);
-            (window.corsFetch ?? fetch)(url, options)
+            doFetch(url, options)
                 .then(r => { clearTimeout(timer); resolve(r); })
                 .catch(e => { clearTimeout(timer); reject(e); });
         });
