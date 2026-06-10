@@ -161,11 +161,11 @@ main {
     align-items: center;
     column-gap: 10px;
     row-gap: 0;
-    margin-bottom: 1px;
+    margin-bottom: 0;
 }
 .glot-token-head > label {
     flex: 0 0 auto;
-    margin: 4px 0 0 0;
+    margin: 4px 0;
 }
 .glot-token-head > .api-key-hint {
     flex: 0 1 auto;
@@ -475,6 +475,9 @@ button:disabled:hover {
         gap: 0;
         align-items: stretch;
     }
+    /* no gap between the title and the wrapped hint, small gap to the input */
+    .glot-token-head { margin-bottom: 2px; }
+    .glot-token-head > label { margin-bottom: 0; }
 
     .tooltip-content {
         width: 280px;
