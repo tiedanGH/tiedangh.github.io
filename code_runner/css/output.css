@@ -128,6 +128,35 @@
 .message-chain-block video,
 .message-chain-block img { max-width: 100%; height: auto; }
 
+/* Active messages (主动消息) area — placed after all Stdout sections */
+.active-area { margin-bottom: 10px; }
+.active-area-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin: 14px 0 10px;
+    padding-top: 12px;
+    border-top: 2px solid #e8e8e8;
+}
+.active-entry {
+    margin-bottom: 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--primary-color);
+}
+.active-target {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 6px;
+}
+.active-target i { color: var(--primary-color); }
+.active-error { color: var(--danger-color); font-weight: 600; padding: 6px 0; }
+
 /* Mobile: drop the desktop left border/indent */
 @media (max-width: 768px) {
     .result-container {

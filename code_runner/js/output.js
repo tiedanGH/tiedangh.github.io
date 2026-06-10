@@ -429,6 +429,88 @@ const GlotOutput = (() => {
         appendDebugSection(container, debugLines);
     }
 
+    // --- Active messages (主动消息) ---
+    // renders each entry's target + message into a dedicated area placed after all Stdout sections.
+    // Sandbox note: no send-failure / private-permission checks (every target assumed reachable).
+    function renderActiveContent(wrap, msg, index, debugLines) {
+        msg = (msg && typeof msg === 'object') ? msg : {};
+        const format = msg.format || 'text';
+        const content = msg.content !== undefined ? String(msg.content) : '';
+        switch (format) {
+            case 'text':    appendTextSection(wrap, 'stdout', '消息内容', content); break;
+            case 'markdown': appendMarkdownSection(wrap, content, '消息内容'); break;
+            case 'image':   appendImageSection(wrap, content, '消息内容'); break;
+            case 'base64':  appendBase64Section(wrap, content, '消息内容', true); break;
+            case 'LaTeX':   appendLatexSection(wrap, content, '消息内容'); break;
+            case 'Audio':   appendAudioSection(wrap, content, '消息内容'); break;
+            case 'MessageChain': handleMessageChain(wrap, msg, '消息内容', debugLines, '主动消息第' + (index + 1) + '条：'); break;
+            case 'MultipleMessage': handleMultipleMessage(wrap, msg, debugLines); break;   // renders Stdout N nodes
+            case 'ForwardMessage': handleForwardMessageOutput(wrap, content); break;       // content = escaped JSON
+            default: appendTextSection(wrap, 'error', '错误', '不支持的输出格式 ' + format);
+        }
+    }
+
+    function renderActiveEntry(area, active, index, debugLines) {
+        active = (active && typeof active === 'object') ? active : {};
+        const entry = document.createElement('div');
+        entry.className = 'active-entry';
+        area.appendChild(entry);
+
+        const hasGroup = active.groupID !== null && active.groupID !== undefined;
+        const hasUser = active.userID !== null && active.userID !== undefined;
+        if (!hasGroup && !hasUser) {
+            const err = document.createElement('div');
+            err.className = 'active-error';
+            err.textContent = '[(' + (index + 1) + ')参数] 目标无效：groupID和userID均为空';
+            entry.appendChild(err);
+            return;
+        }
+        const isGroup = hasGroup;   // group wins when both present (matches bot)
+        const targetType = isGroup ? '群聊' : '私信';
+        const targetId = String(isGroup ? active.groupID : active.userID);
+        const msg = (active.message && typeof active.message === 'object') ? active.message : {};
+        const isMultiple = msg.format === 'MultipleMessage';
+        const note = isMultiple
+            ? '（多条' + targetType + '主动消息，' + (Array.isArray(msg.messageList) ? msg.messageList.length : 0) + ' 条）'
+            : '';
+
+        const target = document.createElement('div');
+        target.className = 'active-target';
+        target.innerHTML = '<i class="fas ' + (isGroup ? 'fa-users' : 'fa-user') + '"></i> ' +
+            GlotUtils.escapeHtml('第' + (index + 1) + '条 → ' + targetType + ' ' + targetId + note);
+        entry.appendChild(target);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'active-msg';
+        entry.appendChild(wrap);
+        renderActiveContent(wrap, msg, index, debugLines);
+    }
+
+    function handleActiveMessages(container, activeArr, debugLines) {
+        if (activeArr === null || activeArr === undefined) return;
+        if (!Array.isArray(activeArr)) { debugLines.push('[WARN] active字段格式错误：应为数组，已跳过解析'); return; }
+        if (activeArr.length === 0) { debugLines.push('[WARN] active字段数组为空，跳过解析'); return; }
+
+        const area = document.createElement('div');
+        area.className = 'active-area';
+        const head = document.createElement('div');
+        head.className = 'active-area-head';
+        head.innerHTML = '<i class="fas fa-paper-plane"></i> 主动消息';
+        area.appendChild(head);
+        container.appendChild(area);
+
+        for (let i = 0; i < activeArr.length; i++) {
+            if (i >= 10) {
+                const err = document.createElement('div');
+                err.className = 'active-entry';
+                err.innerHTML = '<div class="active-error">[上限] 执行中断：单次主动消息上限为10条</div>';
+                area.appendChild(err);
+                break;
+            }
+            renderActiveEntry(area, activeArr[i], i, debugLines);
+        }
+    }
+
     function handleJsonOutput(container, rawText) {
         let json;
         try {
@@ -464,6 +546,9 @@ const GlotOutput = (() => {
                 appendTextSection(container, 'error', '错误', '不支持的输出格式 ' + format);
                 break;
         }
+
+        // Active (主动消息) area, after all Stdout
+        if ('active' in json) handleActiveMessages(container, json.active, debugLines);
 
         // Show debug section
         appendDebugSection(container, debugLines);
