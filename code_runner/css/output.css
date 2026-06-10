@@ -127,3 +127,11 @@
 .message-chain-block audio { width: 100%; }
 .message-chain-block video,
 .message-chain-block img { max-width: 100%; height: auto; }
+
+/* Mobile: drop the desktop left border/indent */
+@media (max-width: 768px) {
+    .result-container {
+        border-left: none;
+        padding-left: 0;
+    }
+}

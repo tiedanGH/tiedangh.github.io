@@ -293,7 +293,7 @@ const GlotOutput = (() => {
 
     // --- SingleJsonMessage ---
     function renderSingleJsonMessage(container, msg, title, debugLines, errorPrefix = '') {
-        const knownFields = new Set(['content', 'format', 'width']);
+        const knownFields = new Set(['content', 'format', 'width', 'at', 'active', 'error', 'storage', 'global', 'bucket', 'messageList']);
         collectUnknownFieldWarnings(msg, knownFields, debugLines);
 
         const format = msg.format || 'text';
@@ -469,8 +469,39 @@ const GlotOutput = (() => {
         appendDebugSection(container, debugLines);
     }
 
+    // --- Storage extraction ---
+    // Returns {global,storage,bucket,error}: null fields = unchanged. Independent of media render.
+    function _safeParse(s) { try { return JSON.parse(String(s).trim()); } catch (e) { return null; } }
+    function _pickStorage(o) {
+        return {
+            global:  (o && o.global  !== undefined) ? o.global  : null,
+            storage: (o && o.storage !== undefined) ? o.storage : null,
+            bucket:  (o && Array.isArray(o.bucket)) ? o.bucket  : null
+        };
+    }
+    function extractStorageFromOutput(rawText, outputFormat) {
+        const none = { global: null, storage: null, bucket: null, error: '' };
+        if (outputFormat === 'json') {
+            const j = _safeParse(rawText);
+            if (!j) return none;
+            if (j.error && String(j.error).length) return { error: String(j.error) };   // abort BEFORE save
+            let out = _pickStorage(j);
+            const sub = j.format || 'text';
+            if (sub === 'ForwardMessage' || sub === 'Audio') {
+                const inner = _safeParse(j.content);   // content is an escaped-JSON string
+                if (inner) out = _pickStorage(inner);  // inner overrides; parse-fail → no override (no garbage save)
+            }
+            return Object.assign({ error: '' }, out);
+        }
+        if (outputFormat === 'ForwardMessage' || outputFormat === 'Audio') {
+            const j = _safeParse(rawText);
+            return j ? Object.assign({ error: '' }, _pickStorage(j)) : none;
+        }
+        return none;   // other formats never save
+    }
+
     // --- Main display function ---
-    function displayResult(result, outputFormat, outputDiv, resultContainer) {
+    function displayResult(result, outputFormat, outputDiv, resultContainer, onStorage) {
         outputDiv.innerHTML = '';
         resultContainer.style.display = 'block';
 
@@ -506,6 +537,11 @@ const GlotOutput = (() => {
             }
         }
 
+        // Storage extraction/save (synchronous, render-independent). Caller decides whether to persist.
+        if (typeof onStorage === 'function' && result.stdout) {
+            onStorage(extractStorageFromOutput(result.stdout, outputFormat));
+        }
+
         // Stderr
         if (result.stderr) {
             appendTextSection(outputDiv, 'stderr', 'Stderr', result.stderr);
@@ -533,5 +569,5 @@ const GlotOutput = (() => {
         resultContainer.scrollIntoView({ behavior: 'smooth' });
     }
 
-    return { displayResult, displayError };
+    return { displayResult, displayError, extractStorageFromOutput };
 })();

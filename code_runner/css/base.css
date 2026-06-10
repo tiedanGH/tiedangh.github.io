@@ -429,4 +429,22 @@ button:disabled:hover {
     .security-notice, .debug-notice {
         font-size: 13px;
     }
+
+    .debug-section {
+        padding: 8px 15px;
+    }
+    .checkbox-label {
+        font-size: 14px;
+    }
+    .security-notice, .api-key-hint {
+        padding: 6px 10px;
+    }
+    .security-notice {
+        align-items: flex-start;
+        gap: 6px;
+    }
+    .security-notice i {
+        flex-shrink: 0;
+        margin-top: 3px;
+    }
 }

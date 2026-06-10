@@ -14,17 +14,19 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/base.css?v=20260608e">
+    <link rel="stylesheet" href="css/base.css?v=20260609b">
     <link rel="stylesheet" href="css/projects.css?v=20260608h">
-    <link rel="stylesheet" href="css/output.css?v=20260607">
+    <link rel="stylesheet" href="css/storage.css?v=20260609e">
+    <link rel="stylesheet" href="css/output.css?v=20260609">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="js/utils.js?v=20260607"></script>
-    <script src="js/projects.js?v=20260609"></script>
+    <script src="js/projects.js?v=20260609b"></script>
+    <script src="js/store.js?v=20260609d"></script>
     <script src="js/storage.js?v=20260608d"></script>
-    <script src="js/output.js?v=20260608"></script>
+    <script src="js/output.js?v=20260609b"></script>
     <script src="js/executor.js?v=20260309"></script>
-    <script src="js/main.js?v=20260608e"></script>
+    <script src="js/main.js?v=20260609f"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -184,18 +186,27 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="storageOption">
-                                存储功能
-                                <span class="tooltip">
-                                    <i class="fas fa-info-circle"></i>
-                                    <div class="tooltip-content">
-                                        <strong>...coming s∞n...</strong><br>
-                                    </div>
+                            <div class="storage-head">
+                                <span class="storage-head-label">存储功能
+                                    <span class="tooltip">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip-content">
+                                            <strong>存储功能：</strong><br>
+                                            • 开启后，运行前会把存储数据注入程序输入的第一行<br>
+                                            • 仅支持 json / ForwardMessage / Audio 输出格式<br>
+                                            • global=项目全局；storage=按模拟用户隔离；bucket=跨项目存储库
+                                        </div>
+                                    </span>
                                 </span>
-                            </label>
-                            <select id="storageOption">
-                                <option value="not-implemented">尚未实现</option>
-                            </select>
+                                <label class="storage-switch" title="开关存储功能">
+                                    <input type="checkbox" id="storageToggle">
+                                    <span class="storage-slider"></span>
+                                </label>
+                            </div>
+                            <div class="storage-actions">
+                                <button type="button" id="openStorageBtn" class="btn-storage"><i class="fas fa-database"></i> 存储管理</button>
+                                <button type="button" id="openEnvBtn" class="btn-env"><i class="fas fa-user-gear"></i> 模拟环境</button>
+                            </div>
                         </div>
                     </div>
 
@@ -247,6 +258,28 @@
             <button type="button" id="pmExportAll" class="btn-export-all"><i class="fas fa-upload"></i> 导出全部</button>
         </div>
         <ul class="project-list" id="projectList"></ul>
+    </div>
+</div>
+
+<!-- 存储管理弹窗（内容由 main.js 动态渲染） -->
+<div id="storageModalOverlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="smTitle">
+        <div class="modal-header">
+            <h2 id="smTitle">存储管理</h2>
+            <button type="button" class="modal-close" id="smClose" aria-label="关闭">&times;</button>
+        </div>
+        <div class="storage-modal-body" id="storageModalBody"></div>
+    </div>
+</div>
+
+<!-- 模拟环境弹窗（内容由 main.js 动态渲染） -->
+<div id="envModalOverlay" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="emTitle">
+        <div class="modal-header">
+            <h2 id="emTitle">模拟环境</h2>
+            <button type="button" class="modal-close" id="emClose" aria-label="关闭">&times;</button>
+        </div>
+        <div class="env-modal-body" id="envModalBody"></div>
     </div>
 </div>
 </body>

@@ -1,0 +1,306 @@
+/* Storage feature UI: entry buttons, 存储管理 modal, 模拟环境 modal.
+   Reuses projects.css generic .modal-overlay/.modal/.modal-header and base button styles. */
+
+/* Entry buttons under the 存储功能 toggle */
+.storage-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.storage-actions button {
+    width: auto;
+    flex: 1 1 0;
+    padding: 9px 10px;
+    font-size: 14px;
+}
+.btn-storage        { background: #16a085; }
+.btn-storage:hover  { background: #128f76; }
+.btn-env            { background: #8e44ad; }
+.btn-env:hover      { background: #793f98; }
+
+/* Storage-feature title + toggle switch */
+.storage-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 4px 0; }
+.storage-head-label { font-weight: 600; color: var(--dark-color); }
+.storage-switch { position: relative; display: inline-block; width: 46px; height: 24px; flex: 0 0 auto; cursor: pointer; margin: 0; }
+.storage-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.storage-slider { position: absolute; inset: 0; background: #c2c8cf; border-radius: 24px; transition: background .2s; }
+.storage-slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.storage-switch input:checked + .storage-slider { background: var(--success-color); }
+.storage-switch input:checked + .storage-slider::before { transform: translateX(22px); }
+
+/* Disabled entry buttons: keep own color, dim + not-allowed (tooltip via title attr) */
+.btn-storage.is-disabled, .btn-storage.is-disabled:hover { background: #16a085; }
+.btn-env.is-disabled, .btn-env.is-disabled:hover { background: #8e44ad; }
+.storage-actions button.is-disabled { opacity: .45; cursor: not-allowed; }
+
+/* Storage modal: per-user storage viewer */
+.sm-user-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: #555; margin-bottom: 6px; }
+.sm-user-row select { width: auto; flex: 0 0 auto; padding: 5px 24px 5px 8px; font-size: 13px; }
+.sm-user-has { color: var(--success-color); font-weight: 600; }
+.sm-user-none { color: var(--gray-color); }
+
+/* Env modal: auto-generated platformID note */
+.env-platformid-note { margin-top: 8px; font-size: 13px; color: #555; }
+.env-platformid-note code { background: #eef3f8; padding: 2px 6px; border-radius: 4px; color: #1c6fa3; }
+
+/* Buttons inside the two modals default to auto width + compact */
+.storage-modal-body button,
+.env-modal-body button {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+.btn-save        { background: var(--success-color); }
+.btn-save:hover  { background: #27ae60; }
+.btn-view        { background: var(--gray-color); }
+.btn-view:hover  { background: #7f8c8d; }
+
+.storage-modal-body,
+.env-modal-body { padding: 14px 20px 20px; }
+
+/* ---- Storage modal: sections ---- */
+.storage-section {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    background: #fbfbfc;
+}
+.sm-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.storage-section > h3,
+.sm-section-head h3 {
+    font-size: 1.05rem;
+    color: var(--dark-color);
+    margin: 0 0 10px;
+}
+.sm-section-head h3 { margin: 0; }
+.sm-note { font-size: 13px; color: var(--gray-color); margin: -4px 0 10px; }
+
+.sm-field { margin-bottom: 12px; }
+.sm-field > label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0 0 4px;
+}
+.sm-field textarea {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    padding: 8px 10px;
+}
+.sm-row-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+/* Linked-bucket chips */
+.sm-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.bucket-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eaf4fb;
+    border: 1px solid #bcdff5;
+    color: #1c6fa3;
+    border-radius: 14px;
+    padding: 3px 6px 3px 12px;
+    font-size: 13px;
+}
+.bucket-chip .chip-x {
+    cursor: pointer;
+    width: 18px; height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50%;
+    color: #1c6fa3;
+}
+.bucket-chip .chip-x:hover { background: #d2e8f7; }
+.sm-link-add { display: flex; gap: 8px; }
+.sm-link-add select { flex: 1; min-width: 0; }
+.sm-empty-hint { font-size: 13px; color: var(--gray-color); }
+
+/* Bucket cards */
+.sm-bucket-list { display: flex; flex-direction: column; gap: 12px; }
+.sm-bucket-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff;
+}
+.sm-bucket-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.sm-bucket-id { font-weight: 700; color: var(--primary-color); flex: 0 0 auto; }
+.sm-bucket-name {
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-weight: 600; color: var(--dark-color);
+}
+.sm-bucket-name.editable { cursor: text; }
+.sm-bucket-name.editable:hover { color: var(--primary-color); }
+.sm-inline-input {
+    padding: 3px 8px;
+    font-size: 14px;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    width: 100%;
+}
+.sm-bucket-badge {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: #fff;
+    background: var(--gray-color);
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+.sm-bucket-size {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: #555;
+    background: #eef0f2;
+    border: 1px solid #dfe3e7;
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+.sm-bucket-card.open .sm-bucket-head { margin-bottom: 0; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
+.sm-bucket-body { margin-top: 10px; }
+.sm-bucket-desc { font-size: 13px; padding: 6px 10px; margin-bottom: 8px; }
+.sm-bucket-body > label { font-size: 13px; font-weight: 600; color: #555; }
+.sm-bucket-content { font-family: 'Courier New', Courier, monospace; font-size: 13px; padding: 8px 10px; min-height: 130px; }
+
+/* Storage modal tabs (top navigation) */
+.sm-tabs { display: flex; gap: 6px; flex-wrap: wrap; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid #eee; }
+.sm-tab { width: auto; flex: 0 0 auto; background: #eef0f2; color: var(--dark-color); padding: 8px 16px; font-size: 14px; font-weight: 600; }
+.sm-tab:hover { background: #e3e7eb; }
+.sm-tab.active { background: var(--primary-color); color: #fff; }
+.sm-tab.active:hover { background: var(--secondary-color); }
+
+/* Backup area (3 slots, collapsible) */
+.sm-backup-area { margin-top: 10px; border-top: 1px dashed #ddd; padding-top: 8px; }
+.sm-backup-head { display: flex; align-items: center; gap: 8px; }
+.sm-backup-title { font-size: 13px; font-weight: 600; color: #8a6d3b; }
+.sm-backup-count { font-size: 12px; color: var(--gray-color); }
+.sm-backup-head .btn-view { margin-left: auto; }
+.sm-backup-slots { margin-top: 6px; }
+.sm-backup-slots.collapsed { display: none; }
+.backup-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 6px 8px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #fafafa;
+}
+.backup-slot.occupied { background: #fff8e1; border-color: #ffe0a3; }
+.backup-slot .slot-no { font-weight: 700; color: var(--warning-color); flex: 0 0 auto; }
+.backup-slot .slot-name { font-weight: 600; color: var(--dark-color); }
+.backup-slot .slot-name.editable { cursor: text; }
+.backup-slot .slot-name.editable:hover { color: var(--primary-color); }
+.backup-slot .slot-meta { font-size: 12px; color: var(--gray-color); flex: 1 1 auto; }
+.backup-slot .slot-empty { font-size: 13px; color: var(--gray-color); flex: 1 1 auto; }
+
+/* Recovery area */
+.sm-recovery-list { display: flex; flex-direction: column; gap: 8px; }
+.recovery-item {
+    border: 1px solid #f0d6d6;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #fdf3f3;
+}
+.recovery-meta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.recovery-source { font-size: 13px; color: #b03a3a; word-break: break-all; }
+.recovery-time { font-size: 12px; color: var(--gray-color); white-space: nowrap; }
+.recovery-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.recovery-actions select { width: auto; flex: 1 1 120px; min-width: 0; padding: 5px 24px 5px 8px; font-size: 13px; }
+
+/* ---- Env modal ---- */
+.env-preview-wrap { margin-bottom: 14px; }
+.env-preview-wrap label { font-size: 14px; font-weight: 600; color: var(--dark-color); margin-bottom: 4px; }
+.env-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.env-preview-head label { margin: 0; }
+.env-preview-head button { width: auto; flex: 0 0 auto; }
+
+/* images upload */
+.env-images-row .env-field-name { color: #8e44ad; }
+.env-image-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.env-image-item { display: flex; align-items: center; gap: 8px; border: 1px solid #e0e0e0; border-radius: 6px; padding: 6px 8px; background: #fff; }
+.env-image-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; flex: 0 0 auto; }
+.env-image-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--dark-color); }
+.env-image-size { font-size: 12px; color: var(--gray-color); }
+.env-preview {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12.5px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 160px;
+    overflow: auto;
+}
+.env-field-row {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: #fbfbfc;
+}
+.env-field-name { font-weight: 700; color: var(--primary-color); }
+.env-field-sub { font-size: 12px; color: var(--gray-color); margin-left: 6px; }
+.env-values { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.env-val {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eef0f2;
+    border: 1px solid #d6dbe0;
+    color: var(--dark-color);
+    border-radius: 14px;
+    padding: 3px 6px 3px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    width: auto;
+}
+.env-val:hover { background: #e3e7eb; }
+.env-val.active { background: var(--primary-color); border-color: var(--secondary-color); color: #fff; }
+.env-val .env-val-del {
+    width: 18px; height: 18px; line-height: 18px; text-align: center;
+    border-radius: 50%; font-style: normal; font-size: 14px;
+}
+.env-val.active .env-val-del:hover { background: rgba(255,255,255,0.3); }
+.env-val .env-val-del:hover { background: #d2d6da; }
+.env-add { display: flex; gap: 8px; flex-wrap: wrap; }
+.env-add input { flex: 1 1 140px; min-width: 0; padding: 7px 10px; font-size: 14px; }
+.env-from-compose { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.env-from-compose input { flex: 1 1 100px; min-width: 0; padding: 7px 10px; font-size: 14px; }
+
+/* Multi-line confirm dialogs (storage flows use \n); loads after projects.css so this wins */
+.cr-confirm-msg { white-space: pre-line; text-align: left; }
+
+/* Mobile */
+@media (max-width: 768px) {
+    /* keep 存储管理 / 模拟环境 on the SAME row */
+    .storage-actions { flex-direction: row; }
+    .storage-modal-body, .env-modal-body { padding: 12px 14px 16px; }
+}

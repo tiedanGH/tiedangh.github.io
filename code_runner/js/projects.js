@@ -11,8 +11,9 @@ const GlotProjects = (() => {
     const PROJECT_FIELDS = ['language', 'codeSource', 'codeUrl', 'code', 'stdin', 'outputFormat', 'storageOption'];
     const DEFAULTS = {
         language: '', codeSource: 'textarea', codeUrl: '', code: '',
-        stdin: '', outputFormat: 'text', storageOption: 'not-implemented'
+        stdin: '', outputFormat: 'text', storageOption: 'disabled'
     };
+    const STORAGE_OPTIONS = ['enabled', 'disabled'];
 
     /* ------------------------ shared token ------------------------ */
     function loadToken() {
@@ -41,6 +42,8 @@ const GlotProjects = (() => {
         if (!name) name = fallback;
         return name.length > MAX_NAME_LEN ? name.slice(0, MAX_NAME_LEN) : name;
     }
+    // Coerce any legacy/foreign storageOption (e.g. "not-implemented") to a valid toggle value.
+    function _normStorageOption(v) { return STORAGE_OPTIONS.indexOf(v) === -1 ? 'disabled' : v; }
     // For UNTRUSTED data (import / legacy migration): whitelist-read known fields ONLY,
     // so any apiKey / token / unknown key is dropped and can never enter storage.
     function _sanitizeProject(obj, fallbackName) {
@@ -49,6 +52,7 @@ const GlotProjects = (() => {
         PROJECT_FIELDS.forEach(f => {
             p[f] = (obj[f] !== undefined && obj[f] !== null) ? String(obj[f]) : DEFAULTS[f];
         });
+        p.storageOption = _normStorageOption(p.storageOption);
         p.name = _clampName(obj.name, fallbackName);
         p.updatedAt = Date.now();
         return p;
@@ -60,6 +64,7 @@ const GlotProjects = (() => {
         PROJECT_FIELDS.forEach(f => {
             cur[f] = (cur[f] !== undefined && cur[f] !== null) ? String(cur[f]) : DEFAULTS[f];
         });
+        cur.storageOption = _normStorageOption(cur.storageOption);
         cur.name = _clampName(cur.name, fallbackName);
         if (typeof cur.updatedAt !== 'number') cur.updatedAt = Date.now();
         return cur;
@@ -220,25 +225,37 @@ const GlotProjects = (() => {
         store.projects[id] = p;
         _writeStore(store); return { ok: true, id: id, name: p.name };
     }
-    function importAll(parsed) {
-        if (!parsed || typeof parsed !== 'object' || parsed.kind !== 'cr-projects' || !Array.isArray(parsed.projects)) {
-            return { ok: false, error: '文件格式不正确（应为全部项目导出文件）' };
-        }
-        const store = _readStore();
+    // Deep copy of the whole store (for full backup). includeDefault=false omits the default project.
+    // cr_projects never holds the token, so the snapshot is token-free by construction.
+    function snapshot(includeDefault) {
+        const store = JSON.parse(JSON.stringify(_readStore()));
+        if (includeDefault === false) delete store.projects[DEFAULT_ID];
+        return store;
+    }
+    // FULL REPLACE from a store object (cr-full import). _ensureValid recreates default + normalizes.
+    function replaceAllFull(storeObj) {
+        _writeStore(_ensureValid(storeObj && typeof storeObj === 'object' ? JSON.parse(JSON.stringify(storeObj)) : _freshStore()));
+        return { ok: true };
+    }
+    // FULL REPLACE from a legacy cr-projects array: discard existing, rebuild on a fresh store.
+    function replaceAllFromArray(arr) {
+        const store = _freshStore();
         const added = [];
-        parsed.projects.forEach(entry => {
+        (Array.isArray(arr) ? arr : []).forEach(entry => {
             const p = _sanitizeProject(entry, '导入项目');
             p.name = _uniqueName(p.name, store, null);
             const id = _genId(store);
-            store.projects[id] = p;                       // merge; never wipes existing
+            store.projects[id] = p;
             added.push({ id: id, name: p.name });
         });
-        _writeStore(store); return { ok: true, added: added };
+        _writeStore(store);
+        return { ok: true, added: added };
     }
 
     return {
         init, list, getActiveId, getProject, setActive, saveProjectData,
-        create, rename, duplicate, remove, exportOne, exportAll, importOne, importAll,
+        create, rename, duplicate, remove, exportOne, exportAll, importOne,
+        snapshot, replaceAllFull, replaceAllFromArray,
         loadToken, saveToken, DEFAULT_ID
     };
 })();
