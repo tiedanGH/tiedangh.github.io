@@ -86,6 +86,16 @@ const GlotExecutor = (() => {
         return extra;
     }
 
+    // --- image path schemes ---
+    // image:// → images copied into this site (resolved against the deployed page, e.g. .../code_runner/images/)
+    // lgtbot:// → the lgtbot GitHub repo (no local copy exists). Simple global replace.
+    const LGTBOT_BASE = 'https://raw.githubusercontent.com/tiedanGH/lgtbot/refs/heads/master/games/';
+    function replaceImageSchemes(text) {
+        if (typeof text !== 'string' || !text) return text;
+        const imageBase = new URL('images/', document.baseURI).href;
+        return text.replace(/image:\/\//g, imageBase).replace(/lgtbot:\/\//g, LGTBOT_BASE);
+    }
+
     async function execute({ apiKey, language, codeSource, codeUrl, code, stdin, requestMethod, dockerUrl, dockerToken }) {
         let finalCode = code;
         if (codeSource === 'url') {
@@ -95,7 +105,7 @@ const GlotExecutor = (() => {
         // Text语言直接返回输入内容，不调用API
         if (language === 'text') {
             return {
-                stdout: finalCode || '',
+                stdout: replaceImageSchemes(finalCode || ''),
                 stderr: '',
                 error: '',
                 duration: 0
@@ -133,6 +143,7 @@ const GlotExecutor = (() => {
                 result.duration = Math.round(result.duration / 1e6);
             }
             if (utilNames.length) result.utilFiles = utilNames;
+            result.stdout = replaceImageSchemes(result.stdout);
             return result;
         }
 
@@ -165,6 +176,7 @@ const GlotExecutor = (() => {
 
         const result = await response.json();
         if (utilNames.length) result.utilFiles = utilNames;
+        result.stdout = replaceImageSchemes(result.stdout);
         return result;
     }
 
