@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pmImportOne: document.getElementById('pmImportOne'),
         pmImportAll: document.getElementById('pmImportAll'),
         pmExportAll: document.getElementById('pmExportAll'),
+        pmSearch: document.getElementById('pmSearch'),
         // storage feature
         openStorageBtn: document.getElementById('openStorageBtn'),
         openEnvBtn: document.getElementById('openEnvBtn')
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const isHttps = window.location.protocol === 'https:';
     let importMode = 'one';   // 'one' | 'all' — which import the hidden file input is serving
+    let pmFilter = '';        // project-manager live search keyword
 
     // --- Init ---
     GlotProjects.init();
@@ -116,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     el.pmImportOne.addEventListener('click', () => triggerImport('one'));
     el.pmImportAll.addEventListener('click', () => triggerImport('all'));
     el.importFile.addEventListener('change', onImportFile);
+    el.pmSearch.addEventListener('input', () => { pmFilter = el.pmSearch.value.trim(); renderProjectList(); });
 
     // Storage feature: enable toggle + two modals
     el.storageToggle.addEventListener('change', () => { saveActiveProject(); updateStorageButtons(); });
@@ -268,8 +271,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function attrEsc(s) { return GlotUtils.escapeHtml(s).replace(/"/g, '&quot;'); }
 
     function renderProjectList() {
-        const items = GlotProjects.list();
+        const kw = pmFilter.toLowerCase();
+        const items = GlotProjects.list().filter(it => !kw || it.name.toLowerCase().indexOf(kw) !== -1);
         const activeId = GlotProjects.getActiveId();
+        if (!items.length) {
+            el.projectList.innerHTML = '<li class="pm-empty">未找到匹配“' + GlotUtils.escapeHtml(pmFilter) + '”的项目</li>';
+            return;
+        }
         el.projectList.innerHTML = items.map(it => {
             const nm = GlotUtils.escapeHtml(it.name);
             const isActive = it.id === activeId;
@@ -292,7 +300,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }).join('');
     }
 
-    function openModal() { renderProjectList(); el.modalOverlay.hidden = false; }
+    function openModal() {
+        pmFilter = '';
+        el.pmSearch.value = '';
+        renderProjectList();
+        el.modalOverlay.hidden = false;
+    }
     function closeModal() { el.modalOverlay.hidden = true; }
 
     // Inline rename: click a (non-default) project name -> input; Enter/blur commits, Esc cancels
@@ -379,6 +392,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const id = GlotProjects.create('新项目');
         GlotProjects.setActive(id);
         applyProjectData(GlotProjects.getProject(id));
+        pmFilter = '';
+        el.pmSearch.value = '';   // clear search so the new project is visible for inline rename
         renderProjectList();
         syncProjectSelect();
         // auto-focus inline rename on the freshly created project

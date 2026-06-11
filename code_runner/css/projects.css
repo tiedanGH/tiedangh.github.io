@@ -46,6 +46,7 @@
     max-width: 560px;
     max-height: 85vh;
     overflow: auto;
+    scrollbar-gutter: stable;   /* appearing scrollbar must not squeeze the layout */
 }
 .modal-header {
     display: flex;
@@ -138,8 +139,23 @@
 }
 .project-row-actions button {
     width: auto;
-    padding: 6px 12px;
+    padding: 6px 10px;
     font-size: 13px;
+}
+
+/* Project-manager live search (in the toolbar) */
+.pm-search {
+    flex: 1 1 180px;
+    min-width: 0;
+    width: auto;
+    padding: 7px 12px;
+    font-size: 14px;
+}
+.pm-empty {
+    grid-column: 1 / -1;
+    color: var(--gray-color);
+    font-size: 14px;
+    padding: 8px 2px;
 }
 
 /* Button colors */
@@ -226,7 +242,7 @@
 .cr-confirm-ok:hover     { background: #c0392b; }
 
 /* Project management modal */
-#projectModalOverlay .modal { max-width: 1300px; }
+#projectModalOverlay .modal { max-width: 1340px; }
 @media (min-width: 900px) {
     .modal { max-width: 860px; }
 }
@@ -236,4 +252,5 @@
     .project-bar { flex-wrap: wrap; }
     .project-manage-btn { width: 100%; }
     .modal-toolbar button { flex: 1 1 auto; }
+    .modal-toolbar .pm-search { flex: 1 1 100%; }   /* search on its own row */
 }

@@ -15,7 +15,7 @@
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
     <link rel="stylesheet" href="css/base.css?v=20260609h">
-    <link rel="stylesheet" href="css/projects.css?v=20260609">
+    <link rel="stylesheet" href="css/projects.css?v=20260611">
     <link rel="stylesheet" href="css/storage.css?v=20260609g">
     <link rel="stylesheet" href="css/output.css?v=20260609b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,7 +28,7 @@
     <script src="js/executor.js?v=20260609c"></script>
     <script src="js/storage-modal.js?v=20260609b"></script>
     <script src="js/env-modal.js?v=20260609"></script>
-    <script src="js/main.js?v=20260609k"></script>
+    <script src="js/main.js?v=20260611"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -312,6 +312,7 @@
             <button type="button" id="pmImportOne" class="btn-import"><i class="fas fa-file-import"></i> 导入项目</button>
             <button type="button" id="pmImportAll" class="btn-import-all"><i class="fas fa-download"></i> 导入全部</button>
             <button type="button" id="pmExportAll" class="btn-export-all"><i class="fas fa-upload"></i> 导出全部</button>
+            <input type="search" id="pmSearch" class="pm-search" placeholder="搜索项目..." autocomplete="off">
         </div>
         <ul class="project-list" id="projectList"></ul>
     </div>
