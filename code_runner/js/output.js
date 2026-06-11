@@ -38,6 +38,33 @@ const GlotOutput = (() => {
         container.appendChild(sec);
     }
 
+    // --- Lenient JSON parse (mirror the bot) ---
+    // Manual encoders like json.h don't escape control chars inside string literals
+    // Escape raw control chars that sit INSIDE a string literal so the same output parses here
+    function _escapeJsonControlChars(text) {
+        let out = '', inStr = false, esc = false;
+        for (let i = 0; i < text.length; i++) {
+            const ch = text[i], code = text.charCodeAt(i);
+            if (inStr) {
+                if (esc) { out += ch; esc = false; }
+                else if (ch === '\\') { out += ch; esc = true; }
+                else if (ch === '"') { out += ch; inStr = false; }
+                else if (code < 0x20) {
+                    out += ch === '\n' ? '\\n' : ch === '\r' ? '\\r' : ch === '\t' ? '\\t'
+                         : ch === '\b' ? '\\b' : ch === '\f' ? '\\f'
+                         : '\\u' + code.toString(16).padStart(4, '0');
+                } else { out += ch; }
+            } else {
+                out += ch;
+                if (ch === '"') inStr = true;
+            }
+        }
+        return out;
+    }
+    function parseBotJson(text) {
+        return JSON.parse(_escapeJsonControlChars(String(text)));
+    }
+
     // --- Markdown rendering ---
     // The bot renders markdown to an image in a headless browser (fully isolated)
     // a Shadow DOM so page CSS cannot bleed in and a program's own <style> stays scoped to its output.
@@ -228,7 +255,7 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
     }
     async function renderAudioInto(targetDiv, rawText) {
         let msg;
-        try { msg = JSON.parse(rawText.trim()); }
+        try { msg = parseBotJson(rawText.trim()); }
         catch (e) { targetDiv.innerHTML = audioErr('[错误] JSON解析错误：' + e.message); return false; }
 
         const content = msg.content !== undefined ? String(msg.content) : '';
@@ -433,7 +460,7 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
         const raw = content !== undefined ? String(content) : '空消息';   // JsonMessage 的 content 默认值
         let inner;
         try {
-            inner = JSON.parse(raw.trim());
+            inner = parseBotJson(raw.trim());
         } catch (e) {
             appendTextSection(container, 'error', label || '错误', '[错误] JSON解析错误：\n' + e.message + '\n\n原始content:\n' + raw);
             return;
@@ -512,17 +539,20 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
     }
 
     // 顶层 ForwardMessage 输出格式：解析 JsonForwardMessage 后渲染
-    function handleForwardMessageOutput(container, rawText) {
+    function handleForwardMessageOutput(container, rawText, debug) {
+        const ownDebug = !debug;
+        const debugLines = debug || [];
         let json;
         try {
-            json = JSON.parse(rawText.trim());
+            json = parseBotJson(rawText.trim());
         } catch (e) {
             appendTextSection(container, 'error', '错误', 'JSON解析失败: ' + e.message + '\n\n原始输出:\n' + rawText);
+            if (ownDebug && debugLines.length) appendDebugSection(container, debugLines);
             return;
         }
-        const debugLines = ['[DEBUG] format: ForwardMessage'];
+        debugLines.push('[DEBUG] format: ForwardMessage');
         renderForwardMessage(container, json, debugLines);
-        appendDebugSection(container, debugLines);
+        if (ownDebug) appendDebugSection(container, debugLines);
     }
 
     // --- Active messages (主动消息) ---
@@ -607,16 +637,19 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
         }
     }
 
-    function handleJsonOutput(container, rawText) {
+    // debug: shared sink array (caller renders one Debug section at the bottom). If omitted, builds + appends locally.
+    function handleJsonOutput(container, rawText, debug) {
+        const ownDebug = !debug;
+        const debugLines = debug || [];
         let json;
         try {
-            json = JSON.parse(rawText.trim());
+            json = parseBotJson(rawText.trim());
         } catch (e) {
             appendTextSection(container, 'error', '错误', 'JSON解析失败: ' + e.message + '\n\n原始输出:\n' + rawText);
+            if (ownDebug && debugLines.length) appendDebugSection(container, debugLines);
             return;
         }
 
-        const debugLines = [];
         if (json.format) debugLines.push('[DEBUG] format: ' + json.format);
 
         const format = json.format || 'text';
@@ -664,13 +697,13 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
         // Active (主动消息) area, after all Stdout
         if ('active' in json) handleActiveMessages(container, json.active, debugLines);
 
-        // Show debug section
-        appendDebugSection(container, debugLines);
+        // When no shared sink was given, render the Debug section here; otherwise the caller renders it at the bottom.
+        if (ownDebug) appendDebugSection(container, debugLines);
     }
 
     // --- Storage extraction ---
     // Returns {global,storage,bucket,error}: null fields = unchanged. Independent of media render.
-    function _safeParse(s) { try { return JSON.parse(String(s).trim()); } catch (e) { return null; } }
+    function _safeParse(s) { try { return parseBotJson(String(s).trim()); } catch (e) { return null; } }
     function _pickStorage(o) {
         return {
             global:  (o && o.global  !== undefined) ? o.global  : null,
@@ -706,7 +739,12 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
 
         if (result.error) appendTextSection(outputDiv, 'error', 'Error', result.error);
 
-        // Main output format handling
+        // Single Debug sink, rendered once at the very bottom.
+        // Seed it with the auto-uploaded util helper files (executor sets result.utilFiles).
+        const debug = (result.utilFiles && result.utilFiles.length)
+            ? result.utilFiles.map(n => '[DEBUG] 自动上传辅助文件：' + n) : [];
+
+        // Main output format handling (json/ForwardMessage push their debug into the shared sink)
         if (result.stdout) {
             switch (outputFormat) {
                 case 'markdown':
@@ -719,10 +757,10 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
                     appendBase64Section(outputDiv, result.stdout, 'Stdout', true);
                     break;
                 case 'json':
-                    handleJsonOutput(outputDiv, result.stdout);
+                    handleJsonOutput(outputDiv, result.stdout, debug);
                     break;
                 case 'ForwardMessage':
-                    handleForwardMessageOutput(outputDiv, result.stdout);
+                    handleForwardMessageOutput(outputDiv, result.stdout, debug);
                     break;
                 case 'LaTeX':
                     appendLatexSection(outputDiv, result.stdout);
@@ -751,7 +789,8 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
             appendTextSection(outputDiv, 'info', '信息', '程序执行完成，但没有输出。');
         }
 
-        // Duration
+        // Bottom of the output: Debug first, then Duration.
+        appendDebugSection(outputDiv, debug);
         if (result.duration) {
             appendTextSection(outputDiv, 'duration', '执行时间', result.duration + ' 毫秒');
         }

@@ -58,6 +58,34 @@ const GlotExecutor = (() => {
         return (language === 'c' || language === 'cpp') ? 'glot/clang:latest' : 'glot/' + language + ':latest';
     }
 
+    // --- util helper files (mirror the bot's data/utils) ---
+    // auto-detect usage from the code (no config), then add the file to the request's files[].
+    const UTIL_FILES = [
+        { name: 'json.h',       langs: ['c', 'cpp'], used: code => code.includes('json.h') },
+        { name: 'htmlTools.py', langs: ['python'],   used: code => code.includes('htmlTools') }
+    ];
+    const _utilCache = {};   // name -> file content (fetched once, same-origin static file)
+    async function loadUtilFile(name) {
+        if (_utilCache[name] === undefined) {
+            const resp = await fetch('utils/' + name);   // relative to code_runner/index.html
+            if (!resp.ok) throw new Error('加载辅助文件 ' + name + ' 失败：HTTP ' + resp.status);
+            _utilCache[name] = await resp.text();
+        }
+        return _utilCache[name];
+    }
+    // Returns extra CodeFile[] to append, based on which util files the code references.
+    async function detectUtilFiles(language, code) {
+        const lang = (language || '').toLowerCase();
+        const extra = [];
+        for (const u of UTIL_FILES) {
+            if (u.langs.indexOf(lang) !== -1 && u.used(code)) {
+                extra.push({ name: u.name, content: await loadUtilFile(u.name) });
+                console.log('Auto-include util file:', u.name);
+            }
+        }
+        return extra;
+    }
+
     async function execute({ apiKey, language, codeSource, codeUrl, code, stdin, requestMethod, dockerUrl, dockerToken }) {
         let finalCode = code;
         if (codeSource === 'url') {
@@ -76,6 +104,9 @@ const GlotExecutor = (() => {
 
         // Shared payload (files + optional stdin/command), same shape as the bot's RunCodeRequest
         const files = [{ name: GlotUtils.getFileName(language), content: finalCode }];
+        const utilFiles = await detectUtilFiles(language, finalCode);   // auto-include util files when referenced
+        for (const f of utilFiles) files.push(f);
+        const utilNames = utilFiles.map(f => f.name);   // surfaced in the Debug area by output.js
         const command = GlotUtils.getCommand(language);
 
         // Docker Run：自定义请求地址，body 为 {image, payload}，鉴权头 X-Access-Token；无需用户脚本/代理
@@ -101,6 +132,7 @@ const GlotExecutor = (() => {
             if (typeof result.duration === 'number' && result.duration > 100000) {
                 result.duration = Math.round(result.duration / 1e6);
             }
+            if (utilNames.length) result.utilFiles = utilNames;
             return result;
         }
 
@@ -131,7 +163,9 @@ const GlotExecutor = (() => {
             throw new Error(`HTTP错误: ${response.status} - ${errText}`);
         }
 
-        return await response.json();
+        const result = await response.json();
+        if (utilNames.length) result.utilFiles = utilNames;
+        return result;
     }
 
     return { execute };
