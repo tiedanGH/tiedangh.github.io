@@ -135,6 +135,12 @@ const GlotStore = (() => {
         Object.keys(s.buckets).forEach(k => {
             const id = Number(k);
             const b = s.buckets[k] && typeof s.buckets[k] === 'object' ? s.buckets[k] : {};
+            if (b.deleted === true) {
+                // 空槽位 (mirrors bot's bucket[id].clear()): keep the id reserved, drop all data
+                s.buckets[k] = { id, deleted: true };
+                if (id > maxId) maxId = id;
+                return;
+            }
             b.id = id;
             b.name = String(b.name == null ? ('存储库' + id) : b.name);
             b.content = String(b.content == null ? '' : b.content);
@@ -148,6 +154,17 @@ const GlotStore = (() => {
         s.nextId = Math.max(Number(s.nextId) || 1, maxId + 1);
         return s;
     }
+    // A bucket entry that exists and is not an empty slot (空槽位)
+    function _liveBucket(s, id) {
+        const b = s.buckets[String(Number(id))];
+        return (b && !b.deleted) ? b : null;
+    }
+    // Smallest free id, scanning from 1 (mirrors bot generateSequence(1L){it+1}.first{isBucketEmpty(it)})
+    function _firstFreeId(s) {
+        let id = 1;
+        while (_liveBucket(s, id)) id++;
+        return id;
+    }
     function _readBuckets() { return _ensureBuckets(_read(BUCKETS_KEY)); }
     function _writeBuckets(s) { return _write(BUCKETS_KEY, s); }
     function _countLinks(id) {
@@ -157,7 +174,7 @@ const GlotStore = (() => {
         return n;
     }
     function _nameTaken(store, name, exceptId) {
-        return Object.keys(store.buckets).some(k => Number(k) !== exceptId && store.buckets[k].name === name);
+        return Object.keys(store.buckets).some(k => Number(k) !== exceptId && !store.buckets[k].deleted && store.buckets[k].name === name);
     }
     function _uniqueBucketName(store, base, exceptId) {
         base = String(base == null ? '存储库' : base).trim() || '存储库';
@@ -167,28 +184,39 @@ const GlotStore = (() => {
         return base + '(' + n + ')';
     }
 
+    // Includes 空槽位 placeholders as {id, deleted:true} so the UI can render them in place.
     function listBuckets() {
         const s = _readBuckets();
         return Object.keys(s.buckets).map(k => {
             const b = s.buckets[k];
+            if (b.deleted) return { id: b.id, deleted: true, linkedCount: 0 };
             return { id: b.id, name: b.name, content: b.content, desc: b.desc,
                      updatedAt: b.updatedAt, backups: _clone(b.backups), linkedCount: _countLinks(b.id) };
         }).sort((a, b) => a.id - b.id);
     }
+    // Empty slots behave as nonexistent for the program contract (links/IO/import-conflicts).
     function getBucket(id) {
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         return b ? _clone(b) : null;
     }
-    function createBucket(name, desc) {
+    // atId (optional): recreate at a specific empty slot; default = smallest free id (reuses holes).
+    function createBucket(name, desc, atId) {
         name = String(name == null ? '' : name).trim();
         if (!name) return { ok: false, error: '请输入存储库名称' };
         if (/^\d+$/.test(name)) return { ok: false, error: '存储库名称不能为纯数字' };
         const s = _readBuckets();
         if (_nameTaken(s, name, -1)) return { ok: false, error: '名称 ' + name + ' 已存在' };
-        const id = Number(s.nextId) || 1;
+        let id;
+        if (atId != null) {
+            id = Number(atId);
+            if (!Number.isInteger(id) || id < 1) return { ok: false, error: '无效的存储库编号' };
+            if (_liveBucket(s, id)) return { ok: false, error: '编号 ' + id + ' 已被占用' };
+        } else {
+            id = _firstFreeId(s);
+        }
         s.buckets[String(id)] = { id, name, content: '', desc: String(desc || ''), createdAt: Date.now(), updatedAt: Date.now(), backups: _normBackups(null) };
-        s.nextId = id + 1;
+        if (id >= (Number(s.nextId) || 1)) s.nextId = id + 1;
         const w = _writeBuckets(s);
         return w.ok ? { ok: true, id } : { ok: false, error: w.error };
     }
@@ -207,31 +235,33 @@ const GlotStore = (() => {
         if (!name) return { ok: false, error: '请输入存储库名称' };
         if (/^\d+$/.test(name)) return { ok: false, error: '存储库名称不能为纯数字' };
         const s = _readBuckets();
-        if (!s.buckets[String(id)]) return { ok: false, error: '存储库不存在' };
+        const b = _liveBucket(s, id);
+        if (!b) return { ok: false, error: '存储库不存在' };
         if (_nameTaken(s, name, id)) return { ok: false, error: '名称 ' + name + ' 已存在' };
-        s.buckets[String(id)].name = name;
-        s.buckets[String(id)].updatedAt = Date.now();
+        b.name = name;
+        b.updatedAt = Date.now();
         return Object.assign({ ok: true, name }, _writeBuckets(s));
     }
     function setBucketDesc(id, desc) {
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b) return { ok: false, error: '存储库不存在' };
         b.desc = String(desc == null ? '' : desc); b.updatedAt = Date.now();
         return Object.assign({ ok: true }, _writeBuckets(s));
     }
     function setBucketContent(id, content) {
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b) return { ok: false, error: '存储库不存在' };
         b.content = String(content == null ? '' : content); b.updatedAt = Date.now();
         return Object.assign({ ok: true }, _writeBuckets(s));
     }
+    // Delete keeps the id reserved as an empty slot (mirrors bot bucket[id].clear()); recreate reuses it.
     function deleteBucket(id) {
         id = Number(id);
         const s = _readBuckets();
-        if (!s.buckets[String(id)]) return { ok: false, error: '存储库不存在' };
-        delete s.buckets[String(id)];
+        if (!_liveBucket(s, id)) return { ok: false, error: '存储库不存在' };
+        s.buckets[String(id)] = { id, deleted: true };
         const w = _writeBuckets(s);
         if (!w.ok) return { ok: false, error: w.error };
         // cascade: unlink from every project
@@ -252,7 +282,7 @@ const GlotStore = (() => {
     function createBackup(id, slot) {
         if (!_slotOk(slot)) return { ok: false, error: '备份编号仅支持 1-' + BACKUP_SLOTS };
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b) return { ok: false, error: '存储库不存在' };
         if (b.content === '') return { ok: false, error: '存储库主内容为空，无需备份' };
         if (b.backups[slot]) return { ok: false, occupied: true, existing: _clone(b.backups[slot]) };
@@ -263,7 +293,7 @@ const GlotStore = (() => {
     function overwriteBackup(id, slot) {
         if (!_slotOk(slot)) return { ok: false, error: '备份编号仅支持 1-' + BACKUP_SLOTS };
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b) return { ok: false, error: '存储库不存在' };
         if (b.content === '') return { ok: false, error: '存储库主内容为空，无需备份' };
         const old = b.backups[slot];
@@ -273,7 +303,7 @@ const GlotStore = (() => {
     function deleteBackup(id, slot) {
         if (!_slotOk(slot)) return { ok: false, error: '备份编号仅支持 1-' + BACKUP_SLOTS };
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b) return { ok: false, error: '存储库不存在' };
         if (!b.backups[slot]) return { ok: false, error: '槽位 ' + (slot + 1) + ' 中没有备份' };
         b.backups[slot] = null;
@@ -282,7 +312,7 @@ const GlotStore = (() => {
     function renameBackup(id, slot, name) {
         if (!_slotOk(slot)) return { ok: false, error: '备份编号仅支持 1-' + BACKUP_SLOTS };
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b || !b.backups[slot]) return { ok: false, error: '槽位没有备份' };
         b.backups[slot].name = String(name == null ? '' : name).trim() || ('备份' + (slot + 1));
         return Object.assign({ ok: true }, _writeBuckets(s));
@@ -291,7 +321,7 @@ const GlotStore = (() => {
     function rollbackBackup(id, slot) {
         if (!_slotOk(slot)) return { ok: false, error: '备份编号仅支持 1-' + BACKUP_SLOTS };
         const s = _readBuckets();
-        const b = s.buckets[String(Number(id))];
+        const b = _liveBucket(s, id);
         if (!b) return { ok: false, error: '存储库不存在' };
         if (!b.backups[slot]) return { ok: false, error: '备份编号 ' + (slot + 1) + ' 没有任何数据' };
         b.content = b.backups[slot].content; b.updatedAt = Date.now();
@@ -499,7 +529,7 @@ const GlotStore = (() => {
         (payload.buckets || []).forEach(b => {
             const id = Number(b.id);
             if (isNaN(id)) return;
-            const existing = s.buckets[String(id)];
+            const existing = _liveBucket(s, id);   // 空槽位 counts as free
             if (!existing) {
                 _createBucketWithId(s, id, b.name, b.content);
             } else if (overwrite) {

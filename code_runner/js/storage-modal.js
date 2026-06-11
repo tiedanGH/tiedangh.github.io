@@ -19,6 +19,14 @@ const GlotStorageModal = (() => {
 
     function renderBucketCard(b) {
         const esc = GlotUtils.escapeHtml;
+        if (b.deleted) {
+            // 空槽位 placeholder: id is reserved; recreate reuses it
+            return '<div class="sm-bucket-card deleted" data-id="' + b.id + '">' +
+                '<div class="sm-bucket-head">' +
+                    '<span class="sm-bucket-id">#' + b.id + '</span>' +
+                    '<span class="sm-bucket-deleted-text">此存储库已被删除</span>' +
+                    '<button class="btn-new" data-act="bucket-recreate">创建</button></div></div>';
+        }
         const open = !!smBucketOpen[b.id];
         const backupCount = b.backups.filter(Boolean).length;
         const head =
@@ -91,20 +99,21 @@ const GlotStorageModal = (() => {
                     '<span class="chip-x" data-act="unlink" data-id="' + id + '" title="解除关联">&times;</span></span>';
             }).join('')
             : '<span class="sm-empty-hint">未关联任何存储库</span>';
-        const linkable = buckets.filter(b => ps.links.indexOf(b.id) === -1);
+        const liveBuckets = buckets.filter(b => !b.deleted);   // 空槽位 excluded from link/recovery targets
+        const linkable = liveBuckets.filter(b => ps.links.indexOf(b.id) === -1);
         const linkOptions = linkable.map(b => '<option value="' + b.id + '">#' + b.id + ' ' + esc(b.name) + '</option>').join('');
 
         const bucketCards = buckets.length ? buckets.map(renderBucketCard).join('')
             : '<p class="sm-empty-hint">还没有存储库，点击“新建存储库”创建。</p>';
 
-        const bucketOpts = buckets.map(b => '<option value="' + b.id + '">#' + b.id + ' ' + esc(b.name) + '</option>').join('');
+        const bucketOpts = liveBuckets.map(b => '<option value="' + b.id + '">#' + b.id + ' ' + esc(b.name) + '</option>').join('');
         const recoveryList = recovery.length ? recovery.map(it => {
             const size = (it.data && it.data.content != null) ? String(it.data.content).length : 0;
             return '<div class="recovery-item" data-rid="' + attrEsc(it.rid) + '">' +
                 '<div class="recovery-meta"><span class="recovery-source">' + esc(it.source) + '</span>' +
                 '<span class="recovery-time">' + formatTime(it.createdAt) + ' · ' + size + ' 字符</span></div>' +
                 '<div class="recovery-actions"><button class="btn-view" data-act="recovery-view">查看</button>' +
-                (buckets.length ? ('<select class="recovery-target">' + bucketOpts + '</select>' +
+                (liveBuckets.length ? ('<select class="recovery-target">' + bucketOpts + '</select>' +
                     '<button class="btn-switch" data-act="recovery-apply">复制到存储库</button>') : '') +
                 '<button class="btn-del" data-act="recovery-del">删除</button></div></div>';
         }).join('') : '<span class="sm-empty-hint">恢复区为空</span>';
@@ -225,8 +234,9 @@ const GlotStorageModal = (() => {
         } else if (act === 'unlink') {
             GlotStore.unlinkBucket(pid, Number(btn.getAttribute('data-id')));
             render(); showToast('已解除关联', 'success');
-        } else if (act === 'new-bucket') {
-            const r = GlotStore.createBucket('新存储库', '');
+        } else if (act === 'new-bucket' || act === 'bucket-recreate') {
+            // new-bucket: smallest free id (reuses empty slots); bucket-recreate: this slot's exact id
+            const r = GlotStore.createBucket('新存储库', '', act === 'bucket-recreate' ? bucketId : null);
             if (!r.ok) { showToast(r.error, 'error'); return; }
             render();
             const newCard = body.querySelector('.sm-bucket-card[data-id="' + r.id + '"]');

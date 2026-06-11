@@ -143,7 +143,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
 }
 .sm-bucket-id { font-weight: 700; color: var(--primary-color); flex: 0 0 auto; }
 .sm-bucket-name {
@@ -180,6 +179,18 @@
     white-space: nowrap;
 }
 .sm-bucket-card.open .sm-bucket-head { margin-bottom: 0; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
+/* placeholder: deleted bucket keeps its id reserved */
+.sm-bucket-card.deleted {
+    background: #f1f3f4;
+    border-style: dashed;
+}
+.sm-bucket-card.deleted .sm-bucket-id { color: var(--gray-color); }
+.sm-bucket-deleted-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--gray-color);
+}
 .sm-bucket-body { margin-top: 10px; }
 .sm-bucket-desc { font-size: 13px; padding: 6px 10px; margin-bottom: 8px; }
 .sm-bucket-body > label { font-size: 13px; font-weight: 600; color: #555; }
