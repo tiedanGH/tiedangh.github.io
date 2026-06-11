@@ -51,25 +51,25 @@
     background: #faf5ff;
 }
 
-/* Markdown rendered output */
+/* Markdown rendered output — content lives in an isolated Shadow DOM */
 .output-section .content.markdown-rendered {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     white-space: normal;
-    line-height: 1.6;
     max-height: 600px;
 }
-.output-section .content.markdown-rendered h1,
-.output-section .content.markdown-rendered h2,
-.output-section .content.markdown-rendered h3 {
-    margin: 8px 0 4px 0;
+.md-iso-host { display: block; }
+
+/* @ (at) parameter status */
+.at-note {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
 }
-.output-section .content.markdown-rendered ul,
-.output-section .content.markdown-rendered ol {
-    margin-left: 20px;
-}
-.output-section .content.markdown-rendered li {
-    margin: 2px 0;
-}
+.at-note.at-ok { color: var(--success-color); }   /* supported: green */
+.at-note.at-no { color: var(--warning-color); }   /* unsupported: yellow */
 
 /* Image output */
 .output-section .content.image-rendered {

@@ -39,16 +39,48 @@ const GlotOutput = (() => {
     }
 
     // --- Markdown rendering ---
+    // The bot renders markdown to an image in a headless browser (fully isolated)
+    // a Shadow DOM so page CSS cannot bleed in and a program's own <style> stays scoped to its output.
+    // Selectors are low-specificity (bare element) so a program's embedded CSS can override the baseline.
+    const MD_BASELINE_CSS = `
+:host{all:initial;display:block;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;font-size:14px;line-height:1.6;color:#2c3e50;word-wrap:break-word;}
+h1,h2,h3,h4,h5,h6{margin:8px 0 4px;line-height:1.3;font-weight:600;color:#2c3e50;}
+h1{font-size:1.7em;}h2{font-size:1.5em;}h3{font-size:1.3em;}h4{font-size:1.1em;}
+p{margin:6px 0;}
+ul,ol{margin:4px 0 4px 22px;padding:0;}
+li{margin:2px 0;}
+a{color:#2980b9;text-decoration:none;}
+code{font-family:'Courier New',Courier,monospace;background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:.92em;}
+pre{background:#f5f5f5;padding:10px;border-radius:4px;overflow:auto;}
+pre code{background:none;padding:0;}
+blockquote{margin:6px 0;padding:2px 12px;border-left:4px solid #dfe2e5;color:#6a737d;}
+table{border-collapse:collapse;margin:6px 0;}
+th,td{border:1px solid #dfe2e5;padding:5px 10px;}
+img{max-width:100%;height:auto;}
+hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
+`;
     function renderMarkdownContent(text) {
         // Use marked library to render markdown
         return marked.parse(text);
+    }
+    // Render markdown into an isolated Shadow DOM: neither page CSS nor the program's own CSS crosses the boundary.
+    function mountIsolatedMarkdown(targetEl, text) {
+        const host = document.createElement('div');
+        host.className = 'md-iso-host';
+        if (host.attachShadow) {
+            const root = host.attachShadow({ mode: 'open' });
+            root.innerHTML = '<style>' + MD_BASELINE_CSS + '</style>' + renderMarkdownContent(text);
+        } else {
+            host.innerHTML = renderMarkdownContent(text);   // legacy fallback (no shadow support)
+        }
+        targetEl.appendChild(host);
     }
 
     function appendMarkdownSection(container, text, title = 'Stdout') {
         const sec = createSection('stdout', title, ICONS.stdout);
         const contentDiv = sec.querySelector('.content');
         contentDiv.classList.add('markdown-rendered');
-        contentDiv.innerHTML = renderMarkdownContent(text);
+        mountIsolatedMarkdown(contentDiv, text);
         container.appendChild(sec);
     }
 
@@ -265,7 +297,7 @@ const GlotOutput = (() => {
                 block.textContent = part.content;
             } else if (part.type === 'markdown') {
                 block.classList.add('markdown-rendered');
-                block.innerHTML = renderMarkdownContent(part.content);
+                mountIsolatedMarkdown(block, part.content);
             } else if (part.type === 'image') {
                 appendImageContent(block, part.content);
             } else if (part.type === 'base64') {
@@ -291,9 +323,35 @@ const GlotOutput = (() => {
         }
     }
 
+    // debug aid flags genuine typos without warning on legitimate fields.
+    const TOP_FIELDS = new Set(['format', 'at', 'width', 'content', 'messageList', 'active', 'storage', 'global', 'bucket', 'error']);  // JsonMessage (top-level / active / ForwardMessage.messages node)
+    const CHAIN_NODE_FIELDS = new Set(['format', 'width', 'content', 'messageList']);  // SingleChainMessage (MultipleMessage / MessageChain node)
+    const SINGLE_FIELDS = new Set(['format', 'width', 'content']);  // JsonSingleMessage (innermost node)
+
+    // --- at (@) parameter simulation ---
+    // Only text / MessageChain / MultipleMessage apply `at`, and only in a group (私聊 never @s).
+    function _isGroupContext() {
+        try { const f = GlotStore.composeEnvValues().from; return !!f && f !== 'private'; }
+        catch (e) { return false; }   // env unavailable → treat as private (no @)
+    }
+    // Pin a small @ status note to the far right of a Stdout section's title row.
+    // section is the rendered .output-section (typically container.lastElementChild after a node renders).
+    function attachAtNote(section, supported, atVal, isGroup) {
+        if (!section) return;
+        const h3 = section.querySelector('h3');
+        if (!h3) return;
+        const span = document.createElement('span');
+        span.className = 'at-note ' + (supported ? 'at-ok' : 'at-no');
+        let txt;
+        if (!supported)      txt = '此处不支持使用 at 参数（at: ' + atVal + '）';
+        else if (!isGroup)   txt = '私聊环境：at 不生效（at: ' + atVal + '）';
+        else                 txt = (atVal ? '已 at 发送者' : '未 at 发送者') + '（at: ' + atVal + '）';
+        span.innerHTML = '<i class="fas fa-at"></i> ' + GlotUtils.escapeHtml(txt);
+        h3.appendChild(span);
+    }
+
     // --- SingleJsonMessage ---
-    function renderSingleJsonMessage(container, msg, title, debugLines, errorPrefix = '') {
-        const knownFields = new Set(['content', 'format', 'width', 'at', 'active', 'error', 'storage', 'global', 'bucket', 'messageList']);
+    function renderSingleJsonMessage(container, msg, title, debugLines, errorPrefix = '', knownFields = TOP_FIELDS) {
         collectUnknownFieldWarnings(msg, knownFields, debugLines);
 
         const format = msg.format || 'text';
@@ -326,8 +384,7 @@ const GlotOutput = (() => {
         }
     }
 
-    function handleMessageChain(container, json, title, debugLines, errorPrefix = '') {
-        const knownFields = new Set(['format', 'messageList']);
+    function handleMessageChain(container, json, title, debugLines, errorPrefix = '', knownFields = TOP_FIELDS) {
         collectUnknownFieldWarnings(json, knownFields, debugLines);
 
         if (!Array.isArray(json.messageList)) {
@@ -337,8 +394,7 @@ const GlotOutput = (() => {
 
         const parts = [];
         json.messageList.forEach(msg => {
-            const knownMsgFields = new Set(['content', 'format', 'width']);
-            collectUnknownFieldWarnings(msg, knownMsgFields, debugLines);
+            collectUnknownFieldWarnings(msg, SINGLE_FIELDS, debugLines);
 
             const format = msg.format || 'text';
             const content = msg.content !== undefined ? String(msg.content) : '';
@@ -372,8 +428,8 @@ const GlotOutput = (() => {
         appendMessageChainSection(container, title, parts);
     }
 
-    // 解析转义后的 JsonForwardMessage 字符串并渲染
-    function renderEscapedForwardMessage(container, content, debugLines, label) {
+    // 解析转义后的 JsonForwardMessage 字符串并渲染（atInfo 仅在顶层 ForwardMessage 携带 at 时传入）
+    function renderEscapedForwardMessage(container, content, debugLines, label, atInfo) {
         const raw = content !== undefined ? String(content) : '空消息';   // JsonMessage 的 content 默认值
         let inner;
         try {
@@ -383,20 +439,29 @@ const GlotOutput = (() => {
             return;
         }
         if (label) debugLines.push('[DEBUG] ' + label + '：嵌套ForwardMessage');
-        renderForwardMessage(container, inner, debugLines);
+        renderForwardMessage(container, inner, debugLines, atInfo);
     }
 
     // Render a list of message nodes as "Stdout N" sections.
-    // context 区分两类节点的允许格式（与 bot 一致）：
     //   'multiple' = MultipleMessage 的 SingleChainMessage 节点（允许嵌套 ForwardMessage，content 再解析）
     //   'forward'  = ForwardMessage.messages 的 JsonMessage 节点（ForwardMessage/json 禁用）
-    function renderMessageNodes(container, list, debugLines, context) {
+    // atInfo {val,isGroup} (when the top-level json has `at`): pin a per-message @ note
+    function renderMessageNodes(container, list, debugLines, context, atInfo) {
         const nodeName = context === 'forward' ? 'JsonMessage' : 'SingleChainMessage';
+        // forward node = JsonMessage (full top-level fields); multiple node = SingleChainMessage
+        const nodeFields = context === 'forward' ? TOP_FIELDS : CHAIN_NODE_FIELDS;
         list.forEach((msg, index) => {
             const title = `Stdout ${index + 1}`;
             const format = msg.format || 'text';
+            // a sub-message applies @ only as a text/MessageChain inside a MultipleMessage (not in a forward card)
+            const subSupportsAt = context === 'multiple' && (format === 'text' || format === 'MessageChain');
+            const noteAt = () => {
+                if (!atInfo) return;
+                attachAtNote(container.lastElementChild, subSupportsAt, atInfo.val, atInfo.isGroup);
+            };
             if (format === 'MessageChain') {
-                handleMessageChain(container, msg, title, debugLines, `第${index + 1}条：`);
+                handleMessageChain(container, msg, title, debugLines, `第${index + 1}条：`, nodeFields);
+                noteAt();
                 return;
             }
             if (format === 'ForwardMessage') {
@@ -412,25 +477,25 @@ const GlotOutput = (() => {
                 appendTextSection(container, 'error', title, '[错误] 不支持在' + where + '内使用“' + format + '”输出格式');
                 return;
             }
-            renderSingleJsonMessage(container, msg, title, debugLines);
+            renderSingleJsonMessage(container, msg, title, debugLines, '', nodeFields);
+            noteAt();
         });
     }
 
-    function handleMultipleMessage(container, json, debugLines) {
-        const knownFields = new Set(['format', 'messageList']);
-        collectUnknownFieldWarnings(json, knownFields, debugLines);
+    function handleMultipleMessage(container, json, debugLines, atInfo) {
+        collectUnknownFieldWarnings(json, TOP_FIELDS, debugLines);   // top-level / active MultipleMessage is a JsonMessage
 
         if (!Array.isArray(json.messageList)) {
             appendTextSection(container, 'error', '错误', 'JSON解析失败：messageList 必须是数组');
             return;
         }
-        renderMessageNodes(container, json.messageList, debugLines, 'multiple');
+        renderMessageNodes(container, json.messageList, debugLines, 'multiple', atInfo);
     }
 
     // --- ForwardMessage ---
     // 原框架的转发消息卡片在网页无对应载体，按 MultipleMessage 的 UI 将 messages[] 渲染为 Stdout N 节点；
     // 卡片元信息(title/brief/preview/summary/name)放入 Debug 区域；不支持的格式与 MultipleMessage 一致处理。
-    function renderForwardMessage(container, json, debugLines) {
+    function renderForwardMessage(container, json, debugLines, atInfo) {
         const knownFields = new Set(['title', 'brief', 'preview', 'summary', 'name', 'messages', 'storage', 'global', 'bucket']);
         collectUnknownFieldWarnings(json, knownFields, debugLines);
 
@@ -443,7 +508,7 @@ const GlotOutput = (() => {
             appendTextSection(container, 'error', '错误', 'JSON解析失败：messages 必须是数组');
             return;
         }
-        renderMessageNodes(container, json.messages, debugLines, 'forward');
+        renderMessageNodes(container, json.messages, debugLines, 'forward', atInfo);
     }
 
     // 顶层 ForwardMessage 输出格式：解析 JsonForwardMessage 后渲染
@@ -555,6 +620,11 @@ const GlotOutput = (() => {
         if (json.format) debugLines.push('[DEBUG] format: ' + json.format);
 
         const format = json.format || 'text';
+        // at simulation: only when the program explicitly includes `at`. text/MessageChain/MultipleMessage
+        // apply @ (text/MessageChain shown green here, MultipleMessage per sub-message); the rest show 不支持.
+        const hasAt = json && typeof json === 'object' && Object.prototype.hasOwnProperty.call(json, 'at');
+        const atVal = json.at !== false;   // JsonMessage default is true; only explicit false disables
+        const atInfo = hasAt ? { val: atVal, isGroup: _isGroupContext() } : null;
         switch (format) {
             case 'text':
             case 'markdown':
@@ -568,15 +638,27 @@ const GlotOutput = (() => {
                 handleMessageChain(container, json, 'Stdout', debugLines);
                 break;
             case 'MultipleMessage':
-                handleMultipleMessage(container, json, debugLines);
+                handleMultipleMessage(container, json, debugLines, atInfo);
                 break;
             case 'ForwardMessage':
                 // json 格式下 content 为转义后的 JsonForwardMessage 字符串（内部再次解析）
-                renderEscapedForwardMessage(container, json.content, debugLines);
+                renderEscapedForwardMessage(container, json.content, debugLines, undefined, atInfo);
                 break;
             default:
                 appendTextSection(container, 'error', '错误', '不支持的输出格式 ' + format);
                 break;
+        }
+        // Single-section top-level formats: pin the @ note to that one Stdout's title row.
+        // text/MessageChain support at (green); markdown/image/base64/LaTeX/Audio don't (yellow + Debug warn).
+        // MultipleMessage & ForwardMessage notes are attached per sub-message inside their renderers.
+        if (atInfo) {
+            const supported = (format === 'text' || format === 'MessageChain');
+            if (supported || ['markdown', 'image', 'base64', 'LaTeX', 'Audio'].indexOf(format) !== -1) {
+                attachAtNote(container.lastElementChild, supported, atInfo.val, atInfo.isGroup);
+                if (!supported) debugLines.push('[WARN] 当前输出格式（' + format + '）不支持 at 参数，已忽略');
+            } else if (format === 'ForwardMessage') {
+                debugLines.push('[WARN] 当前输出格式（ForwardMessage）不支持 at 参数，已忽略');
+            }
         }
 
         // Active (主动消息) area, after all Stdout
