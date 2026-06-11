@@ -79,13 +79,13 @@
     font-size: 14px;
 }
 
-/* Project list — one column, two columns on wide screens */
+/* Project list — auto-fitting columns: more columns on wider screens */
 .project-list {
     list-style: none;
     margin: 0;
     padding: 0 20px 20px;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 10px;
 }
 .project-row {
@@ -113,6 +113,7 @@
 }
 .project-row-name.editable { cursor: text; }
 .project-row-name.editable:hover { color: var(--primary-color); }
+.project-row-name:not(.editable) { color: var(--primary-color); }   /* 默认项目 */
 .project-row-name-input {
     width: 100%;
     padding: 4px 8px;
@@ -224,10 +225,10 @@
 .cr-confirm-ok           { background: var(--danger-color); }
 .cr-confirm-ok:hover     { background: #c0392b; }
 
-/* Wide screens: wider modal + two-column project list */
+/* Project management modal */
+#projectModalOverlay .modal { max-width: 1300px; }
 @media (min-width: 900px) {
     .modal { max-width: 860px; }
-    .project-list { grid-template-columns: 1fr 1fr; }
 }
 
 /* Mobile */
