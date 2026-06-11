@@ -245,23 +245,35 @@
 .recovery-actions select { width: auto; flex: 1 1 120px; min-width: 0; padding: 5px 24px 5px 8px; font-size: 13px; }
 
 /* ---- Env modal ---- */
-/* Config import/export bar */
-.env-config-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
+/* Header: title left; buttons left of the close */
+.env-modal-header {
+    justify-content: flex-start;
+    gap: 10px;
 }
+.env-modal-header h2 { flex: 0 0 auto; }
 .env-config-note {
     flex: 1 1 auto;
     min-width: 0;
     font-size: 13px;
     color: var(--gray-color);
+    text-align: right;     /* sits right, snug against the buttons */
 }
-.env-config-bar button { flex: 0 0 auto; }
+.env-modal-header .btn-import,
+.env-modal-header .btn-export {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+/* Mobile: row 1 = title + ×, row 2 = note, row 3 = the two buttons */
+@media (max-width: 768px) {
+    .env-modal-header { flex-wrap: wrap; }
+    .env-modal-header h2 { order: 0; flex: 1 1 auto; }
+    .env-modal-header .modal-close { order: 1; }
+    .env-config-note { order: 2; flex: 1 1 100%; text-align: left; }
+    .env-modal-header .btn-import,
+    .env-modal-header .btn-export { order: 3; flex: 1 1 auto; }
+}
 
 .env-preview-wrap { margin-bottom: 14px; }
 .env-preview-wrap label { font-size: 14px; font-weight: 600; color: var(--dark-color); margin-bottom: 4px; }

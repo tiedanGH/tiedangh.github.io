@@ -70,16 +70,7 @@ const GlotEnvModal = (() => {
                 '<input type="file" class="env-image-input" accept="image/*" multiple hidden>' +
                 (images.length ? '<button class="btn-del" data-act="env-image-clear">清空</button>' : '') + '</div></div>';
 
-        // 配置导入导出独立于项目（项目导入导出不再携带模拟环境）
-        const configBar =
-            '<div class="env-config-bar">' +
-                '<span class="env-config-note">模拟环境配置独立于项目的导入导出</span>' +
-                '<button class="btn-import" data-act="env-import-config"><i class="fas fa-file-import"></i> 导入配置</button>' +
-                '<button class="btn-export" data-act="env-export-config"><i class="fas fa-upload"></i> 导出配置</button>' +
-                '<input type="file" class="env-config-file" accept="application/json,.json" hidden>' +
-            '</div>';
-
-        body.innerHTML = configBar +
+        body.innerHTML =
             '<div class="env-preview-wrap"><div class="env-preview-head">' +
                 '<label>JsonStorage 预览（运行时注入程序输入第一行）</label>' +
                 '<button class="btn-view" data-act="env-copy-raw"><i class="fas fa-copy"></i> 复制原始数据</button></div>' +
@@ -126,13 +117,6 @@ const GlotEnvModal = (() => {
         } else if (act === 'env-image-clear') {
             GlotStore.clearEnvImages();
             render();
-        } else if (act === 'env-export-config') {
-            const r = GlotStore.exportEnvConfig();
-            downloadJson('code_runner-env-config.json', r.json);
-            showToast('已导出模拟环境配置', 'success');
-        } else if (act === 'env-import-config') {
-            const inp = body.querySelector('.env-config-file');
-            if (inp) { inp.value = ''; inp.click(); }   // allow re-importing the same file
         }
     }
 
@@ -157,11 +141,8 @@ const GlotEnvModal = (() => {
         reader.readAsText(file);
     }
 
-    // File pickers: env-config import + image upload (base64 -> images[])
+    // File picker: image upload (base64 -> images[])
     function onBodyChange(e) {
-        const cfg = e.target.closest('.env-config-file');
-        if (cfg && cfg.files && cfg.files.length) { onConfigFile(cfg.files[0]); return; }
-
         const input = e.target.closest('.env-image-input');
         if (!input || !input.files || !input.files.length) return;
         const files = Array.prototype.slice.call(input.files);
@@ -205,6 +186,20 @@ const GlotEnvModal = (() => {
         body.addEventListener('click', onBodyClick);
         body.addEventListener('change', onBodyChange);
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+        // Config import/export lives in the modal header (static HTML)
+        const configFile = document.getElementById('envConfigFile');
+        document.getElementById('envExportConfigBtn').addEventListener('click', () => {
+            const r = GlotStore.exportEnvConfig();
+            downloadJson('code_runner-env-config.json', r.json);
+            showToast('已导出模拟环境配置', 'success');
+        });
+        document.getElementById('envImportConfigBtn').addEventListener('click', () => {
+            configFile.value = '';   // allow re-importing the same file
+            configFile.click();
+        });
+        configFile.addEventListener('change', () => {
+            if (configFile.files && configFile.files.length) onConfigFile(configFile.files[0]);
+        });
     }
 
     return { init, open, close };

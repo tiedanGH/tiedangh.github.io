@@ -256,14 +256,20 @@ const GlotProjects = (() => {
         if (includeDefault === false) delete store.projects[DEFAULT_ID];
         return store;
     }
-    // FULL REPLACE from a store object (cr-full import). _ensureValid recreates default + normalizes.
+    // FULL REPLACE from a store object (cr-full import).
+    // The CURRENT default project is kept untouched — imports never replace or reset it.
     function replaceAllFull(storeObj) {
-        _writeStore(_ensureValid(storeObj && typeof storeObj === 'object' ? JSON.parse(JSON.stringify(storeObj)) : _freshStore()));
+        const currentDefault = _readStore().projects[DEFAULT_ID];
+        const store = _ensureValid(storeObj && typeof storeObj === 'object' ? JSON.parse(JSON.stringify(storeObj)) : _freshStore());
+        store.projects[DEFAULT_ID] = currentDefault;
+        _writeStore(store);
         return { ok: true };
     }
     // FULL REPLACE from a legacy cr-projects array: discard existing, rebuild on a fresh store.
     function replaceAllFromArray(arr) {
+        const currentDefault = _readStore().projects[DEFAULT_ID];
         const store = _freshStore();
+        store.projects[DEFAULT_ID] = currentDefault;   // default 维持原样
         const added = [];
         (Array.isArray(arr) ? arr : []).forEach(entry => {
             const p = _sanitizeProject(entry, '导入项目');

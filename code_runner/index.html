@@ -16,18 +16,18 @@
 
     <link rel="stylesheet" href="css/base.css?v=20260609h">
     <link rel="stylesheet" href="css/projects.css?v=20260611">
-    <link rel="stylesheet" href="css/storage.css?v=20260611">
+    <link rel="stylesheet" href="css/storage.css?v=20260611b">
     <link rel="stylesheet" href="css/output.css?v=20260609b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="js/utils.js?v=20260609"></script>
-    <script src="js/projects.js?v=20260609c"></script>
-    <script src="js/store.js?v=20260611"></script>
+    <script src="js/projects.js?v=20260611"></script>
+    <script src="js/store.js?v=20260611b"></script>
     <script src="js/storage.js?v=20260608d"></script>
     <script src="js/output.js?v=20260611"></script>
     <script src="js/executor.js?v=20260609c"></script>
     <script src="js/storage-modal.js?v=20260609b"></script>
-    <script src="js/env-modal.js?v=20260611"></script>
+    <script src="js/env-modal.js?v=20260611b"></script>
     <script src="js/main.js?v=20260611b"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -332,8 +332,12 @@
 <!-- 模拟环境弹窗（内容由 main.js 动态渲染） -->
 <div id="envModalOverlay" class="modal-overlay" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="emTitle">
-        <div class="modal-header">
+        <div class="modal-header env-modal-header">
             <h2 id="emTitle">模拟环境</h2>
+            <span class="env-config-note">模拟环境配置独立于项目的导入导出</span>
+            <button type="button" id="envImportConfigBtn" class="btn-import"><i class="fas fa-file-import"></i> 导入配置</button>
+            <button type="button" id="envExportConfigBtn" class="btn-export"><i class="fas fa-upload"></i> 导出配置</button>
+            <input type="file" id="envConfigFile" accept="application/json,.json" hidden>
             <button type="button" class="modal-close" id="emClose" aria-label="关闭">&times;</button>
         </div>
         <div class="env-modal-body" id="envModalBody"></div>

@@ -560,10 +560,16 @@ const GlotStore = (() => {
     }
     // FULL REPLACE: projects + storage/buckets from parsed. cr_recovery and cr_env untouched
     // (legacy cr-full files may carry an env field — deliberately ignored). Missing sections reset to fresh.
+    // The default project stays: its config (replaceAllFull) AND its storage entry are preserved.
     function fullReplace(parsed) {
         parsed = parsed || {};
+        const defId = GlotProjects.DEFAULT_ID;
+        const currentDefaultStorage = _readStorage().projects[defId];
         GlotProjects.replaceAllFull(parsed.projects);
-        _writeStorage(_ensureStorage(parsed.storage || _freshStorage()));
+        const storage = _ensureStorage(parsed.storage || _freshStorage());
+        if (currentDefaultStorage) storage.projects[defId] = currentDefaultStorage;
+        else delete storage.projects[defId];   // the file's default-project storage must not apply either
+        _writeStorage(storage);
         _writeBuckets(_ensureBuckets(parsed.buckets || _freshBuckets()));
         return { ok: true };
     }
