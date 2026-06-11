@@ -1,7 +1,7 @@
 // Mock environment modal (模拟环境): per-field value libraries + image input that compose the JsonStorage line.
-// Self-contained; depends on GlotStore/GlotProjects/GlotUtils (globals) + showToast (injected via init).
+// Self-contained; depends on GlotStore/GlotProjects/GlotUtils (globals) + showToast/confirmDialog/downloadJson (injected via init).
 const GlotEnvModal = (() => {
-    let overlay, body, showToast;
+    let overlay, body, showToast, confirmDialog, downloadJson;
     const ENV_DESC = {
         userID: '用户ID，决定 storage 归属',
         nickname: '用户昵称',
@@ -70,7 +70,16 @@ const GlotEnvModal = (() => {
                 '<input type="file" class="env-image-input" accept="image/*" multiple hidden>' +
                 (images.length ? '<button class="btn-del" data-act="env-image-clear">清空</button>' : '') + '</div></div>';
 
-        body.innerHTML =
+        // 配置导入导出独立于项目（项目导入导出不再携带模拟环境）
+        const configBar =
+            '<div class="env-config-bar">' +
+                '<span class="env-config-note">模拟环境配置独立于项目的导入导出</span>' +
+                '<button class="btn-import" data-act="env-import-config"><i class="fas fa-file-import"></i> 导入配置</button>' +
+                '<button class="btn-export" data-act="env-export-config"><i class="fas fa-upload"></i> 导出配置</button>' +
+                '<input type="file" class="env-config-file" accept="application/json,.json" hidden>' +
+            '</div>';
+
+        body.innerHTML = configBar +
             '<div class="env-preview-wrap"><div class="env-preview-head">' +
                 '<label>JsonStorage 预览（运行时注入程序输入第一行）</label>' +
                 '<button class="btn-view" data-act="env-copy-raw"><i class="fas fa-copy"></i> 复制原始数据</button></div>' +
@@ -117,11 +126,42 @@ const GlotEnvModal = (() => {
         } else if (act === 'env-image-clear') {
             GlotStore.clearEnvImages();
             render();
+        } else if (act === 'env-export-config') {
+            const r = GlotStore.exportEnvConfig();
+            downloadJson('code_runner-env-config.json', r.json);
+            showToast('已导出模拟环境配置', 'success');
+        } else if (act === 'env-import-config') {
+            const inp = body.querySelector('.env-config-file');
+            if (inp) { inp.value = ''; inp.click(); }   // allow re-importing the same file
         }
     }
 
-    // File picker -> base64 -> images[]
+    // Config file picked -> validate -> confirm overwrite -> apply
+    function onConfigFile(file) {
+        const reader = new FileReader();
+        reader.onload = async () => {
+            let parsed;
+            try { parsed = JSON.parse(reader.result); }
+            catch (err) { showToast('无法解析文件：不是有效的 JSON', 'error'); return; }
+            if (!parsed || parsed.kind !== 'cr-env' || !parsed.env) {
+                showToast('导入失败：文件格式不正确（应为模拟环境配置导出文件）', 'error'); return;
+            }
+            const ok = await confirmDialog('导入将覆盖当前模拟环境配置（全部字段候选值与图片），且不可撤销。确认导入？');
+            if (!ok) return;
+            const r = GlotStore.importEnvConfig(parsed);
+            if (!r.ok) { showToast('导入失败：' + r.error, 'error'); return; }
+            render();
+            showToast('已导入模拟环境配置', 'success');
+        };
+        reader.onerror = () => showToast('读取文件失败', 'error');
+        reader.readAsText(file);
+    }
+
+    // File pickers: env-config import + image upload (base64 -> images[])
     function onBodyChange(e) {
+        const cfg = e.target.closest('.env-config-file');
+        if (cfg && cfg.files && cfg.files.length) { onConfigFile(cfg.files[0]); return; }
+
         const input = e.target.closest('.env-image-input');
         if (!input || !input.files || !input.files.length) return;
         const files = Array.prototype.slice.call(input.files);
@@ -158,6 +198,8 @@ const GlotEnvModal = (() => {
         overlay = document.getElementById('envModalOverlay');
         body = document.getElementById('envModalBody');
         showToast = deps.showToast;
+        confirmDialog = deps.confirmDialog;
+        downloadJson = deps.downloadJson;
         document.getElementById('emClose').addEventListener('click', close);
         overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
         body.addEventListener('click', onBodyClick);

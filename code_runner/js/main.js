@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Storage feature: enable toggle + two modals
     el.storageToggle.addEventListener('change', () => { saveActiveProject(); updateStorageButtons(); });
     GlotStorageModal.init({ showToast: showToast, confirmDialog: confirmDialog });
-    GlotEnvModal.init({ showToast: showToast });
+    GlotEnvModal.init({ showToast: showToast, confirmDialog: confirmDialog, downloadJson: downloadJson });
     el.openStorageBtn.addEventListener('click', () => requireStorageOn() && GlotStorageModal.open());
     el.openEnvBtn.addEventListener('click', () => requireStorageOn() && GlotEnvModal.open());
 
@@ -404,7 +404,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function onExportAll() {
         saveActiveProject();
-        const withStorage = await confirmDialog('同时导出全部存储数据？\n（包含存储库、备份、模拟环境等全部数据；默认项目不导出）');
+        const withStorage = await confirmDialog(
+            '同时导出全部存储数据？\n' +
+            '包含存储库、备份等全部存储数据，默认项目不导出。\n' +
+            '（模拟环境配置不参与项目导出，请单独导出）'
+        );
         const full = GlotStore.buildFullExport({ includeDefault: false, includeStorage: withStorage });
         const count = Object.keys((full.projects && full.projects.projects) || {}).length;
         if (count === 0) { showToast('没有可导出的项目（默认项目不导出）', 'error'); return; }
@@ -463,7 +467,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isFull && !isLegacy) { showToast('导入失败：文件格式不正确（应为「全部」导出文件）', 'error'); return; }
         const ok = await confirmDialog(
             '【导入全部 = 全盘替换】\n\n' +
-            '将丢弃当前的全部项目与存储数据，替换为导入文件的内容，且不可撤销。\n\n' +
+            '将丢弃当前的全部项目与存储数据，替换为导入文件的内容，且不可撤销。\n' +
+            '（模拟环境配置不参与项目导入，请单独导入）\n\n' +
             '点“确定”后会先自动下载当前全部数据的备份文件，随后执行替换。'
         );
         if (!ok) return;

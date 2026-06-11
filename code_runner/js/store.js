@@ -544,8 +544,8 @@ const GlotStore = (() => {
         return { ok: true };
     }
 
-    // Full snapshot for backup / restore. includeStorage adds storage/buckets/env; includeDefault keeps the default project.
-    // NEVER includes cr_recovery or the API token.
+    // Full snapshot for backup / restore. includeStorage adds storage/buckets; includeDefault keeps the default project.
+    // NEVER includes cr_recovery, cr_env (模拟环境 has its own import/export) or the API token.
     function buildFullExport(opts) {
         opts = opts || {};
         const out = { schema: SCHEMA, kind: 'cr-full', exportedAt: Date.now() };
@@ -555,18 +555,29 @@ const GlotStore = (() => {
             if (opts.includeDefault === false && GlotProjects.DEFAULT_ID) delete storage.projects[GlotProjects.DEFAULT_ID];
             out.storage = storage;
             out.buckets = _clone(_readBuckets());
-            out.env = _clone(_readEnv());
         }
         return out;
     }
-    // FULL REPLACE: projects + storage/buckets/env from parsed. cr_recovery untouched. Missing sections reset to fresh.
+    // FULL REPLACE: projects + storage/buckets from parsed. cr_recovery and cr_env untouched
+    // (legacy cr-full files may carry an env field — deliberately ignored). Missing sections reset to fresh.
     function fullReplace(parsed) {
         parsed = parsed || {};
         GlotProjects.replaceAllFull(parsed.projects);
         _writeStorage(_ensureStorage(parsed.storage || _freshStorage()));
         _writeBuckets(_ensureBuckets(parsed.buckets || _freshBuckets()));
-        _writeEnv(_ensureEnv(parsed.env || _freshEnv()));
         return { ok: true };
+    }
+
+    // 模拟环境 config has its own import/export, fully separate from project/storage files.
+    function exportEnvConfig() {
+        return { ok: true, json: JSON.stringify({ schema: SCHEMA, kind: 'cr-env', exportedAt: Date.now(), env: _clone(_readEnv()) }, null, 2) };
+    }
+    function importEnvConfig(parsed) {
+        if (!parsed || typeof parsed !== 'object' || parsed.kind !== 'cr-env' || !parsed.env || typeof parsed.env !== 'object') {
+            return { ok: false, error: '文件格式不正确（应为模拟环境配置导出文件）' };
+        }
+        const w = _writeEnv(_ensureEnv(parsed.env));
+        return w.ok ? { ok: true } : { ok: false, error: w.error };
     }
 
     /* ------------------------ init ------------------------ */
@@ -593,6 +604,7 @@ const GlotStore = (() => {
         // I/O contract
         buildStorageInput, applyStorageOutput,
         // import/export
-        exportProjectStorage, planStorageConflicts, applyStorageImport, buildFullExport, fullReplace
+        exportProjectStorage, planStorageConflicts, applyStorageImport, buildFullExport, fullReplace,
+        exportEnvConfig, importEnvConfig
     };
 })();
