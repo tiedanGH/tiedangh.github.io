@@ -118,7 +118,7 @@ const GlotStore = (() => {
     }
 
     /* ------------------------ cr_buckets ------------------------ */
-    function _freshBuckets() { return { version: SCHEMA, nextId: 1, buckets: {} }; }
+    function _freshBuckets() { return { version: SCHEMA, buckets: {} }; }
     function _normBackup(b) {
         if (!b || typeof b !== 'object') return null;
         return { name: String(b.name == null ? '' : b.name), time: Number(b.time) || 0, content: String(b.content == null ? '' : b.content) };
@@ -131,14 +131,13 @@ const GlotStore = (() => {
     function _ensureBuckets(s) {
         if (!s || typeof s !== 'object' || typeof s.buckets !== 'object' || !s.buckets) return _freshBuckets();
         s.version = SCHEMA;
-        let maxId = 0;
+        delete s.nextId;   // legacy allocator field; ids are now assigned by _firstFreeId scan
         Object.keys(s.buckets).forEach(k => {
             const id = Number(k);
             const b = s.buckets[k] && typeof s.buckets[k] === 'object' ? s.buckets[k] : {};
             if (b.deleted === true) {
                 // 空槽位 (mirrors bot's bucket[id].clear()): keep the id reserved, drop all data
                 s.buckets[k] = { id, deleted: true };
-                if (id > maxId) maxId = id;
                 return;
             }
             b.id = id;
@@ -149,9 +148,7 @@ const GlotStore = (() => {
             b.updatedAt = Number(b.updatedAt) || b.createdAt;
             b.backups = _normBackups(b.backups);
             s.buckets[k] = b;
-            if (id > maxId) maxId = id;
         });
-        s.nextId = Math.max(Number(s.nextId) || 1, maxId + 1);
         return s;
     }
     // A bucket entry that exists and is not an empty slot (空槽位)
@@ -216,18 +213,16 @@ const GlotStore = (() => {
             id = _firstFreeId(s);
         }
         s.buckets[String(id)] = { id, name, content: '', desc: String(desc || ''), createdAt: Date.now(), updatedAt: Date.now(), backups: _normBackups(null) };
-        if (id >= (Number(s.nextId) || 1)) s.nextId = id + 1;
         const w = _writeBuckets(s);
         return w.ok ? { ok: true, id } : { ok: false, error: w.error };
     }
-    // Create a bucket at a SPECIFIC id (import path). Name made unique; nextId advanced.
+    // Create a bucket at a SPECIFIC id (import path). Name made unique.
     function _createBucketWithId(s, id, name, content, desc) {
         id = Number(id);
         s.buckets[String(id)] = {
             id, name: _uniqueBucketName(s, name, id), content: String(content == null ? '' : content),
             desc: String(desc || ''), createdAt: Date.now(), updatedAt: Date.now(), backups: _normBackups(null)
         };
-        if (id >= (Number(s.nextId) || 1)) s.nextId = id + 1;
     }
     function renameBucket(id, name) {
         id = Number(id);

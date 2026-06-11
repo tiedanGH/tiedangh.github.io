@@ -372,13 +372,44 @@ const GlotOutput = (() => {
         appendMessageChainSection(container, title, parts);
     }
 
-    // Render a list of message nodes as "Stdout N" sections (shared by MultipleMessage & ForwardMessage)
-    function renderMessageNodes(container, list, debugLines) {
+    // 解析转义后的 JsonForwardMessage 字符串并渲染
+    function renderEscapedForwardMessage(container, content, debugLines, label) {
+        const raw = content !== undefined ? String(content) : '空消息';   // JsonMessage 的 content 默认值
+        let inner;
+        try {
+            inner = JSON.parse(raw.trim());
+        } catch (e) {
+            appendTextSection(container, 'error', label || '错误', '[错误] JSON解析错误：\n' + e.message + '\n\n原始content:\n' + raw);
+            return;
+        }
+        if (label) debugLines.push('[DEBUG] ' + label + '：嵌套ForwardMessage');
+        renderForwardMessage(container, inner, debugLines);
+    }
+
+    // Render a list of message nodes as "Stdout N" sections.
+    // context 区分两类节点的允许格式（与 bot 一致）：
+    //   'multiple' = MultipleMessage 的 SingleChainMessage 节点（允许嵌套 ForwardMessage，content 再解析）
+    //   'forward'  = ForwardMessage.messages 的 JsonMessage 节点（ForwardMessage/json 禁用）
+    function renderMessageNodes(container, list, debugLines, context) {
+        const nodeName = context === 'forward' ? 'JsonMessage' : 'SingleChainMessage';
         list.forEach((msg, index) => {
             const title = `Stdout ${index + 1}`;
             const format = msg.format || 'text';
             if (format === 'MessageChain') {
                 handleMessageChain(container, msg, title, debugLines, `第${index + 1}条：`);
+                return;
+            }
+            if (format === 'ForwardMessage') {
+                if (context === 'forward') {
+                    appendTextSection(container, 'error', title, '[错误] 不支持在JsonMessage内使用“ForwardMessage”输出格式');
+                } else {
+                    renderEscapedForwardMessage(container, msg.content, debugLines, title);
+                }
+                return;
+            }
+            if (format === 'json' || format === 'MultipleMessage') {
+                const where = (format === 'MultipleMessage' && context === 'forward') ? 'ForwardMessage' : nodeName;
+                appendTextSection(container, 'error', title, '[错误] 不支持在' + where + '内使用“' + format + '”输出格式');
                 return;
             }
             renderSingleJsonMessage(container, msg, title, debugLines);
@@ -393,7 +424,7 @@ const GlotOutput = (() => {
             appendTextSection(container, 'error', '错误', 'JSON解析失败：messageList 必须是数组');
             return;
         }
-        renderMessageNodes(container, json.messageList, debugLines);
+        renderMessageNodes(container, json.messageList, debugLines, 'multiple');
     }
 
     // --- ForwardMessage ---
@@ -412,7 +443,7 @@ const GlotOutput = (() => {
             appendTextSection(container, 'error', '错误', 'JSON解析失败：messages 必须是数组');
             return;
         }
-        renderMessageNodes(container, json.messages, debugLines);
+        renderMessageNodes(container, json.messages, debugLines, 'forward');
     }
 
     // 顶层 ForwardMessage 输出格式：解析 JsonForwardMessage 后渲染
@@ -540,7 +571,8 @@ const GlotOutput = (() => {
                 handleMultipleMessage(container, json, debugLines);
                 break;
             case 'ForwardMessage':
-                renderForwardMessage(container, json, debugLines);
+                // json 格式下 content 为转义后的 JsonForwardMessage 字符串（内部再次解析）
+                renderEscapedForwardMessage(container, json.content, debugLines);
                 break;
             default:
                 appendTextSection(container, 'error', '错误', '不支持的输出格式 ' + format);
