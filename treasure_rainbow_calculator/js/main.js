@@ -1,5 +1,5 @@
 // js/main.js — 交互逻辑：预设地图、控件、调用后台求解、展示结果
-import { createBoard } from './grid.js';
+import { createBoard } from './grid.js?v=20260625';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sizeInput     = document.getElementById('sizeInput');
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function runSync(payload) {
         // 无 Worker 时的回退：异步让出，先渲染「计算中」
-        const { solveExact } = await import('./calculator.js');
+        const { solveExact } = await import('./calculator.js?v=20260625');
         setTimeout(() => onResult(solveExact(payload)), 0);
     }
 
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let w = null;
         try {
-            w = new Worker(new URL('./solver.worker.js', import.meta.url), { type: 'module' });
+            w = new Worker(new URL('./solver.worker.js?v=20260625', import.meta.url), { type: 'module' });
         } catch (_) { w = null; }
 
         if (w) {

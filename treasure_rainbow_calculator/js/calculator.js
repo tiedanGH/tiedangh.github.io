@@ -61,11 +61,10 @@ function buildPool(type, idx, size) {
  * @param {number} input.totalT   宝藏总数
  * @param {number} input.totalB   炸弹总数
  * @param {string[]} input.cells  长度 size*size，每格内容：'★' '✹' 'R3' … 或 ''(未知)
- * @param {number} [input.timeBudgetMs] 计算时间上限，超时则中止并提示
- * @param {number} [input.nodeCap]      搜索节点数上限（安全阀）
+ * @param {number} [input.nodeCap]      搜索节点数上限（安全阀，无时间限制）
  * @returns {Object} { ok, pT, pB, isUnknown, stats }
  */
-export function solveExact({ size, totalT, totalB, cells, timeBudgetMs = 30_000, nodeCap = 10_000_000_000 }) {
+export function solveExact({ size, totalT, totalB, cells, nodeCap = 10_000_000_000 }) {
     const clock = (typeof performance !== 'undefined' ? performance : Date);
     const t0 = clock.now();
     const N = size * size;
@@ -165,9 +164,8 @@ export function solveExact({ size, totalT, totalB, cells, timeBudgetMs = 30_000,
 
     function dfs(pos, tc, bc) {
         if (truncated) return;
-        // 安全阀：节点数或墙钟时间超限即中止（局面过于复杂时）
+        // 安全阀：无时间限制，仅在搜索量超出节点上限时中止（极端复杂局面防止永久占用 CPU）
         if (++nodes > nodeCap) { truncated = true; return; }
-        if ((nodes & 0x3FFF) === 0 && clock.now() - t0 > timeBudgetMs) { truncated = true; return; }
 
         const restT = remT - tc, restB = remB - bc;
         if (restT < 0 || restB < 0) return;
@@ -245,7 +243,7 @@ export function solveExact({ size, totalT, totalB, cells, timeBudgetMs = 30_000,
     return {
         ok: W > 0 && !truncated,
         reason: truncated
-            ? `局面过于复杂，已超过 ${Math.round(timeBudgetMs / 1000)} 秒计算上限而中止`
+            ? '局面过于复杂，搜索量超出上限已中止'
             : (W === 0 ? '无满足所有线索的方案' : ''),
         pT, pB, isUnknown,
         stats: {

@@ -1,5 +1,5 @@
 // js/solver.worker.js — 在后台线程运行求解，避免阻塞 UI
-import { solveExact } from './calculator.js';
+import { solveExact } from './calculator.js?v=20260625';
 
 self.onmessage = (e) => {
     const result = solveExact(e.data);
