@@ -86,8 +86,8 @@ export function createBoard(container) {
                     const onTopBot = r === 0 || r === n + 1;
                     const onLeftRight = c === 0 || c === n + 1;
                     let label = '';
-                    if (onTopBot && !onLeftRight) label = String.fromCharCode(64 + c);
-                    else if (onLeftRight && !onTopBot) label = String(r);
+                    if (onTopBot && !onLeftRight) label = String(c);
+                    else if (onLeftRight && !onTopBot) label = String.fromCharCode(64 + r);
                     container.appendChild(makeCoord(label));
                     continue;
                 }

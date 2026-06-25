@@ -65,7 +65,7 @@ function buildPool(type, idx, size) {
  * @param {number} [input.nodeCap]      搜索节点数上限（安全阀）
  * @returns {Object} { ok, pT, pB, isUnknown, stats }
  */
-export function solveExact({ size, totalT, totalB, cells, timeBudgetMs = 8000, nodeCap = 30_000_000 }) {
+export function solveExact({ size, totalT, totalB, cells, timeBudgetMs = 30_000, nodeCap = 10_000_000_000 }) {
     const clock = (typeof performance !== 'undefined' ? performance : Date);
     const t0 = clock.now();
     const N = size * size;
@@ -244,7 +244,9 @@ export function solveExact({ size, totalT, totalB, cells, timeBudgetMs = 8000, n
     const timeMs = clock.now() - t0;
     return {
         ok: W > 0 && !truncated,
-        reason: truncated ? '局面过于复杂，已中止计算' : (W === 0 ? '无满足所有线索的方案' : ''),
+        reason: truncated
+            ? `局面过于复杂，已超过 ${Math.round(timeBudgetMs / 1000)} 秒计算上限而中止`
+            : (W === 0 ? '无满足所有线索的方案' : ''),
         pT, pB, isUnknown,
         stats: {
             timeMs, totalConfigs: W, remT, remB,
