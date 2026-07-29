@@ -2,10 +2,13 @@
 const gridOptions = [
     ['空地', 'empty.png'],
     ['树丛', 'grass.png'],
+    ['浆果丛', 'berry.png'],
     ['水洼', 'water.png'],
     ['传送门', 'portal.png'],
+    // ['单向', 'oneway_portal.png'],
     ['陷阱', 'trap.png'],
     ['热源', 'heat.png'],
+    ['心脏', 'heart.png'],
     ['逃生舱', 'exit.png'],
     ['未知', 'unknown.png'],
 ];
@@ -15,17 +18,19 @@ const attachOptions = [
     ['箱子', 'box.png'],
     ['小太阳', 'heat_box.png'],
     ['屏蔽器', 'jammer_box.png'],
+    ['金币', 'coin.png'],
     ['无', 'transparent.png'],
 ];
 const wallOptions = [
     ['空', 'walls/empty_row.png', 'walls/empty_col.png', '#FFFFFF'],
     ['普通', 'walls/wall_row.png', 'walls/wall_col.png', '#000000'],
+    ['树篱', 'walls/hedge_row.png', 'walls/hedge_col.png', '#4E9A06'],
     ['门', 'walls/door_row.png', 'walls/door_col.png', '#EA68A2'],
     ['门 (开)', 'walls/dooropen_row.png', 'walls/dooropen_col.png', '#F8CDE1'],
     ['未知', 'walls/unknown_row.png', 'walls/unknown_col.png', '#D9D9D9'],
 ];
 const pushableTypes = ['箱子', '小太阳', '屏蔽器'];
-const blockingWallTypes = ['普通', '门', '自定义'];
+const blockingWallTypes = ['普通', '树篱', '门', '自定义'];
 
 const num = ["⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨"];
 
