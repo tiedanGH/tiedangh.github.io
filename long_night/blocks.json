@@ -1682,7 +1682,7 @@
     },
     {
       "pos": {"y": 0, "x": 2}, "ground": {"type": "空地", "attach": "按钮"},
-      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": true}
+      "top": {"type": "普通", "wall": true}, "bottom": {"type": "门 (开)", "wall": true}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": false}
     },
     {
       "pos": {"y": 1, "x": 0}, "ground": {"type": "空地"},
@@ -1917,7 +1917,7 @@
       "top": {"type": "普通", "wall": false}, "bottom": {"type": "普通", "wall": false}, "left": {"type": "普通", "wall": false}, "right": {"type": "普通", "wall": true}
     },
     {
-      "pos": {"y": 1, "x": 1}, "ground": {"type": "巨大的心脏"},
+      "pos": {"y": 1, "x": 1}, "ground": {"type": "心脏"},
       "top": {"type": "普通", "wall": true}, "bottom": {"type": "普通", "wall": true}, "left": {"type": "普通", "wall": true}, "right": {"type": "普通", "wall": true}
     },
     {
