@@ -1,66 +1,166 @@
-// 通用颜色输入函数
+// ===== 颜色转换工具 =====
+function cpHsvToRgb(h, s, v) {
+    const c = v * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = v - c;
+    let r, g, b;
+    if (h < 60)       { r = c; g = x; b = 0; }
+    else if (h < 120) { r = x; g = c; b = 0; }
+    else if (h < 180) { r = 0; g = c; b = x; }
+    else if (h < 240) { r = 0; g = x; b = c; }
+    else if (h < 300) { r = x; g = 0; b = c; }
+    else              { r = c; g = 0; b = x; }
+    return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+}
+
+function cpRgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    let h = 0;
+    if (d !== 0) {
+        if (max === r) h = 60 * (((g - b) / d) % 6);
+        else if (max === g) h = 60 * ((b - r) / d + 2);
+        else h = 60 * ((r - g) / d + 4);
+    }
+    if (h < 0) h += 360;
+    return [h, max === 0 ? 0 : d / max, max];
+}
+
+function cpRgbToHex(rgb) {
+    return '#' + rgb.map(n => n.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+function cpHexToRgb(hex) {
+    const s = hex.replace(/^#/, '');
+    if (!/^[0-9A-F]{6}$/i.test(s)) return null;
+    const n = parseInt(s, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+const cpClamp = (n, min, max) => Math.min(max, Math.max(min, n));
+
+// 通用颜色输入函数：可拖动取色器（SV面板 + 色相条）
 function createCustomColorInput(title, onConfirm) {
+    let hue = 0, sat = 1, val = 1;
+    let currentColor = '#FF0000';
+
     const inputContainer = document.createElement('div');
-    inputContainer.className = 'color-input-container';
+    inputContainer.className = 'color-input-container color-picker';
+
     const titleEl = document.createElement('div');
+    titleEl.className = 'cp-title';
     titleEl.textContent = title;
-    titleEl.style.fontWeight = 'bold';
-    const previewBox = document.createElement('div');
-    previewBox.className = 'color-preview-box';
+
+    // 饱和度 / 明度 面板
+    const svPanel = document.createElement('div');
+    svPanel.className = 'cp-sv';
+    const svThumb = document.createElement('div');
+    svThumb.className = 'cp-thumb cp-sv-thumb';
+    svPanel.appendChild(svThumb);
+
+    // 色相条
+    const hueBar = document.createElement('div');
+    hueBar.className = 'cp-hue';
+    const hueThumb = document.createElement('div');
+    hueThumb.className = 'cp-thumb cp-hue-thumb';
+    hueBar.appendChild(hueThumb);
+
+    // 底部：当前颜色 + HEX + 确定
+    const footer = document.createElement('div');
+    footer.className = 'cp-footer';
+    const swatch = document.createElement('div');
+    swatch.className = 'cp-swatch';
+    const hexWrap = document.createElement('div');
+    hexWrap.className = 'cp-hex-wrap';
+    const hash = document.createElement('span');
+    hash.className = 'cp-hash';
+    hash.textContent = '#';
     const colorInput = document.createElement('input');
     colorInput.type = 'text';
-    colorInput.placeholder = '6位HEX颜色';
+    colorInput.className = 'cp-hex';
     colorInput.maxLength = 6;
-    const preview = document.createElement('div');
-    preview.className = 'color-preview invalid';
-    preview.style.backgroundImage = 'url(./img/custom.png)';
-    colorInput.value = '';
-    let isValidColor = false;
-    let currentColor = '';
+    colorInput.spellcheck = false;
+    hexWrap.appendChild(hash);
+    hexWrap.appendChild(colorInput);
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'text-confirm-btn';
+    confirmBtn.textContent = '确定';
+    footer.appendChild(swatch);
+    footer.appendChild(hexWrap);
+    footer.appendChild(confirmBtn);
 
+    // 同步界面；syncHex=false 时不回写输入框，避免打字时光标跳动
+    function render(syncHex = true) {
+        currentColor = cpRgbToHex(cpHsvToRgb(hue, sat, val));
+        svPanel.style.backgroundColor = cpRgbToHex(cpHsvToRgb(hue, 1, 1));
+        svThumb.style.left = (sat * 100) + '%';
+        svThumb.style.top = ((1 - val) * 100) + '%';
+        svThumb.style.backgroundColor = currentColor;
+        hueThumb.style.left = (hue / 360 * 100) + '%';
+        swatch.style.backgroundColor = currentColor;
+        if (syncHex) colorInput.value = currentColor.slice(1);
+    }
+
+    // 拖动：按下即取色，拖动过程实时更新（指针捕获，支持鼠标与触摸）
+    function makeDraggable(el, onMove) {
+        const apply = (e) => {
+            const rect = el.getBoundingClientRect();
+            onMove(
+                cpClamp((e.clientX - rect.left) / rect.width, 0, 1),
+                cpClamp((e.clientY - rect.top) / rect.height, 0, 1)
+            );
+            render();
+        };
+        el.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            apply(e);
+            // 监听 window，保证指针拖出控件范围后仍能继续取色
+            const move = (ev) => { ev.preventDefault(); apply(ev); };
+            const up = () => {
+                window.removeEventListener('pointermove', move);
+                window.removeEventListener('pointerup', up);
+                window.removeEventListener('pointercancel', up);
+            };
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', up);
+            window.addEventListener('pointercancel', up);
+        });
+    }
+
+    makeDraggable(svPanel, (x, y) => { sat = x; val = 1 - y; });
+    makeDraggable(hueBar, (x) => { hue = x * 360; });
+
+    // HEX 手动输入
     colorInput.addEventListener('input', () => {
-        let color = colorInput.value.trim().toUpperCase();
-        color = color.replace(/[^0-9A-F]/g, '');    // 过滤非HEX字符
-        colorInput.value = color;
-
-        if (/^[0-9A-F]{6}$/i.test(color)) {
-            preview.style.backgroundImage = 'none';
-            preview.style.backgroundColor = '#' + color;
-            preview.className = 'color-preview valid';
-            isValidColor = true;
-            currentColor = '#' + color;
-        } else {
-            preview.style.backgroundImage = 'url(./img/custom.png)';
-            preview.style.backgroundColor = 'transparent';
-            preview.className = 'color-preview invalid';
-            isValidColor = false;
-            currentColor = '';
-        }
+        const cleaned = colorInput.value.replace(/[^0-9A-Fa-f]/g, '').toUpperCase().slice(0, 6);
+        colorInput.value = cleaned;
+        const rgb = cpHexToRgb(cleaned);
+        if (!rgb) return;
+        const hsv = cpRgbToHsv(rgb[0], rgb[1], rgb[2]);
+        if (hsv[1] > 0) hue = hsv[0];   // 灰阶时保留当前色相，避免拖动点跳回红色
+        sat = hsv[1];
+        val = hsv[2];
+        render(false);
     });
 
-    // 点击预览确认
-    preview.onclick = () => {
-        if (isValidColor && currentColor) {
-            onConfirm(currentColor);
-            if (document.body.contains(inputContainer)) {
-                document.body.removeChild(inputContainer);
-            }
+    const confirm = () => {
+        onConfirm(currentColor);
+        if (document.body.contains(inputContainer)) {
+            document.body.removeChild(inputContainer);
         }
     };
-    // 按Enter键确认
+    confirmBtn.onclick = confirm;
     colorInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter' && isValidColor && currentColor) {
-            onConfirm(currentColor);
-            if (document.body.contains(inputContainer)) {
-                document.body.removeChild(inputContainer);
-            }
-        }
+        if (e.key === 'Enter') confirm();
     });
 
-    previewBox.appendChild(preview);
-    previewBox.appendChild(colorInput);
     inputContainer.appendChild(titleEl);
-    inputContainer.appendChild(previewBox);
+    inputContainer.appendChild(svPanel);
+    inputContainer.appendChild(hueBar);
+    inputContainer.appendChild(footer);
+
+    render();
 
     return {
         container: inputContainer,
