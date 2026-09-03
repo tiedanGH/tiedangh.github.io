@@ -1,4 +1,7 @@
 
+// 拖动判定阈值：位移超过该值视为拖动地图，不触发点选
+const EDIT_DRAG_THRESHOLD = 5;
+
 class EditModeManager {
     constructor(map) {
         this.map = map;
@@ -10,6 +13,10 @@ class EditModeManager {
         this.selectionStart = null;
         this.selectionEnd = null;
         this.selectedRange = null;
+
+        // 区分“拖动地图”与“点击选点”
+        this.pointerDownPos = null;
+        this.pointerMoved = false;
 
         this.payload = [];
         this.sourceAnchor = null;
@@ -72,6 +79,19 @@ class EditModeManager {
         return this.active;
     }
 
+    // 仅框选阶段独占指针；其余阶段放行地图拖动
+    blocksMapDrag() {
+        return this.active && (this.stage === 'selecting' || this.draggingSelection);
+    }
+
+    markPointerMoved(x, y) {
+        if (!this.pointerDownPos) return;
+        if (Math.abs(x - this.pointerDownPos.x) > EDIT_DRAG_THRESHOLD ||
+            Math.abs(y - this.pointerDownPos.y) > EDIT_DRAG_THRESHOLD) {
+            this.pointerMoved = true;
+        }
+    }
+
     // 进入编辑模式：清理弹窗，锁定历史记录，显示横幅
     enterMode() {
         this.clearOtherPopups();
@@ -105,6 +125,8 @@ class EditModeManager {
         this.previewDelta = null;
         this.selectionStart = null;
         this.selectionEnd = null;
+        this.pointerDownPos = null;
+        this.pointerMoved = false;
 
         if (window.historyManager?.setLocked) {
             window.historyManager.setLocked(false);
@@ -191,13 +213,7 @@ class EditModeManager {
         };
 
         this.stage = 'selection-ready';
-        this.showConfirmBar({
-            text: '已框选区域，先确认选区后再选择目标位置',
-            confirmText: '确认选区',
-            onConfirm: () => this.confirmSelection(),
-            cancelText: '重选',
-            onCancel: () => this.backToSelection()
-        });
+        this.showSelectionBar();
 
         originalEvent?.stopPropagation?.();
     }
@@ -205,14 +221,20 @@ class EditModeManager {
     // 鼠标事件处理
     onMouseDown(e) {
         if (!this.active || e.button !== 0) return;
+        this.pointerDownPos = { x: e.clientX, y: e.clientY };
+        this.pointerMoved = false;
         const cell = e.target.closest?.('.cell');
         this.startSelectionFromCell(cell, e);
     }
 
     onMouseMove(e) {
-        if (!this.active || !this.draggingSelection) return;
-        const cell = e.target.closest?.('.cell');
-        this.updateSelectionFromCell(cell);
+        if (!this.active) return;
+        if (this.draggingSelection) {
+            const cell = e.target.closest?.('.cell');
+            this.updateSelectionFromCell(cell);
+            return;
+        }
+        this.markPointerMoved(e.clientX, e.clientY);
     }
 
     onMouseUp(e) {
@@ -224,38 +246,49 @@ class EditModeManager {
         if (!this.active) return;
         if (!e.touches || e.touches.length === 0) return;
 
-        e.preventDefault();
-
         const touch = e.touches[0];
-        const cell = this.getCellFromPoint(touch.clientX, touch.clientY);
+        this.pointerDownPos = { x: touch.clientX, y: touch.clientY };
+        this.pointerMoved = false;
 
-        // 如果当前还在框选阶段，就开始框选
+        // 仅框选阶段独占触摸；其余阶段交给地图拖动，抬手时再判定是否点选
         if (this.stage === 'selecting') {
-            this.startSelectionFromCell(cell, e);
-            return;
-        }
-
-        // 如果已经在选目标阶段，触摸直接当成点目标
-        if (this.stage === 'choosing-target' || this.stage === 'preview-ready') {
-            this.selectTargetFromCell(cell, e);
+            e.preventDefault();
+            this.startSelectionFromCell(this.getCellFromPoint(touch.clientX, touch.clientY), e);
         }
     }
 
     onTouchMove(e) {
         if (!this.active) return;
         if (!e.touches || e.touches.length === 0) return;
-        if (!this.draggingSelection) return;
-
-        e.preventDefault();
 
         const touch = e.touches[0];
-        const cell = this.getCellFromPoint(touch.clientX, touch.clientY);
-        this.updateSelectionFromCell(cell);
+
+        if (this.draggingSelection) {
+            e.preventDefault();
+            this.updateSelectionFromCell(this.getCellFromPoint(touch.clientX, touch.clientY));
+            return;
+        }
+
+        this.markPointerMoved(touch.clientX, touch.clientY);
     }
 
     onTouchEnd(e) {
         if (!this.active) return;
-        this.finishSelection(e);
+
+        if (this.draggingSelection) {
+            this.finishSelection(e);
+            return;
+        }
+
+        // 拖动过地图就不当作选点
+        const touch = e.changedTouches?.[0];
+        if (touch && !this.pointerMoved &&
+            (this.stage === 'choosing-target' || this.stage === 'preview-ready')) {
+            this.selectTargetFromCell(this.getCellFromPoint(touch.clientX, touch.clientY), e);
+        }
+
+        this.pointerDownPos = null;
+        this.pointerMoved = false;
     }
 
     selectTargetFromCell(cell, originalEvent = null) {
@@ -281,11 +314,12 @@ class EditModeManager {
         this.stage = 'preview-ready';
 
         this.showConfirmBar({
-            text: '已生成目标预览，确认后执行移动',
-            confirmText: '确认并移动',
-            onConfirm: () => this.confirmMove(),
-            cancelText: '重选目标',
-            onCancel: () => this.cancelTargetPreview()
+            text: '已生成目标预览，可拖动地图',
+            buttons: [
+                { label: '确认并移动', className: 'confirm-btn', onClick: () => this.confirmMove() },
+                { label: '确认并复制', className: 'copy-btn', onClick: () => this.confirmCopy() },
+                { label: '重选目标', className: 'cancel-btn', onClick: () => this.cancelTargetPreview() }
+            ]
         });
     }
 
@@ -293,10 +327,11 @@ class EditModeManager {
     confirmSelection() {
         if (this.stage !== 'selection-ready' || this.payload.length === 0) return;
         this.stage = 'choosing-target';
-        this.hideConfirmBar();
+        this.showTargetBar();
     }
 
     onClickTarget(e) {
+        if (this.pointerMoved) return;
         const cell = e.target.closest?.('.cell');
         this.selectTargetFromCell(cell, e);
     }
@@ -356,7 +391,7 @@ class EditModeManager {
         this.previewDelta = null;
         this.previewAnchor = null;
         this.stage = 'choosing-target';
-        this.hideConfirmBar();
+        this.showTargetBar();
     }
 
     backToSelection() {
@@ -492,18 +527,43 @@ class EditModeManager {
     }
 
     // 确认栏
-    showConfirmBar({ text, confirmText, onConfirm, cancelText, onCancel }) {
-        const textEl = this.confirmBar.querySelector('.move-confirm-text');
-        const confirmBtn = this.confirmBar.querySelector('.confirm-btn');
-        const cancelBtn = this.confirmBar.querySelector('.cancel-btn');
+    showConfirmBar({ text, buttons }) {
+        this.confirmBar.querySelector('.move-confirm-text').textContent = text;
 
-        textEl.textContent = text;
-        confirmBtn.textContent = confirmText;
-        cancelBtn.textContent = cancelText;
-        confirmBtn.onclick = onConfirm;
-        cancelBtn.onclick = onCancel;
+        const actions = this.confirmBar.querySelector('.move-confirm-actions');
+        actions.innerHTML = '';
+        buttons.forEach(({ label, className, onClick }) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = className;
+            btn.textContent = label;
+            btn.onclick = onClick;
+            actions.appendChild(btn);
+        });
 
         this.confirmBar.classList.add('show');
+    }
+
+    // 已框选：确认选区 / 删除区域 / 重选
+    showSelectionBar() {
+        this.showConfirmBar({
+            text: '已框选区域，可拖动地图',
+            buttons: [
+                { label: '确认选区', className: 'confirm-btn', onClick: () => this.confirmSelection() },
+                { label: '删除区域', className: 'delete-btn', onClick: () => this.deleteSelection() },
+                { label: '重选', className: 'cancel-btn', onClick: () => this.backToSelection() }
+            ]
+        });
+    }
+
+    // 选目标阶段：可拖动地图，点击落点
+    showTargetBar() {
+        this.showConfirmBar({
+            text: '可拖动地图，点击目标位置',
+            buttons: [
+                { label: '重选', className: 'cancel-btn', onClick: () => this.backToSelection() }
+            ]
+        });
     }
 
     hideConfirmBar() {
@@ -515,8 +575,7 @@ class EditModeManager {
         bar.className = 'move-confirm-bar';
         bar.innerHTML = `
             <span class="move-confirm-text">已生成预览</span>
-            <button class="confirm-btn" type="button">确认</button>
-            <button class="cancel-btn" type="button">取消</button>
+            <div class="move-confirm-actions"></div>
         `;
 
         document.body.appendChild(bar);
@@ -602,19 +661,55 @@ class EditModeManager {
         }
     }
 
-    // 确认移动：将预览状态应用到地图，并保存历史记录
-    confirmMove() {
+    // 删除选区：范围内全部内容（含空白格）重置为未知，然后退出编辑模式
+    deleteSelection() {
+        if (this.stage !== 'selection-ready' || !this.selectedRange) return;
+
+        const { size, wall } = getCellMetrics();
+        const { minI, maxI, minJ, maxJ } = this.selectedRange;
+
+        for (let i = minI; i <= maxI; i++) {
+            for (let j = minJ; j <= maxJ; j++) {
+                this.map.ensureCell(i, j, size, wall);
+                const cell = this.map.cells.get(`${i},${j}`);
+                if (!cell || cell.classList.contains('center')) continue;
+
+                if (cell.dataset.type === 'square') this.resetSquareCell(cell);
+                else if (cell.dataset.type === 'wall') this.resetWallCell(cell);
+            }
+        }
+
+        if (window.historyManager) {
+            window.historyManager.saveState();
+        }
+
+        this.exitMode();
+    }
+
+    // 复制时去掉全图唯一的标记（玩家/米诺陶斯/邦邦），避免出现重复
+    stripUniqueMarkers(item) {
+        if (item.type !== 'square' || !item.markers?.length) return item;
+
+        const uniqueTypes = new Set(Object.values(MARKER_TYPE));
+        const markers = item.markers.filter(m => !MARKER_TYPE[m.text] && !uniqueTypes.has(m.markerType));
+        return { ...item, markers };
+    }
+
+    // 将选区写入目标位置：clearSource 为 true 是移动，false 是复制
+    applyPayloadToTarget(clearSource) {
         if (this.stage !== 'preview-ready') return;
         if (!this.previewDelta || this.payload.length === 0) return;
 
         const { size, wall } = getCellMetrics();
 
-        this.payload.forEach(item => {
-            const sourceCell = this.map.cells.get(item.key);
-            if (!sourceCell) return;
-            if (item.type === 'square') this.resetSquareCell(sourceCell);
-            else this.resetWallCell(sourceCell);
-        });
+        if (clearSource) {
+            this.payload.forEach(item => {
+                const sourceCell = this.map.cells.get(item.key);
+                if (!sourceCell) return;
+                if (item.type === 'square') this.resetSquareCell(sourceCell);
+                else this.resetWallCell(sourceCell);
+            });
+        }
 
         this.payload.forEach(item => {
             const ti = item.i + this.previewDelta.i;
@@ -623,10 +718,12 @@ class EditModeManager {
             const targetCell = this.map.cells.get(`${ti},${tj}`);
             if (!targetCell) return;
 
+            const state = clearSource ? item : this.stripUniqueMarkers(item);
+
             if (item.type === 'square' && targetCell.dataset.type === 'square') {
-                this.applySquareState(targetCell, item);
+                this.applySquareState(targetCell, state);
             } else if (item.type === 'wall' && targetCell.dataset.type === 'wall') {
-                this.applyWallState(targetCell, item);
+                this.applyWallState(targetCell, state);
             }
         });
 
@@ -635,5 +732,15 @@ class EditModeManager {
         }
 
         this.exitMode();
+    }
+
+    // 确认移动：清空原位置后写入目标位置
+    confirmMove() {
+        this.applyPayloadToTarget(true);
+    }
+
+    // 确认复制：保留原位置内容
+    confirmCopy() {
+        this.applyPayloadToTarget(false);
     }
 }

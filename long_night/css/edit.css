@@ -42,6 +42,13 @@
     display: flex;
 }
 
+.move-confirm-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .move-confirm-bar button {
     border: none;
     border-radius: 6px;
@@ -56,6 +63,25 @@
 
 .move-confirm-bar .cancel-btn {
     background: #ea4335;
+}
+
+/* 删除区域 */
+.move-confirm-bar .delete-btn {
+    background: #e8710a;
+    font-weight: 700;
+}
+
+.move-confirm-bar .delete-btn:hover {
+    background: #cc5f00;
+}
+
+/* 确认并复制 */
+.move-confirm-bar .copy-btn {
+    background: #6f42c1;
+}
+
+.move-confirm-bar .copy-btn:hover {
+    background: #5a34a3;
 }
 
 .edit-mode-banner {
@@ -96,6 +122,15 @@
         padding: 5px 8px;
         font-size: 12px;
         flex-shrink: 0;
+    }
+
+    .move-confirm-actions {
+        gap: 3px;
+    }
+
+    .move-confirm-text {
+        flex: 1;
+        min-width: 0;
     }
 
     .edit-mode-banner {

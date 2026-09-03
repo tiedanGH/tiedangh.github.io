@@ -18,7 +18,7 @@ class InfiniteMap {
         let start = { x: 0, y: 0 };
 
         this.container.addEventListener('mousedown', e => {
-            if (window.editModeManager?.isActive()) return;
+            if (window.editModeManager?.blocksMapDrag?.()) return;
             if (e.button === 0) {
                 isDragging = true;
                 start = { x: e.clientX, y: e.clientY };
@@ -44,7 +44,7 @@ class InfiniteMap {
 
         // 移动端支持
         this.container.addEventListener('touchstart', e => {
-            if (window.editModeManager?.isActive()) return;
+            if (window.editModeManager?.blocksMapDrag?.()) return;
             isDragging = true;
             const touch = e.touches[0];
             start = { x: touch.clientX, y: touch.clientY };
