@@ -289,6 +289,69 @@
     box-sizing: border-box;
 }
 
+/* 墙壁菜单标题行 + 快速放置入口 */
+.wall-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.selector button.wall-quick-btn {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 1;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* 快速放置二级菜单 */
+.wall-quick-panel {
+    padding: 0 8px 8px 8px;
+}
+.quick-group-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin: 6px 0 4px;
+}
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+.quick-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    user-select: none;
+}
+.quick-item:hover {
+    background-color: #eee;
+}
+.quick-icon {
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+    border: 3px solid #e3e3e3;
+    background: #fff;
+}
+
+/* 快速放置时高亮当前格子 */
+.quick-target-highlight {
+    outline: 3px solid #ff8c00;
+    outline-offset: -3px;
+    z-index: 8;
+}
+
 /* 响应式设计 */
 @media (max-width: 600px) {
     .selector {
@@ -360,5 +423,13 @@
     .wall-box {
         width: 22px;
         height: 5px;
+    }
+
+    .quick-icon {
+        width: 20px;
+        height: 20px;
+    }
+    .quick-item {
+        font-size: 11px;
     }
 }

@@ -428,6 +428,151 @@ function showSquareAttachSelector(e, cell) {
     }, 0);
 }
 
+/* ========== 墙壁快速放置 ========== */
+const WALL_QUICK_PATTERNS = [
+    { group: '2墙', label: '左上', sides: ['left', 'top'] },
+    { group: '2墙', label: '右上', sides: ['right', 'top'] },
+    { group: '2墙', label: '左下', sides: ['left', 'bottom'] },
+    { group: '2墙', label: '右下', sides: ['right', 'bottom'] },
+    { group: '2墙', label: '上下', sides: ['top', 'bottom'] },
+    { group: '2墙', label: '左右', sides: ['left', 'right'] },
+    { group: '3墙', label: '缺上', sides: ['left', 'right', 'bottom'] },
+    { group: '3墙', label: '缺下', sides: ['left', 'right', 'top'] },
+    { group: '3墙', label: '缺左', sides: ['top', 'bottom', 'right'] },
+    { group: '3墙', label: '缺右', sides: ['top', 'bottom', 'left'] },
+];
+
+// 方块四周墙壁相对方块的坐标偏移
+const WALL_SIDE_OFFSET = {
+    top:    [0, -1],
+    bottom: [0, 1],
+    left:   [-1, 0],
+    right:  [1, 0],
+};
+
+function clearQuickTargetHighlight() {
+    document.querySelectorAll('.quick-target-highlight').forEach(cell => {
+        cell.classList.remove('quick-target-highlight');
+    });
+}
+
+// 目标格子：竖墙取右侧，横墙取下方
+function getQuickTargetSquare(wallCell) {
+    const i = parseInt(wallCell.dataset.i, 10);
+    const j = parseInt(wallCell.dataset.j, 10);
+    const isVertical = i % 2 === 1;
+    const ti = isVertical ? i + 1 : i;
+    const tj = isVertical ? j : j + 1;
+
+    const { size, wall } = getCellMetrics();
+    currentMap.ensureCell(ti, tj, size, wall);
+    const cell = currentMap.cells.get(`${ti},${tj}`);
+    return cell?.dataset.type === 'square' ? { cell, i: ti, j: tj } : null;
+}
+
+function isUnknownTerrain(cell) {
+    const bgColor = cell.style.backgroundColor;
+    if (bgColor && bgColor !== 'transparent') return false;   // 自定义地形颜色
+    const bgImage = cell.style.backgroundImage;
+    return !bgImage || bgImage === 'none' || bgImage.includes('unknown.png');
+}
+
+// 按图案设置目标格子四周墙壁：按墙壁优先级保留更高者
+function applyWallPattern(target, sides) {
+    // 未知地形先变为空地
+    if (isUnknownTerrain(target.cell)) {
+        target.cell.style.backgroundColor = '';
+        target.cell.style.backgroundImage = `url('./img/empty.png')`;
+        refreshMarkerColors(target.cell);
+    }
+
+    const { size, wall } = getCellMetrics();
+
+    Object.entries(WALL_SIDE_OFFSET).forEach(([side, [di, dj]]) => {
+        const wi = target.i + di;
+        const wj = target.j + dj;
+        currentMap.ensureCell(wi, wj, size, wall);
+        const wallCell = currentMap.cells.get(`${wi},${wj}`);
+        if (!wallCell || wallCell.dataset.type !== 'wall') return;
+
+        const desired = sides.includes(side) ? '普通' : '空';
+        // 仅当新墙壁优先级更高时才覆盖
+        if (compareWallPriority(getCurrentWallType(wallCell), desired) !== desired) return;
+
+        const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+        wallCell.style.backgroundColor = '';
+        wallCell.style.backgroundImage = `url('${getWallImage(desired, orientation)}')`;
+    });
+}
+
+function createQuickPatternIcon(sides) {
+    const icon = document.createElement('div');
+    icon.className = 'quick-icon';
+    ['top', 'right', 'bottom', 'left'].forEach(side => {
+        const prop = `border${side[0].toUpperCase()}${side.slice(1)}Color`;
+        icon.style[prop] = sides.includes(side) ? '#000' : '#e3e3e3';
+    });
+    return icon;
+}
+
+// 二级菜单：快速放置 2墙 / 3墙
+function showWallQuickMenu(e, wallCell) {
+    document.querySelectorAll('.wall-quick-panel').forEach(el => el.remove());
+    clearQuickTargetHighlight();
+
+    const target = getQuickTargetSquare(wallCell);
+    if (!target) return;
+
+    // 高亮当前作用的格子，关闭或选择后取消
+    target.cell.classList.add('quick-target-highlight');
+
+    const panel = document.createElement('div');
+    panel.className = 'selector wall-quick-panel';
+    panel.style.left = e.clientX + 'px';
+    panel.style.top = e.clientY + 'px';
+
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = '快速放置';
+    panel.appendChild(title);
+
+    ['2墙', '3墙'].forEach(group => {
+        const groupTitle = document.createElement('div');
+        groupTitle.className = 'quick-group-title';
+        groupTitle.textContent = group;
+        panel.appendChild(groupTitle);
+
+        const grid = document.createElement('div');
+        grid.className = 'quick-grid';
+
+        WALL_QUICK_PATTERNS.filter(p => p.group === group).forEach(pattern => {
+            const item = document.createElement('div');
+            item.className = 'quick-item';
+
+            const label = document.createElement('span');
+            label.textContent = pattern.label;
+
+            item.appendChild(createQuickPatternIcon(pattern.sides));
+            item.appendChild(label);
+            item.onclick = () => {
+                applyWallPattern(target, pattern.sides);
+                saveHistory();
+                removeSelector();
+            };
+
+            grid.appendChild(item);
+        });
+
+        panel.appendChild(grid);
+    });
+
+    document.body.appendChild(panel);
+
+    setTimeout(() => {
+        adjustElementPosition(panel, e);
+    }, 0);
+}
+
 // 墙壁选择器
 function showWallSelector(e, cell, orientation) {
     const sel = document.createElement('div');
@@ -436,8 +581,23 @@ function showWallSelector(e, cell, orientation) {
     sel.style.top = e.clientY + 'px';
 
     const title = document.createElement('div');
-    title.textContent = '墙壁类型';
-    title.className = 'option-title';
+    title.className = 'option-title wall-title-row';
+
+    const titleText = document.createElement('span');
+    titleText.textContent = '墙壁';
+
+    const quickBtn = document.createElement('button');
+    quickBtn.type = 'button';
+    quickBtn.className = 'wall-quick-btn';
+    quickBtn.textContent = '+';
+    quickBtn.title = '快速放置 2墙 / 3墙';
+    quickBtn.onclick = ev => {
+        ev.stopPropagation();
+        showWallQuickMenu(ev, cell);
+    };
+
+    title.appendChild(titleText);
+    title.appendChild(quickBtn);
 
     const ul = document.createElement('ul');
     ul.className = 'option-list';
@@ -544,6 +704,6 @@ function showPlayerSelector(e, onSelect) {
 }
 
 function removeSelector() {
-    const ex = document.querySelector('.selector');
-    if (ex) ex.remove();
+    document.querySelectorAll('.selector').forEach(el => el.remove());
+    clearQuickTargetHighlight();
 }
