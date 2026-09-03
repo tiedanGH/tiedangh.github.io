@@ -75,7 +75,7 @@ function uiCellEvents(map) {
                 if (choice === '🧍') {
                     window.playerCell = cell;
                 }
-            });
+            }, cell);
         }
         lastClickTime = now;
     });
@@ -100,7 +100,7 @@ function uiCellEvents(map) {
             if (choice === '🧍') {
                 window.playerCell = cell;
             }
-        });
+        }, cell);
     });
 
     // 左键：设置方块 / 墙

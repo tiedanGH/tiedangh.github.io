@@ -352,6 +352,26 @@
     z-index: 8;
 }
 
+/* 赛况快捷路径 */
+.selector button.path-btn {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    margin-top: 6px;
+    padding: 4px 2px;
+    background: #d9ecff;
+    border-color: #4a90d9;
+    font-weight: bold;
+}
+.selector button.path-btn:hover {
+    background: #bfdcff;
+}
+.color-input-container input.path-input {
+    width: 260px;
+    max-width: 70vw;
+    font-family: inherit;
+}
+
 /* 响应式设计 */
 @media (max-width: 600px) {
     .selector {

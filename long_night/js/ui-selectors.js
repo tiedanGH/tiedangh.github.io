@@ -170,7 +170,7 @@ function createCustomColorInput(title, onConfirm) {
 }
 
 // 通用自定义文本输入函数
-function createCustomTextInput(title, initialValue, onConfirm) {
+function createCustomTextInput(title, initialValue, onConfirm, options = {}) {
     const inputContainer = document.createElement('div');
     inputContainer.className = 'color-input-container';
 
@@ -184,8 +184,9 @@ function createCustomTextInput(title, initialValue, onConfirm) {
     const textInput = document.createElement('input');
     textInput.type = 'text';
     textInput.className = 'text-attach-input';
-    textInput.placeholder = '输入文本';
-    textInput.maxLength = 12;
+    textInput.placeholder = options.placeholder || '输入文本';
+    textInput.maxLength = options.maxLength || 12;
+    if (options.wide) textInput.classList.add('path-input');
     textInput.value = initialValue || '';
 
     const confirmBtn = document.createElement('button');
@@ -486,23 +487,22 @@ function applyWallPattern(target, sides) {
         refreshMarkerColors(target.cell);
     }
 
-    const { size, wall } = getCellMetrics();
-
     Object.entries(WALL_SIDE_OFFSET).forEach(([side, [di, dj]]) => {
-        const wi = target.i + di;
-        const wj = target.j + dj;
-        currentMap.ensureCell(wi, wj, size, wall);
-        const wallCell = currentMap.cells.get(`${wi},${wj}`);
-        if (!wallCell || wallCell.dataset.type !== 'wall') return;
-
-        const desired = sides.includes(side) ? '普通' : '空';
-        // 仅当新墙壁优先级更高时才覆盖
-        if (compareWallPriority(getCurrentWallType(wallCell), desired) !== desired) return;
-
-        const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
-        wallCell.style.backgroundColor = '';
-        wallCell.style.backgroundImage = `url('${getWallImage(desired, orientation)}')`;
+        setWallByPriority(target.i + di, target.j + dj, sides.includes(side) ? '普通' : '空');
     });
+}
+
+// 写入墙壁：仅当新墙壁优先级更高时才覆盖
+function setWallByPriority(wi, wj, type) {
+    const { size, wall } = getCellMetrics();
+    currentMap.ensureCell(wi, wj, size, wall);
+    const wallCell = currentMap.cells.get(`${wi},${wj}`);
+    if (!wallCell || wallCell.dataset.type !== 'wall') return;
+    if (compareWallPriority(getCurrentWallType(wallCell), type) !== type) return;
+
+    const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+    wallCell.style.backgroundColor = '';
+    wallCell.style.backgroundImage = `url('${getWallImage(type, orientation)}')`;
 }
 
 function createQuickPatternIcon(sides) {
@@ -637,8 +637,138 @@ function showWallSelector(e, cell, orientation) {
     }, 0);
 }
 
+/* ========== 快捷路径：按主游戏赛况文本绘制已知信息 ========== */
+const PATH_DIR_DELTA = {
+    '↑': [0, -2],
+    '↓': [0, 2],
+    '←': [-2, 0],
+    '→': [2, 0],
+};
+
+// 解析括号片段：区分移动、撞墙与终点标记
+function interpretPathToken(inner) {
+    const lead = PATH_DIR_DELTA[inner[0]] ? inner[0] : null;
+
+    if (inner.includes('撞')) return lead ? [{ type: 'hit', dir: lead }] : [];
+    if (inner.includes('逃生')) return [{ type: 'mark', terrain: '逃生舱' }];
+    if (inner.includes('陷阱')) return [{ type: 'mark', terrain: '陷阱' }];
+    if (inner.includes('热源')) return [{ type: 'mark', terrain: '热源' }];
+
+    // [热浪] [传送] (停止) (捕捉) 等不含方向的片段直接忽略
+    if (!lead) return [];
+
+    let terrain = null;
+    if (inner.includes('浆果丛')) terrain = '浆果丛';
+    else if (inner.includes('沙沙')) terrain = '树丛';
+    else if (inner.includes('啪嗒') || inner.includes('啪啪')) terrain = '水洼';
+    return [{ type: 'move', dir: lead, terrain }];
+}
+
+// 从赛况文本中提取全部方向与已知信息
+function parsePathRecord(text) {
+    const ops = [];
+    let i = 0;
+
+    while (i < text.length) {
+        const ch = text[i];
+
+        // 方向箭头，支持合并写法 ↑*5
+        if (PATH_DIR_DELTA[ch]) {
+            const merged = /^\*(\d+)/.exec(text.slice(i + 1));
+            const count = merged ? parseInt(merged[1], 10) : 1;
+            for (let k = 0; k < count; k++) ops.push({ type: 'move', dir: ch, terrain: null });
+            i += 1 + (merged ? merged[0].length : 0);
+            continue;
+        }
+
+        // 括号片段，[] 可能嵌套（如 [↑掩盖[沙沙]]）
+        if (ch === '[' || ch === '(') {
+            const close = ch === '[' ? ']' : ')';
+            let depth = 0;
+            let j = i;
+            for (; j < text.length; j++) {
+                if (text[j] === ch) depth++;
+                else if (text[j] === close && --depth === 0) break;
+            }
+            if (j >= text.length) { i++; continue; }   // 括号未闭合
+            ops.push(...interpretPathToken(text.slice(i + 1, j)));
+            i = j + 1;
+            continue;
+        }
+
+        i++;    // 回合标题等其余内容跳过
+    }
+
+    return ops;
+}
+
+function setPathTerrain(i, j, name, onlyIfUnknown) {
+    const { size, wall } = getCellMetrics();
+    currentMap.ensureCell(i, j, size, wall);
+    const cell = currentMap.cells.get(`${i},${j}`);
+    if (!cell || cell.dataset.type !== 'square') return;
+    if (onlyIfUnknown && !isUnknownTerrain(cell)) return;
+
+    const file = gridOptions.find(([n]) => n === name)?.[1];
+    if (!file) return;
+    cell.style.backgroundColor = '';
+    cell.style.backgroundImage = `url('./img/${file}')`;
+    refreshMarkerColors(cell);
+}
+
+// 以选中格为起点绘制整条路径
+function applyPathRecord(startCell, ops) {
+    let i = parseInt(startCell.dataset.i, 10);
+    let j = parseInt(startCell.dataset.j, 10);
+
+    setPathTerrain(i, j, '空地', true);
+
+    ops.forEach(op => {
+        const delta = PATH_DIR_DELTA[op.dir];
+
+        if (op.type === 'hit') {
+            // 撞墙：原地不动，在该方向补一堵普通墙
+            setWallByPriority(i + delta[0] / 2, j + delta[1] / 2, '普通');
+            return;
+        }
+        if (op.type === 'mark') {
+            setPathTerrain(i, j, op.terrain, false);
+            return;
+        }
+
+        setWallByPriority(i + delta[0] / 2, j + delta[1] / 2, '空');
+        i += delta[0];
+        j += delta[1];
+        setPathTerrain(i, j, op.terrain || '空地', !op.terrain);
+    });
+}
+
+// 玩家菜单中的“赛况快捷路径”入口
+function showPathInput(e, cell) {
+    const input = createCustomTextInput('赛况快捷路径', '', text => {
+        const ops = parsePathRecord(text);
+        if (ops.length) {
+            applyPathRecord(cell, ops);
+            saveHistory();
+        }
+        removeSelector();
+    }, { maxLength: 4000, wide: true, placeholder: '粘贴赛况，例：→→↓↑[↑沙沙]↑(逃生)' });
+
+    positionSelector(input.container, e.target, window.innerWidth <= 600);
+    document.body.appendChild(input.container);
+    input.focus();
+
+    const handleOutsideClick = ev => {
+        if (!input.container.contains(ev.target)) {
+            input.container.remove();
+            document.removeEventListener('mousedown', handleOutsideClick);
+        }
+    };
+    setTimeout(() => document.addEventListener('mousedown', handleOutsideClick), 0);
+}
+
 // 玩家标记选择器
-function showPlayerSelector(e, onSelect) {
+function showPlayerSelector(e, onSelect, cell) {
     const panel = document.createElement('div');
     panel.className = 'selector';
     panel.style.left = `${e.clientX}px`;
@@ -695,7 +825,20 @@ function showPlayerSelector(e, onSelect) {
     panel.appendChild(title);
     panel.appendChild(special);
     panel.appendChild(numbers);
+
     panel.appendChild(clearBtn);
+
+    // 赛况快捷路径：按主游戏赛况文本绘制路径
+    if (cell) {
+        const pathBtn = document.createElement('button');
+        pathBtn.textContent = '赛况快捷路径';
+        pathBtn.className = 'path-btn';
+        pathBtn.onclick = ev => {
+            ev.stopPropagation();
+            showPathInput(ev, cell);
+        };
+        panel.appendChild(pathBtn);
+    }
     document.body.appendChild(panel);
 
     setTimeout(() => {
