@@ -431,6 +431,10 @@ function showSquareAttachSelector(e, cell) {
 
 /* ========== 墙壁快速放置 ========== */
 const WALL_QUICK_PATTERNS = [
+    { label: '单上', sides: ['top'] },
+    { label: '单下', sides: ['bottom'] },
+    { label: '单左', sides: ['left'] },
+    { label: '单右', sides: ['right'] },
     { label: '左上', sides: ['left', 'top'] },
     { label: '右上', sides: ['right', 'top'] },
     { label: '左下', sides: ['left', 'bottom'] },
