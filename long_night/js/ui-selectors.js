@@ -431,16 +431,18 @@ function showSquareAttachSelector(e, cell) {
 
 /* ========== 墙壁快速放置 ========== */
 const WALL_QUICK_PATTERNS = [
-    { group: '2墙', label: '左上', sides: ['left', 'top'] },
-    { group: '2墙', label: '右上', sides: ['right', 'top'] },
-    { group: '2墙', label: '左下', sides: ['left', 'bottom'] },
-    { group: '2墙', label: '右下', sides: ['right', 'bottom'] },
-    { group: '2墙', label: '上下', sides: ['top', 'bottom'] },
-    { group: '2墙', label: '左右', sides: ['left', 'right'] },
-    { group: '3墙', label: '缺上', sides: ['left', 'right', 'bottom'] },
-    { group: '3墙', label: '缺下', sides: ['left', 'right', 'top'] },
-    { group: '3墙', label: '缺左', sides: ['top', 'bottom', 'right'] },
-    { group: '3墙', label: '缺右', sides: ['top', 'bottom', 'left'] },
+    { label: '左上', sides: ['left', 'top'] },
+    { label: '右上', sides: ['right', 'top'] },
+    { label: '左下', sides: ['left', 'bottom'] },
+    { label: '右下', sides: ['right', 'bottom'] },
+    { label: '上下', sides: ['top', 'bottom'] },
+    { label: '左右', sides: ['left', 'right'] },
+    { label: '四空', sides: [] },
+    { label: '四墙', sides: ['top', 'bottom', 'left', 'right'] },
+    { label: '缺上', sides: ['left', 'right', 'bottom'] },
+    { label: '缺下', sides: ['left', 'right', 'top'] },
+    { label: '缺左', sides: ['top', 'bottom', 'right'] },
+    { label: '缺右', sides: ['top', 'bottom', 'left'] },
 ];
 
 // 方块四周墙壁相对方块的坐标偏移
@@ -536,35 +538,28 @@ function showWallQuickMenu(e, wallCell) {
     title.textContent = '快速放置';
     panel.appendChild(title);
 
-    ['2墙', '3墙'].forEach(group => {
-        const groupTitle = document.createElement('div');
-        groupTitle.className = 'quick-group-title';
-        groupTitle.textContent = group;
-        panel.appendChild(groupTitle);
+    const grid = document.createElement('div');
+    grid.className = 'quick-grid';
 
-        const grid = document.createElement('div');
-        grid.className = 'quick-grid';
+    WALL_QUICK_PATTERNS.forEach(pattern => {
+        const item = document.createElement('div');
+        item.className = 'quick-item';
 
-        WALL_QUICK_PATTERNS.filter(p => p.group === group).forEach(pattern => {
-            const item = document.createElement('div');
-            item.className = 'quick-item';
+        const label = document.createElement('span');
+        label.textContent = pattern.label;
 
-            const label = document.createElement('span');
-            label.textContent = pattern.label;
+        item.appendChild(createQuickPatternIcon(pattern.sides));
+        item.appendChild(label);
+        item.onclick = () => {
+            applyWallPattern(target, pattern.sides);
+            saveHistory();
+            removeSelector();
+        };
 
-            item.appendChild(createQuickPatternIcon(pattern.sides));
-            item.appendChild(label);
-            item.onclick = () => {
-                applyWallPattern(target, pattern.sides);
-                saveHistory();
-                removeSelector();
-            };
-
-            grid.appendChild(item);
-        });
-
-        panel.appendChild(grid);
+        grid.appendChild(item);
     });
+
+    panel.appendChild(grid);
 
     document.body.appendChild(panel);
 
@@ -590,7 +585,7 @@ function showWallSelector(e, cell, orientation) {
     quickBtn.type = 'button';
     quickBtn.className = 'wall-quick-btn';
     quickBtn.textContent = '+';
-    quickBtn.title = '快速放置 2墙 / 3墙';
+    quickBtn.title = '快速放置多墙';
     quickBtn.onclick = ev => {
         ev.stopPropagation();
         showWallQuickMenu(ev, cell);
