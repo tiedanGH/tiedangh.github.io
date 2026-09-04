@@ -667,9 +667,9 @@ function parsePathRecord(text) {
     while (i < text.length) {
         const ch = text[i];
 
-        // 方向箭头，支持合并写法 ↑*5
+        // 方向箭头，支持合并写法 ↑×5（兼容旧版*）
         if (PATH_DIR_DELTA[ch]) {
-            const merged = /^\*(\d+)/.exec(text.slice(i + 1));
+            const merged = /^[×*](\d+)/.exec(text.slice(i + 1));
             const count = merged ? parseInt(merged[1], 10) : 1;
             for (let k = 0; k < count; k++) ops.push({ type: 'move', dir: ch, terrain: null });
             i += 1 + (merged ? merged[0].length : 0);
