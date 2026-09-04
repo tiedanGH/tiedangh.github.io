@@ -625,15 +625,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } catch (error) {
             console.error('执行代码时出错:', error);
-            let msg = error.message;
+            const msg = error.message;
             if (msg.includes('Failed to fetch') || msg.includes('CORS')) {
-                msg += '\n\n由于 CORS 限制，尝试请求 Glot API 失败。请尝试再次执行，或者安装用户脚本代替公共代理。';
+                GlotOutput.displayError(
+                    msg + '\n\n由于 CORS 限制，尝试请求 Glot API 失败。请尝试再次执行，或者安装用户脚本代替公共代理。',
+                    el.output, el.result
+                );
             } else if (msg.includes('corsdemo')) {
-                msg += '\n\n第三方CORS代理服务提示需手动激活，请访问'
-                    + ' <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a> '
-                    + '点击 `Request temporary access to the demo server` 按钮获取临时访问权限后，再返回本页面重新请求执行。\n\n或者安装用户脚本代替公共代理。';
+                GlotOutput.displayError([
+                    msg + '\n\n第三方CORS代理服务提示需手动激活，请访问 ',
+                    { url: 'https://cors-anywhere.herokuapp.com/corsdemo' },
+                    ' 点击 `Request temporary access to the demo server` 按钮获取临时访问权限后，再返回本页面重新请求执行。\n\n或者安装用户脚本代替公共代理。'
+                ], el.output, el.result);
+            } else {
+                GlotOutput.displayError(msg, el.output, el.result);
             }
-            GlotOutput.displayError(msg, el.output, el.result);
         } finally {
             setRunning(false);
         }

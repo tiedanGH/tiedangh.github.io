@@ -418,7 +418,7 @@ const GlotStore = (() => {
     function listRecovery() { return _readRecovery().items.slice().reverse(); }   // newest first
     function pushRecovery(kind, source, data) {
         const s = _readRecovery();
-        const rid = 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const rid = 'r_' + Date.now().toString(36) + GlotUtils.randomId(4);
         s.items.push({ rid, kind: String(kind || 'bucket'), source: String(source || ''), createdAt: Date.now(), data: _clone(data) });
         _writeRecovery(s);
         return rid;

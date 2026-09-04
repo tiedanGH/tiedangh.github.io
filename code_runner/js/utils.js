@@ -56,6 +56,12 @@ const GlotUtils = (() => {
         return d.innerHTML;
     }
 
+    function randomId(len) {
+        const bytes = new Uint8Array(Math.ceil(len / 2));
+        crypto.getRandomValues(bytes);
+        return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, len);
+    }
+
     function isValidUrl(str) {
         try {
             const u = new URL(str.trim());
@@ -145,5 +151,5 @@ const GlotUtils = (() => {
         catch { return ''; }
     }
 
-    return { encrypt, decrypt, fetchWithTimeout, getFileName, getCommand, escapeHtml, isValidUrl, parseBase64, bytesToText };
+    return { encrypt, decrypt, fetchWithTimeout, getFileName, getCommand, escapeHtml, randomId, isValidUrl, parseBase64, bytesToText };
 })();

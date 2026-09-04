@@ -96,7 +96,7 @@ const GlotProjects = (() => {
     function _genId(store) {
         let id;
         do {
-            id = 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            id = 'p_' + Date.now().toString(36) + GlotUtils.randomId(5);
         } while (id === DEFAULT_ID || (store.projects && store.projects[id]));
         return id;
     }

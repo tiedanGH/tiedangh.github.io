@@ -802,7 +802,21 @@ hr{border:none;border-top:1px solid #eaecef;margin:10px 0;}
         outputDiv.innerHTML = '';
         resultContainer.style.display = 'block';
         const sec = createSection('error', '错误', ICONS.error);
-        sec.querySelector('.content').innerHTML = message;
+        const content = sec.querySelector('.content');
+        const parts = Array.isArray(message) ? message : [message];
+        parts.forEach(part => {
+            const url = (part && typeof part === 'object') ? String(part.url || '') : '';
+            if (url && GlotUtils.isValidUrl(url)) {   // http/https only
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = part.text || url;
+                content.appendChild(a);
+            } else {
+                content.appendChild(document.createTextNode(url || String(part)));
+            }
+        });
         outputDiv.appendChild(sec);
         resultContainer.scrollIntoView({ behavior: 'smooth' });
     }
