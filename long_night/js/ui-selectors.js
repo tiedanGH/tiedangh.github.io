@@ -262,7 +262,7 @@ function createOptionItem(name, imageSrc, onClick, imageClass = 'square-box') {
 }
 
 // 创建自定义选项
-function createCustomOption(cell, event, groupType) {
+function createCustomOption(cell, groupType) {
     const li = document.createElement('li');
     li.className = 'option-item custom-option';
 
@@ -321,7 +321,7 @@ function createCustomOption(cell, event, groupType) {
 }
 
 // 创建自定义文本选项（仅附着组）
-function createCustomTextOption(cell, event) {
+function createCustomTextOption(cell) {
     const li = document.createElement('li');
     li.className = 'option-item custom-option';
 
@@ -364,7 +364,7 @@ function createCustomTextOption(cell, event) {
 }
 
 // 创建选项组
-function createOptionGroup(titleText, options, cell, event, groupType = 'grid') {
+function createOptionGroup(titleText, options, cell, groupType = 'grid') {
     const group = document.createElement('div');
     group.style.flex = '1';
     group.style.padding = '0 10px';
@@ -395,11 +395,11 @@ function createOptionGroup(titleText, options, cell, event, groupType = 'grid') 
         ul.appendChild(li);
     });
     // 添加自定义选项
-    const customLi = createCustomOption(cell, event, groupType);
+    const customLi = createCustomOption(cell, groupType);
     ul.appendChild(customLi);
     // 附着组额外添加“自定义文本”选项（位于最下方）
     if (groupType === 'attach') {
-        ul.appendChild(createCustomTextOption(cell, event));
+        ul.appendChild(createCustomTextOption(cell));
     }
 
     group.appendChild(title);
@@ -416,9 +416,9 @@ function showSquareAttachSelector(e, cell) {
     sel.style.display = 'flex';
 
     // 创建地形组
-    const gridGroup = createOptionGroup('地形', gridOptions, cell, e, 'grid');
+    const gridGroup = createOptionGroup('地形', gridOptions, cell, 'grid');
     // 创建附着组
-    const attachGroup = createOptionGroup('附着', attachOptions, cell, e, 'attach');
+    const attachGroup = createOptionGroup('附着', attachOptions, cell, 'attach');
 
     sel.appendChild(gridGroup);
     sel.appendChild(attachGroup);
@@ -624,7 +624,7 @@ function showWallSelector(e, cell, orientation) {
         ul.appendChild(li);
     });
     // 添加自定义墙壁选项
-    const customLi = createCustomOption(cell, e, 'wall');
+    const customLi = createCustomOption(cell, 'wall');
     ul.appendChild(customLi);
 
     sel.appendChild(title);
