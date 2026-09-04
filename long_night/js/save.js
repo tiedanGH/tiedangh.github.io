@@ -308,6 +308,9 @@ class SaveManager {
     }
 
     loadSaveData(saveData) {
+        // 读档重置 [树篱] 冲刺链
+        resetPlayerMoveHistory();
+
         // 清除现有玩家标记
         if (window.playerCell) {
             const playerMarkers = window.playerCell.querySelectorAll('.marker');

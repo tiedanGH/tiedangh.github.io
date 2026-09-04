@@ -44,6 +44,7 @@ class HistoryManager {
         const snapshot = {
             cells: new Map(),
             playerPosition: null,
+            lastMoveDirection: getPlayerMoveDirection(),   // [树篱] 冲刺链
             timestamp: Date.now()
         };
 
@@ -167,6 +168,9 @@ class HistoryManager {
         } else {
             window.playerCell = null;
         }
+
+        // 恢复 [树篱] 冲刺链
+        setPlayerMoveDirection(snapshot.lastMoveDirection);
 
         // 恢复每个单元格的状态
         snapshot.cells.forEach((cellData, key) => {

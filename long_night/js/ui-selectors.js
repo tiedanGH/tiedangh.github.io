@@ -439,14 +439,14 @@ const WALL_QUICK_PATTERNS = [
     { label: '右上', sides: ['right', 'top'] },
     { label: '左下', sides: ['left', 'bottom'] },
     { label: '右下', sides: ['right', 'bottom'] },
-    { label: '上下', sides: ['top', 'bottom'] },
-    { label: '左右', sides: ['left', 'right'] },
-    { label: '四空', sides: [] },
-    { label: '四墙', sides: ['top', 'bottom', 'left', 'right'] },
     { label: '缺上', sides: ['left', 'right', 'bottom'] },
     { label: '缺下', sides: ['left', 'right', 'top'] },
     { label: '缺左', sides: ['top', 'bottom', 'right'] },
     { label: '缺右', sides: ['top', 'bottom', 'left'] },
+    { label: '上下', sides: ['top', 'bottom'] },
+    { label: '左右', sides: ['left', 'right'] },
+    { label: '四空', sides: [] },
+    { label: '四墙', sides: ['top', 'bottom', 'left', 'right'] },
 ];
 
 // 方块四周墙壁相对方块的坐标偏移

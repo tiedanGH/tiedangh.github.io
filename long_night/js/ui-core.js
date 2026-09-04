@@ -74,6 +74,7 @@ function uiCellEvents(map) {
                 // 更新玩家位置
                 if (choice === '🧍') {
                     window.playerCell = cell;
+                    resetPlayerMoveHistory();   // 重新放置玩家：清空行动轨迹
                 }
             }, cell);
         }
@@ -99,6 +100,7 @@ function uiCellEvents(map) {
             // 更新玩家位置
             if (choice === '🧍') {
                 window.playerCell = cell;
+                resetPlayerMoveHistory();   // 重新放置玩家：清空行动轨迹
             }
         }, cell);
     });

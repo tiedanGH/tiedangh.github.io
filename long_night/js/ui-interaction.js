@@ -208,6 +208,21 @@ function initMobileDirectionControls() {
     });
 }
 
+// [树篱] 冲刺判定：上一次移动的方向，重新放置玩家后清空
+let lastMoveDirection = null;
+
+function resetPlayerMoveHistory() {
+    lastMoveDirection = null;
+}
+
+function getPlayerMoveDirection() {
+    return lastMoveDirection;
+}
+
+function setPlayerMoveDirection(direction) {
+    lastMoveDirection = direction || null;
+}
+
 function movePlayer(direction) {
     if (window.editModeManager?.isActive()) return;
     if (!window.playerCell) return;
@@ -249,6 +264,9 @@ function movePlayer(direction) {
 
     if (!targetSquare || !wallCell) return;
 
+    // [树篱] 与上一步同向则冲刺穿过（保留），否则视为撞树篱（消失）
+    const isHedgeDash = getCurrentWallType(wallCell) === '树篱' && lastMoveDirection === direction;
+
     let pushedBox = false;
     let pushedBoxWallCell = null;
 
@@ -271,7 +289,8 @@ function movePlayer(direction) {
     // 替换未知区域为已知
     ensureKnownSquare(targetSquare);
     // 更新经过的墙壁状态
-    updatePassedWall(wallCell);
+    updatePassedWall(wallCell, isHedgeDash);
+    lastMoveDirection = direction;
 
     // 推动成功时，人物和箱子间的墙也要变成空
     if (pushedBox && pushedBoxWallCell && pushedBoxWallCell.dataset.type === 'wall') {
@@ -281,14 +300,17 @@ function movePlayer(direction) {
     saveHistory(); // 保存历史
 }
 
-function updatePassedWall(wallCell) {
+function updatePassedWall(wallCell, isHedgeDash = false) {
     if (!wallCell || wallCell.dataset.type !== 'wall') return;
 
     const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
     const currentWallType = getCurrentWallType(wallCell);
     let newWallType = '空';
 
-    if (currentWallType === '门') {
+    if (currentWallType === '树篱') {
+        if (isHedgeDash) return;  // 冲刺穿过：树篱保留
+        newWallType = '空';       // 撞树篱：树篱消失
+    } else if (currentWallType === '门') {
         newWallType = '门 (开)';  // 如果是关闭的门，设为打开的门
     } else if (currentWallType === '门 (开)') {
         newWallType = '门 (开)';  // 如果是打开的门，保持为打开的门
