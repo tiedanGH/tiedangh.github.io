@@ -18,14 +18,7 @@ export function createMaze(gridEl, wrapEl) {
     let cells = new Map();      // 'c,r' → { el, mark, square }
     let start = null;           // 起点，{ c, r } 或 null
     let goal = null;            // 终点，{ c, r } 或 null
-    let next = 'start';         // 下一次点击格子放置的地标，起点与终点交替
     let changeHandler = () => {};
-
-    // 切换下一次放置的地标，格子的鼠标高亮随之变为蓝色（起点）或红色（终点）
-    function setNext(value) {
-        next = value;
-        gridEl.classList.toggle('next-goal', value === 'goal');
-    }
 
     /* ========== 墙体读写 ========== */
     const hasH = (c, r) => wallH.has(key(c, r));
@@ -104,14 +97,8 @@ export function createMaze(gridEl, wrapEl) {
             const [c, r] = k.split(',').map(Number);
             if (c >= size - 1 || r >= size) wallV.delete(k);
         }
-        if (start && (start.c >= size || start.r >= size)) {
-            start = null;
-            setNext('start');
-        }
-        if (goal && (goal.c >= size || goal.r >= size)) {
-            goal = null;
-            if (start) setNext('goal');
-        }
+        if (start && (start.c >= size || start.r >= size)) start = null;
+        if (goal && (goal.c >= size || goal.r >= size)) goal = null;
 
         slots = new Map();
         cells = new Map();
@@ -161,7 +148,6 @@ export function createMaze(gridEl, wrapEl) {
                     const c = (col - 1) / 2;
                     const r = (row - 1) / 2;
                     el.className = 'cell';
-                    el.dataset.cell = key(c, r);
                     el.title = (r * size + c + 1) + ' 号格';
                     const num = document.createElement('span');
                     num.className = 'num';
@@ -206,66 +192,30 @@ export function createMaze(gridEl, wrapEl) {
         }
     }
 
-    // 点击格子放置地标：起点与终点交替，落在另一个地标上时把它让出来
-    function placeLandmark(c, r) {
-        const touched = [[c, r]];
-        const other = next === 'start' ? goal : start;
-        if (samePos(other, c, r)) {
-            if (next === 'start') {
-                goal = null;
-            } else {
-                start = null;
-            }
-        }
-        const previous = next === 'start' ? start : goal;
-        if (previous) {
-            touched.push([previous.c, previous.r]);
-        }
-        if (next === 'start') {
-            start = { c, r };
-            setNext('goal');
-        } else {
-            goal = { c, r };
-            setNext('start');
-        }
-        for (const [tc, tr] of touched) {
-            paintLandmark(tc, tr);
-        }
-    }
-
     gridEl.addEventListener('click', (e) => {
         const slot = e.target.closest('.slot');
-        if (slot) {
-            toggleWall(slot.dataset.k);
-            changeHandler();
-            return;
-        }
-        const cell = e.target.closest('.cell');
-        if (!cell) return;
-        const [c, r] = cell.dataset.cell.split(',').map(Number);
-        placeLandmark(c, r);
-        changeHandler();
-    });
-
-    // 右键格子：移除该格的地标，下一次点击重新放置它。迷宫内一律不弹出浏览器菜单
-    gridEl.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        const cell = e.target.closest('.cell');
-        if (!cell) return;
-        const [c, r] = cell.dataset.cell.split(',').map(Number);
-        if (!samePos(start, c, r) && !samePos(goal, c, r)) return;
-        if (samePos(start, c, r)) {
-            start = null;
-            setNext('start');
-        } else {
-            goal = null;
-            setNext('goal');
-        }
-        paintLandmark(c, r);
+        if (!slot) return;
+        toggleWall(slot.dataset.k);
         changeHandler();
     });
 
     /* ========== 对外接口 ========== */
+    // 起点与终点来自上方输入框，传入格子编号（1 ~ size²），null 或越界表示未设置
+    function setLandmarks(startId, goalId) {
+        const toPos = (id) => {
+            if (!Number.isInteger(id) || id < 1 || id > size * size) {
+                return null;
+            }
+            return { c: (id - 1) % size, r: Math.floor((id - 1) / size) };
+        };
+        const stale = [start, goal];
+        start = toPos(startId);
+        goal = toPos(goalId);
+        for (const pos of [...stale, start, goal]) {
+            if (pos) paintLandmark(pos.c, pos.r);
+        }
+    }
+
     function clear() {
         if (!wallH.size && !wallV.size) return;
         wallH.clear();
@@ -345,6 +295,7 @@ export function createMaze(gridEl, wrapEl) {
         rebuild,
         clear,
         setBlackWhite,
+        setLandmarks,
         relayout,
         regionCount,
         shortestDistance,
@@ -352,7 +303,6 @@ export function createMaze(gridEl, wrapEl) {
         get size() { return size; },
         get wallCount() { return wallH.size + wallV.size; },
         get hasLandmarks() { return !!start && !!goal; },
-        get nextLandmark() { return next; },
         onChange(cb) { changeHandler = cb; },
     };
 }

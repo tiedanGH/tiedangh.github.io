@@ -14,8 +14,8 @@
     <meta name="apple-mobile-web-app-title" content="迷宫绘图">
     <link rel="apple-touch-icon" href="../assets/icons/games/maze.png"/>
 
-    <link rel="stylesheet" href="css/style.css?v=20260917">
-    <script type="module" src="js/main.js?v=20260917"></script>
+    <link rel="stylesheet" href="css/style.css?v=20260918">
+    <script type="module" src="js/main.js?v=20260918"></script>
 </head>
 <body>
 <div class="container">
@@ -23,14 +23,22 @@
     <h1>迷宫 · 快速绘图</h1>
 
     <div class="controls">
-        <label>边长<input id="sizeInput" type="number" min="5" max="9" step="1" value="5"></label>
-        <label>墙数<input id="limitInput" type="number" min="5" max="64" step="1" value="16"></label>
-        <label class="switch">
-            <input id="bwInput" type="checkbox">
-            <span class="switch-track"><span class="switch-dot"></span></span>
-            黑白模式
-        </label>
-        <button id="clearBtn" class="ghost">清空墙体</button>
+        <div class="control-group">
+            <label>边长<input id="sizeInput" type="number" min="5" max="9" step="1" value="5" inputmode="numeric"></label>
+            <label>墙数<input id="limitInput" type="number" min="5" max="64" step="1" value="16" inputmode="numeric"></label>
+        </div>
+        <div class="control-group">
+            <label>起点<input id="startInput" type="number" min="1" max="25" step="1" inputmode="numeric" placeholder="编号"></label>
+            <label>终点<input id="goalInput" type="number" min="1" max="25" step="1" inputmode="numeric" placeholder="编号"></label>
+        </div>
+        <div class="control-group">
+            <label class="switch">
+                <input id="bwInput" type="checkbox">
+                <span class="switch-track"><span class="switch-dot"></span></span>
+                黑白模式
+            </label>
+            <button id="clearBtn" class="ghost">清空墙体</button>
+        </div>
     </div>
 
     <div id="status" class="status"></div>
@@ -61,7 +69,7 @@
         <summary>使用说明</summary>
         <div class="help-body">
             <p>🖱️ <b>点击</b>格子之间的缝隙即可<b>放置</b>墙壁，<b>再次点击</b>则<b>移除</b>，地图边界不可放置。</p>
-            <p>🚩 <b>点击格子</b>轮流放置<b>起点</b>与<b>终点</b>：先放置起点，后放置终点；<b>[右键]</b> 格子可移除该格的地标。</p>
+            <p>🚩 在上方<b>起点</b>与<b>终点</b>框内填入格子<b>编号</b>，即可实时判断两点之间是否有通路。</p>
             <p>⬛ <b>黑白模式</b>展示每格周边通路数的奇偶：<b>黑</b>为奇数、<b>白</b>为偶数，地图边界视为墙，
                 <b>起点与终点不展示</b>黑白信息。</p>
             <p>📋 复制指令后<b>私信机器人</b>发送即可一次放置全部墙壁。若已经画过墙，请先发送「<b>清空</b>」再发送本指令。</p>
