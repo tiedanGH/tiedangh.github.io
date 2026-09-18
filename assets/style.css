@@ -62,6 +62,9 @@ a:hover {
 .btn-map {
     background-color: #01B0F1;
 }
+.btn-maze {
+    background-color: #3F6FD8;
+}
 .btn-runner {
     background-color: #50b5ff;
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="迷宫快速绘图工具：点击墙壁绘制迷宫，一键生成机器人画图指令"/>
+    <meta property="og:image" content="https://tdgame.tiedan.site/assets/icons/tiedan.png">
+
+    <title>迷宫 · 快速绘图</title>
+    <link rel="icon" href="favicon.ico">
+
+    <!-- WebApp -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="迷宫绘图">
+    <link rel="apple-touch-icon" href="../assets/icons/games/maze.png"/>
+
+    <link rel="stylesheet" href="css/style.css?v=20260917">
+    <script type="module" src="js/main.js?v=20260917"></script>
+</head>
+<body>
+<div class="container">
+    <a href="../" class="back-home">返回主页</a>
+    <h1>迷宫 · 快速绘图</h1>
+
+    <div class="controls">
+        <label>边长<input id="sizeInput" type="number" min="5" max="9" step="1" value="5"></label>
+        <label>墙数<input id="limitInput" type="number" min="5" max="64" step="1" value="16"></label>
+        <label class="switch">
+            <input id="bwInput" type="checkbox">
+            <span class="switch-track"><span class="switch-dot"></span></span>
+            黑白模式
+        </label>
+        <button id="clearBtn" class="ghost">清空墙体</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="mazeWrap" class="maze-wrap">
+        <div id="mazeGrid" class="maze"></div>
+    </div>
+
+    <div class="legend" id="legend">
+        <span class="legend-item"><span class="swatch cell-start"></span>起点</span>
+        <span class="legend-item"><span class="swatch cell-goal"></span>终点</span>
+        <span class="legend-item"><span class="swatch wall-on"></span>放置的墙</span>
+        <span class="legend-item"><span class="swatch wall-off"></span>无墙</span>
+        <span class="legend-item bw-only"><span class="swatch cell-black"></span>奇数通路</span>
+        <span class="legend-item bw-only"><span class="swatch cell-white"></span>偶数通路</span>
+    </div>
+
+    <div class="command">
+        <div class="command-head">
+            <span class="command-label">机器人画图指令</span>
+            <button id="copyBtn" class="primary">一键复制</button>
+        </div>
+        <label for="cmdOutput"></label>
+        <textarea id="cmdOutput" class="command-box" rows="2" readonly spellcheck="false" placeholder="点击迷宫中的墙壁位置开始绘制，指令会自动生成"></textarea>
+    </div>
+
+    <details class="help">
+        <summary>使用说明</summary>
+        <div class="help-body">
+            <p>🖱️ <b>点击</b>格子之间的缝隙即可<b>放置</b>墙壁，<b>再次点击</b>则<b>移除</b>，地图边界不可放置。</p>
+            <p>🚩 <b>点击格子</b>轮流放置<b>起点</b>与<b>终点</b>：先放置起点，后放置终点；<b>[右键]</b> 格子可移除该格的地标。</p>
+            <p>⬛ <b>黑白模式</b>展示每格周边通路数的奇偶：<b>黑</b>为奇数、<b>白</b>为偶数，地图边界视为墙，
+                <b>起点与终点不展示</b>黑白信息。</p>
+            <p>📋 复制指令后<b>私信机器人</b>发送即可一次放置全部墙壁。若已经画过墙，请先发送「<b>清空</b>」再发送本指令。</p>
+        </div>
+    </details>
+</div>
+</body>
+</html>

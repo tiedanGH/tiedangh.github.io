@@ -1,0 +1,317 @@
+/* ===== 基础 ===== */
+:root {
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --ink: #2b3445;
+    --line: #e3e8f0;
+    --danger: #d32f2f;
+    --safe: #2e9e4f;
+    --warn: #c47a00;
+
+    --wall: #2B2B2B;        /* 边界与交点 */
+    --wall-placed: #3F6FD8; /* 放置的墙 */
+    --wall-empty: #FFFFFF;  /* 无墙 */
+    --grid: #E4E4E4;        /* 格子底色 */
+    --start: #D6E7FF;       /* 起点 */
+    --goal: #FFD9D9;        /* 终点 */
+    --cell-black: #595959;  /* 奇数通路 */
+    --cell-white: #FFFFFF;  /* 偶数通路 */
+
+    --cell-size: 56px;
+    --wall-size: 10px;
+    --num-font: 13px;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding: 12px;
+    background: #eef2f7;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+.container {
+    position: relative;
+    max-width: 720px;
+    margin: auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(20, 40, 80, 0.10);
+    padding: 20px 22px 16px;
+}
+.back-home {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    z-index: 2;
+    padding: 6px 12px;
+    background: #f1f5fb;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .15s;
+}
+.back-home:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+h1 {
+    text-align: center;
+    margin: 0 0 16px;
+    font-size: 22px;
+    letter-spacing: .5px;
+}
+
+/* ===== 控件 ===== */
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+.controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #55617a;
+}
+.controls input[type="number"] {
+    width: 56px;
+    padding: 6px 8px;
+    border: 1px solid #ccd4e0;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+.controls input[type="number"]:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+/* 黑白模式开关 */
+.switch { cursor: pointer; user-select: none; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch-track {
+    position: relative;
+    width: 38px;
+    height: 20px;
+    border-radius: 10px;
+    background: #ccd4e0;
+    transition: background .15s;
+    flex: none;
+}
+.switch-dot {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+    transition: transform .15s;
+}
+.switch input:checked + .switch-track { background: var(--cell-black); }
+.switch input:checked + .switch-track .switch-dot { transform: translateX(18px); }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+button.primary, button.ghost {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .15s;
+}
+button.primary { background: var(--accent); color: #fff; }
+button.primary:hover { background: var(--accent-dark); }
+button.primary.done { background: var(--safe); }
+button.ghost { background: #fff; color: #55617a; border-color: #ccd4e0; }
+button.ghost:hover { background: #f3f6fb; }
+
+/* ===== 状态提示 ===== */
+.status {
+    text-align: center;
+    min-height: 22px;
+    margin: 4px 0 8px;
+    font-size: 14px;
+    color: #55617a;
+}
+.status b { color: var(--ink); }
+.status .ok { color: var(--safe); }
+.status .warn { color: var(--warn); }
+.status .hint { color: #9098a8; }
+.status .error { color: var(--danger); font-weight: 600; }
+.status .sep { color: #c3cbd8; margin: 0 6px; }
+
+/* ===== 迷宫 ===== */
+.maze-wrap {
+    display: flex;
+    justify-content: safe center;
+    overflow-x: auto;
+    padding: 2px 0;
+}
+.maze {
+    display: grid;
+    flex: none;
+    touch-action: manipulation;
+}
+
+/* 交点与地图边界 */
+.corner, .border { background: var(--wall); }
+
+/* 墙壁位置 */
+.slot {
+    background: var(--wall-empty);
+    position: relative;
+    cursor: pointer;
+    z-index: 2;
+    transition: background .1s;
+}
+.slot.on { background: var(--wall-placed); }
+.slot:hover { background: #bdcef1; }
+.slot.on:hover { background: #6f92e3; }
+/* 扩大触摸热区：横墙向上下、纵墙向左右各延伸 */
+.slot::after {
+    content: '';
+    position: absolute;
+    inset: -6px 0;
+}
+.slot.vertical::after { inset: 0 -6px; }
+
+/* 格子：点击可轮流放置起点与终点 */
+.cell {
+    position: relative;
+    background: var(--grid);
+    cursor: pointer;
+    z-index: 1;
+}
+/* 鼠标高亮：放置起点的轮次为蓝色，放置终点的轮次为红色 */
+.cell:hover { box-shadow: inset 0 0 0 2px rgba(37, 99, 235, .35); }
+.maze.next-goal .cell:hover { box-shadow: inset 0 0 0 2px rgba(211, 47, 47, .35); }
+.cell .num {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    padding: 1px 3px;
+    font-size: var(--num-font);
+    line-height: 1;
+    color: #6E6E6E;
+    background: #EFEFEF;
+    border-bottom-right-radius: 4px;
+    user-select: none;
+}
+/* 地标：起点与终点 */
+.cell .mark {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: calc(var(--cell-size) * 0.43);
+    font-weight: bold;
+    user-select: none;
+}
+.cell.start { background: var(--start); }
+.cell.goal { background: var(--goal); }
+
+/* 黑白信息方块：边长为格子的 42 / 56 */
+.cell .square {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(var(--cell-size) * 0.75);
+    height: calc(var(--cell-size) * 0.75);
+    border: 1px solid #8C8C8C;
+    background: var(--cell-white);
+    display: none;
+}
+.cell .square.black { background: var(--cell-black); }
+/* 起点与终点不展示黑白信息 */
+.maze.bw .cell:not(.start):not(.goal) .square { display: block; }
+
+/* ===== 图例 ===== */
+.legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 10px 0 12px;
+    font-size: 13px;
+    color: #55617a;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.legend .bw-only { display: none; }
+.legend.bw .bw-only { display: inline-flex; }
+.swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #999999;
+    flex: none;
+}
+.swatch.cell-start { background: var(--start); }
+.swatch.cell-goal { background: var(--goal); }
+.swatch.wall-on { background: var(--wall-placed); }
+.swatch.wall-off { background: var(--wall-empty); }
+.swatch.cell-black { background: var(--cell-black); }
+.swatch.cell-white { background: var(--cell-white); }
+
+/* ===== 指令输出 ===== */
+.command {
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+}
+.command-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.command-label { font-size: 14px; font-weight: 600; color: #55617a; }
+.command-box {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccd4e0;
+    border-radius: 8px;
+    background: #f8fafd;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+    resize: vertical;
+}
+.command-box:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+/* ===== 帮助 ===== */
+.help {
+    margin-top: 14px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+    font-size: 13px;
+    color: #55617a;
+}
+.help summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+}
+.help-body { margin-top: 8px; line-height: 1.7; }
+.help-body p { margin: 6px 0; }
+
+@media (max-width: 480px) {
+    .container { padding: 52px 12px 12px; }
+    h1 { font-size: 19px; }
+    .back-home { left: 12px; top: 12px; }
+    .controls { gap: 10px; }
+}
