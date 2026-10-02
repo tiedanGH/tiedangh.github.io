@@ -258,8 +258,26 @@ class HistoryManager {
             }
         });
 
+        // 快照之后才创建的格子（如拖动地图到新区域）在快照时必为初始状态，一并还原
+        this.map.cells.forEach((cell, key) => {
+            if (!snapshot.cells.has(key)) this.resetCellToInitial(cell);
+        });
+
         renderSubspaceBadge();
         this.updateButtons();
+    }
+
+    // 与 InfiniteMap.ensureCell 新建时一致；标记与附着层已在 restoreState 开头统一清除
+    resetCellToInitial(cell) {
+        cell.style.backgroundColor = '';
+        cell.style.border = '';
+        if (cell.dataset.type === 'square') {
+            cell.style.backgroundImage = '';
+            setBlockBinding(cell, null);
+        } else if (cell.dataset.type === 'wall') {
+            const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+            cell.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
+        }
     }
 
     // 撤销操作
