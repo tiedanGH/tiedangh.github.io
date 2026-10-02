@@ -32,6 +32,9 @@
     background: #f0f0f0;
     border-radius: 4px;
 }
+.selector button.block-btn {
+    line-height: 15px;
+}
 .selector button:hover {
     background: #ddd;
 }

@@ -19,7 +19,6 @@ const attachOptions = [
     ['小太阳', 'heat_box.png'],
     ['屏蔽器', 'jammer_box.png'],
     ['金币', 'coin.png'],
-    ['无', 'transparent.png'],
 ];
 const wallOptions = [
     ['空', 'walls/empty_row.png', 'walls/empty_col.png', '#FFFFFF'],

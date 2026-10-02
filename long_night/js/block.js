@@ -8,7 +8,25 @@ function getScriptVersion() {
 
 const BLOCKS_VERSION = getScriptVersion();
 
+// 区块数据：主游戏 map/block_data.h：{ 编号: { name, type, attach?, cells: [9 个格子] } }
 let blocksData = {};
+
+// 网页端自带的全空白区块：显示在 S 行末尾
+const BLANK_BLOCK_ID = '__BLANK__';
+const NO_WALL = { wall: false, type: '空' };
+const BLANK_BLOCK = {
+    name: '空白',
+    type: '空地',
+    cells: Array.from({ length: 9 }, (_, k) => ({
+        pos: { y: Math.floor(k / 3), x: k % 3 },
+        ground: { type: '空地' },
+        top: NO_WALL, bottom: NO_WALL, left: NO_WALL, right: NO_WALL,
+    })),
+};
+
+function getBlock(blockId) {
+    return blockId === BLANK_BLOCK_ID ? BLANK_BLOCK : blocksData[blockId];
+}
 
 function loadBlocks() {
     fetch(`blocks.json?v=${BLOCKS_VERSION}`)
@@ -94,7 +112,7 @@ function blockCellEvent(map) {
                 return;
             }
 
-            const block = blocksData[blockId];
+            const block = getBlock(blockId);
             if (!block) return;
 
             // 先清空区域
@@ -123,7 +141,7 @@ function blockCellEvent(map) {
             }
 
             // 然后放置区块
-            block.forEach(cellInfo => {
+            block.cells.forEach(cellInfo => {
                 const i = i0 + cellInfo.pos.x * 2 + 1;
                 const j = j0 + cellInfo.pos.y * 2 + 1;
                 const key = `${i},${j}`;
@@ -197,29 +215,29 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
     const specialGrid = createGrid('6px');
     const exitGrid = createGrid('6px');
 
-    ids.forEach(id => {
-        const block = blocksData[id];
+    function addBlockButton(grid, id, label, block) {
         const btnWrap = document.createElement('div');
         btnWrap.style.display = 'flex';
         btnWrap.style.flexDirection = 'column';
         btnWrap.style.alignItems = 'center';
 
         const btn = document.createElement('button');
-        btn.textContent = id;
+        btn.className = 'block-btn';
+        btn.textContent = label;
+        btn.title = block.name;
         btn.onclick = () => onSelect(id);
 
-        const preview = createPreview(block);
         btnWrap.appendChild(btn);
-        btnWrap.appendChild(preview);
+        btnWrap.appendChild(createPreview(block));
+        grid.appendChild(btnWrap);
+    }
 
-        if (id.startsWith('E')) {
-            exitGrid.appendChild(btnWrap);
-        } else if (id.startsWith('S')) {
-            specialGrid.appendChild(btnWrap)
-        } else {
-            normalGrid.appendChild(btnWrap);
-        }
+    ids.forEach(id => {
+        const grid = id.startsWith('E') ? exitGrid : id.startsWith('S') ? specialGrid : normalGrid;
+        addBlockButton(grid, id, id, blocksData[id]);
     });
+    // 网页端自带的全空白区块
+    addBlockButton(specialGrid, BLANK_BLOCK_ID, BLANK_BLOCK.name, BLANK_BLOCK);
 
     // 预设地图边框按钮
     const borderSizes = [
@@ -379,7 +397,7 @@ function createPreview(block) {
         for (let x = 0; x < 3; x++) {
             const td = document.createElement('td');
 
-            const info = block.find(b => b.pos.x === x && b.pos.y === y);
+            const info = block.cells.find(b => b.pos.x === x && b.pos.y === y);
             if (info) {
                 const imgFile = gridOptions.find(([name]) => name === info.ground.type)?.[1];
                 td.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;

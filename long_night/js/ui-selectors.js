@@ -250,11 +250,11 @@ function createOptionItem(name, imageSrc, onClick, imageClass = 'square-box') {
     const li = document.createElement('li');
     li.className = 'option-item';
 
-    const img = document.createElement('img');
-    img.className = imageClass;
-    img.src = imageSrc;
+    const icon = document.createElement(imageSrc ? 'img' : 'span');
+    icon.className = imageClass;
+    if (imageSrc) icon.src = imageSrc;
 
-    li.appendChild(img);
+    li.appendChild(icon);
     li.appendChild(document.createTextNode(name));
 
     li.onclick = onClick;
@@ -394,6 +394,15 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
         const li = createOptionItem(name, `./img/${val}`, onClick);
         ul.appendChild(li);
     });
+    // 附着组“无”：直接移除附着层
+    if (groupType === 'attach') {
+        ul.appendChild(createOptionItem('无', null, () => {
+            clearAttachment(cell);
+            refreshMarkerColors(cell);
+            saveHistory();
+            removeSelector();
+        }));
+    }
     // 添加自定义选项
     const customLi = createCustomOption(cell, groupType);
     ul.appendChild(customLi);
