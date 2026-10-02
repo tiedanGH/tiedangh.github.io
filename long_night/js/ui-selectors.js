@@ -277,6 +277,7 @@ function createCustomOption(cell, groupType) {
         const title = groupType === 'grid' ? '自定义地形颜色' : (groupType === 'attach' ? '自定义附着颜色' : '自定义墙壁颜色');
 
         const colorInput = createCustomColorInput(title, (color) => {
+            clearBlockBinding(cell, groupType);
             if (groupType === 'grid') {
                 // 自定义地形
                 cell.style.backgroundImage = 'none';
@@ -334,6 +335,7 @@ function createCustomTextOption(cell) {
 
     li.onclick = (e) => {
         const textInput = createCustomTextInput('自定义文本', getCurrentAttachText(cell), (text) => {
+            clearBlockBinding(cell, 'attach');
             setCustomTextAttachment(cell, text);
             refreshMarkerColors(cell);
             saveHistory();
@@ -378,6 +380,7 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
     // 添加常规选项
     options.forEach(([name, val]) => {
         const onClick = () => {
+            clearBlockBinding(cell, groupType);
             if (groupType === 'grid') {
                 cell.style.backgroundColor = '';
                 cell.style.backgroundImage = `url('./img/${val}')`;
@@ -397,6 +400,7 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
     // 附着组“无”：直接移除附着层
     if (groupType === 'attach') {
         ul.appendChild(createOptionItem('无', null, () => {
+            clearBlockBinding(cell, 'attach');
             clearAttachment(cell);
             refreshMarkerColors(cell);
             saveHistory();

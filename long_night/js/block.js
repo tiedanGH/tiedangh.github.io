@@ -24,6 +24,21 @@ const BLANK_BLOCK = {
     })),
 };
 
+// 区块数据中的地形关联交互 → 相对地图坐标
+function buildBlockBinding({ pos, ground }) {
+    const binding = {};
+    if (ground.portal_to) {
+        binding.portalTo = JSON.stringify([(ground.portal_to.x - pos.x) * 2, (ground.portal_to.y - pos.y) * 2]);
+    }
+    if (ground.button_doors?.length) {
+        binding.buttonDoors = JSON.stringify(ground.button_doors.map(({ x, y, side }) => {
+            const [si, sj] = WALL_SIDE_OFFSET[side];
+            return [(x - pos.x) * 2 + si, (y - pos.y) * 2 + sj];
+        }));
+    }
+    return binding;
+}
+
 function getBlock(blockId) {
     return blockId === BLANK_BLOCK_ID ? BLANK_BLOCK : blocksData[blockId];
 }
@@ -124,6 +139,7 @@ function blockCellEvent(map) {
                     const square = map.cells.get(key);
                     if (square?.dataset.type === 'square') {
                         square.style.backgroundImage = `url('./img/empty.png')`;
+                        setBlockBinding(square, null);
                     }
 
                     const directions = [[i - 1, j], [i + 1, j], [i, j - 1], [i, j + 1]];
@@ -152,6 +168,7 @@ function blockCellEvent(map) {
                 square.style.backgroundImage = `url('./img/${imgFile || 'unknown.png'}')`;
                 const attImgFile = attachOptions.find(([name]) => name === cellInfo.ground.attach)?.[1];
                 if (attImgFile) setAttachment(square, attImgFile);
+                setBlockBinding(square, buildBlockBinding(cellInfo));
 
                 refreshMarkerColors(square);  // 刷新标记颜色
 
@@ -366,6 +383,7 @@ function clearArea(map, i0, j0) {
             if (square?.dataset.type === 'square') {
                 // 清除地形
                 square.style.backgroundImage = 'url(./img/unknown.png)';
+                setBlockBinding(square, null);
                 // 清除附着
                 const attachmentLayer = square.querySelector('.attachment-layer');
                 if (attachmentLayer) {

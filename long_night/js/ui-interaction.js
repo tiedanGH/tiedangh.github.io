@@ -210,9 +210,13 @@ function initMobileDirectionControls() {
 
 // [树篱] 冲刺判定：上一次移动的方向，重新放置玩家后清空
 let lastMoveDirection = null;
+// [亚空间] 进入区块传送门后的剩余步数，0 为不在亚空间
+let subspaceSteps = 0;
 
 function resetPlayerMoveHistory() {
     lastMoveDirection = null;
+    subspaceSteps = 0;
+    renderSubspaceBadge();
 }
 
 function getPlayerMoveDirection() {
@@ -223,9 +227,100 @@ function setPlayerMoveDirection(direction) {
     lastMoveDirection = direction || null;
 }
 
+function getPlayerSubspace() {
+    return subspaceSteps;
+}
+
+function setPlayerSubspace(steps) {
+    subspaceSteps = steps || 0;
+}
+
+/* ========== 区块交互：传送门与按钮门 ========== */
+// 仅放置区块时写入，以相对地图坐标存于格子：portalTo 为 [di, dj]，buttonDoors 为 [[di, dj], ...]（墙格）
+function getBlockBinding(cell) {
+    const { portalTo, buttonDoors } = cell.dataset;
+    return portalTo || buttonDoors ? { portalTo, buttonDoors } : null;
+}
+
+function setBlockBinding(cell, binding) {
+    delete cell.dataset.portalTo;
+    delete cell.dataset.buttonDoors;
+    if (binding?.portalTo) cell.dataset.portalTo = binding.portalTo;
+    if (binding?.buttonDoors) cell.dataset.buttonDoors = binding.buttonDoors;
+}
+
+// 手动修改地形 / 附着后，该格不再具备区块交互功能
+function clearBlockBinding(cell, groupType) {
+    if (groupType === 'grid') delete cell.dataset.portalTo;
+    else if (groupType === 'attach') delete cell.dataset.buttonDoors;
+}
+
+function parseBindingOffsets(value) {
+    try {
+        return value ? JSON.parse(value) : null;
+    } catch {
+        return null;
+    }
+}
+
+function getTerrainType(cell) {
+    const fileName = cell.style.backgroundImage.match(/\/([^\/]+\.png)/)?.[1];
+    return gridOptions.find(([, file]) => file === fileName)?.[0] ?? null;
+}
+
+function getRelativeCell(cell, [di, dj]) {
+    const i = parseInt(cell.dataset.i, 10) + di;
+    const j = parseInt(cell.dataset.j, 10) + dj;
+    const { size, wall } = getCellMetrics();
+    currentMap.ensureCell(i, j, size, wall);
+    return currentMap.cells.get(`${i},${j}`);
+}
+
+// [按钮] 按下区块按钮：逐个切换关联的门，不是门的位置无事发生
+function pressBlockButton(cell) {
+    if (getAttachmentType(cell) !== '按钮') return;
+    (parseBindingOffsets(cell.dataset.buttonDoors) || []).forEach(offset => {
+        const wallCell = getRelativeCell(cell, offset);
+        if (wallCell?.dataset.type !== 'wall') return;
+        const type = getCurrentWallType(wallCell);
+        const next = type === '门' ? '门 (开)' : type === '门 (开)' ? '门' : null;
+        if (!next) return;
+        const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+        wallCell.style.backgroundColor = '';
+        wallCell.style.backgroundImage = `url('${getWallImage(next, orientation)}')`;
+    });
+}
+
+// [传送门] 传送到绑定的目标格：目标不是传送门也传送；落点的按钮会被按下，但不会再次进入亚空间
+function teleportFromPortal(portalCell) {
+    const offset = parseBindingOffsets(portalCell.dataset.portalTo);
+    const target = offset && getRelativeCell(portalCell, offset);
+    if (target?.dataset.type !== 'square') return;
+    addMarker(target, '🧍', 'black');
+    window.playerCell = target;
+    pressBlockButton(target);
+}
+
+// [亚空间] 剩余步数显示为玩家右上角的角标
+function renderSubspaceBadge() {
+    document.querySelectorAll('.marker[data-subspace]').forEach(marker => delete marker.dataset.subspace);
+    if (!subspaceSteps || !window.playerCell) return;
+    const marker = [...window.playerCell.querySelectorAll('.marker')].find(m => m.dataset.markerType === 'player');
+    if (marker) marker.dataset.subspace = subspaceSteps;
+}
+
 function movePlayer(direction) {
     if (window.editModeManager?.isActive()) return;
     if (!window.playerCell) return;
+
+    // [亚空间] 原地不动，剩余步数归零时传送（亚空间内的步也计入冲刺方向）
+    if (subspaceSteps > 0) {
+        lastMoveDirection = direction;
+        if (--subspaceSteps === 0) teleportFromPortal(window.playerCell);
+        renderSubspaceBadge();
+        saveHistory();
+        return;
+    }
 
     const i = parseInt(window.playerCell.dataset.i, 10);
     const j = parseInt(window.playerCell.dataset.j, 10);
@@ -296,6 +391,11 @@ function movePlayer(direction) {
     if (pushedBox && pushedBoxWallCell && pushedBoxWallCell.dataset.type === 'wall') {
         updatePassedWall(pushedBoxWallCell);
     }
+
+    // [区块交互] 按下按钮；进入区块传送门则进入亚空间
+    pressBlockButton(targetSquare);
+    if (targetSquare.dataset.portalTo && getTerrainType(targetSquare) === '传送门') subspaceSteps = 2;
+    renderSubspaceBadge();
 
     saveHistory(); // 保存历史
 }

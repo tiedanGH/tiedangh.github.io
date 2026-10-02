@@ -444,7 +444,8 @@ class EditModeManager {
                         backgroundImage: cell.style.backgroundImage,
                         backgroundColor: cell.style.backgroundColor,
                         markers: this.serializeMarkers(cell),
-                        attachment: this.serializeAttachment(cell)
+                        attachment: this.serializeAttachment(cell),
+                        binding: getBlockBinding(cell)
                     });
                 } else if (cell.dataset.type === 'wall') {
                     if (this.isUnknownWall(cell)) continue;
@@ -593,6 +594,7 @@ class EditModeManager {
     resetSquareCell(cell) {
         cell.style.backgroundImage = `url('./img/unknown.png')`;
         cell.style.backgroundColor = '';
+        setBlockBinding(cell, null);
         cell.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
         cell.querySelectorAll('.marker').forEach(marker => marker.remove());
         if (window.playerCell === cell) {
@@ -611,6 +613,7 @@ class EditModeManager {
         this.resetSquareCell(cell);
         cell.style.backgroundImage = state.backgroundImage;
         cell.style.backgroundColor = state.backgroundColor;
+        setBlockBinding(cell, state.binding);   // 相对坐标随区块一起移动 / 复制
 
         if (state.attachment) {
             const layer = getAttachmentLayer(cell);

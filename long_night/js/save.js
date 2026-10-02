@@ -131,6 +131,12 @@ class SaveManager {
                         }
                     });
                 }
+                // 区块交互
+                const binding = getBlockBinding(cell);
+                if (binding) {
+                    cellData.binding = binding;
+                    hasCustomData = true;
+                }
             }
 
             // 检查墙壁类型
@@ -391,6 +397,9 @@ class SaveManager {
                         cell.appendChild(layer);
                     });
                 }
+
+                // 恢复区块交互
+                if (cell.dataset.type === 'square') setBlockBinding(cell, cellData.binding);
 
                 // 恢复墙壁
                 if (cellData.wallType && cellData.orientation) {

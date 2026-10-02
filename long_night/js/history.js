@@ -45,6 +45,7 @@ class HistoryManager {
             cells: new Map(),
             playerPosition: null,
             lastMoveDirection: getPlayerMoveDirection(),   // [树篱] 冲刺链
+            subspaceSteps: getPlayerSubspace(),            // [亚空间] 剩余步数
             timestamp: Date.now()
         };
 
@@ -80,7 +81,8 @@ class HistoryManager {
                 markers: [],
                 attach: null,
                 customAttach: null,
-                textAttach: null
+                textAttach: null,
+                binding: getBlockBinding(cell)   // 区块交互
             };
 
             // 保存标记
@@ -169,8 +171,9 @@ class HistoryManager {
             window.playerCell = null;
         }
 
-        // 恢复 [树篱] 冲刺链
+        // 恢复 [树篱] 冲刺链与 [亚空间] 状态
         setPlayerMoveDirection(snapshot.lastMoveDirection);
+        setPlayerSubspace(snapshot.subspaceSteps);
 
         // 恢复每个单元格的状态
         snapshot.cells.forEach((cellData, key) => {
@@ -180,6 +183,7 @@ class HistoryManager {
                 existingCell.style.backgroundImage = cellData.style.backgroundImage;
                 existingCell.style.backgroundColor = cellData.style.backgroundColor;
                 existingCell.style.border = cellData.style.border;
+                setBlockBinding(existingCell, cellData.binding);
 
                 // 恢复附着
                 if (cellData.textAttach != null) {
@@ -254,6 +258,7 @@ class HistoryManager {
             }
         });
 
+        renderSubspaceBadge();
         this.updateButtons();
     }
 
