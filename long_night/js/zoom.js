@@ -7,20 +7,24 @@ let zoomIndex = ZOOM_LEVELS.indexOf(1.0);
 function getCellMetrics() {
     const big = window.innerWidth > 600;
     const scale = ZOOM_LEVELS[zoomIndex];
+    const marker = Math.round((big ? 14 : 12) * scale);
     return {
         size: Math.round((big ? 40 : 30) * scale),
         wall: Math.round((big ? 11 : 9) * scale),
-        marker: Math.round((big ? 14 : 12) * scale),
+        marker,
+        boss: Math.round(marker * 22 / 19),   // BOSS 图标
     };
 }
 
 // 将当前尺寸写入 CSS 变量，使所有格子元素同步缩放，返回当前 {size, wall}
 function applyCellMetricsVars() {
-    const { size, wall, marker } = getCellMetrics();
+    const { size, wall, marker, boss } = getCellMetrics();
     const root = document.documentElement;
     root.style.setProperty('--cell-size', size + 'px');
     root.style.setProperty('--wall-size', wall + 'px');
     root.style.setProperty('--marker-font', marker + 'px');
+    root.style.setProperty('--boss-size', boss + 'px');
+    refreshBossIcons(boss);
     return { size, wall };
 }
 

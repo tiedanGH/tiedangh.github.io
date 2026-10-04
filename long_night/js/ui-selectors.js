@@ -799,19 +799,39 @@ function showPlayerSelector(e, onSelect, cell) {
     title.textContent = '标记玩家';
     title.className = 'option-title';
 
-    // emoji标记
-    const special = createGrid('10px');
-    markerEmojis.forEach(({emoji, color, name}) => {
+    function createMarkerButton({ emoji, color, name, boss }) {
         const btn = document.createElement('button');
-        btn.textContent = emoji;
+        btn.className = 'marker-btn';
         btn.style.color = color;
         btn.title = name; // 悬停提示
+        if (boss) {
+            const icon = document.createElement('span');
+            icon.className = 'boss-icon';
+            icon.dataset.markerType = MARKER_TYPE[emoji];
+            btn.appendChild(icon);
+        } else {
+            btn.textContent = emoji;
+        }
         btn.onclick = () => {
             onSelect(emoji, color);
             saveHistory(); // 保存历史
         };
-        special.appendChild(btn);
-    });
+        return btn;
+    }
+
+    // 第一行：玩家单独一行，附操作提示
+    const playerMarker = markerEmojis.find(({ emoji }) => MARKER_TYPE[emoji] === 'player');
+    const playerRow = document.createElement('div');
+    playerRow.className = 'player-row';
+    const playerHint = document.createElement('span');
+    playerHint.className = 'player-hint';
+    playerHint.textContent = '可用方向键移动';
+    playerRow.appendChild(createMarkerButton(playerMarker));
+    playerRow.appendChild(playerHint);
+
+    // 第二行：BOSS 与星星
+    const special = createGrid('6px');
+    markerEmojis.filter(m => m !== playerMarker).forEach(m => special.appendChild(createMarkerButton(m)));
 
     const numbers = createGrid('10px');
     for (let i = 0; i <= 7; i++) {
@@ -835,6 +855,7 @@ function showPlayerSelector(e, onSelect, cell) {
     };
 
     panel.appendChild(title);
+    panel.appendChild(playerRow);
     panel.appendChild(special);
     panel.appendChild(numbers);
 

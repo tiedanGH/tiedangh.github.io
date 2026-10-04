@@ -15,6 +15,8 @@ html, body {
     --cell-size: 40px;
     --wall-size: 11px;
     --marker-font: 14px;
+    --boss-size: 16px;
+    --boss-menu-size: 15px;
 }
 
 #map-container {
@@ -127,11 +129,37 @@ html, body {
     text-align: center;
 }
 
+/* BOSS 图标：图片由 ui-core.js 按显示尺寸预先缩小后写入 --boss-* 变量 */
+.marker[data-marker-type="minotaur"],
+.marker[data-marker-type="bangbang"],
+.marker[data-marker-type="tyrant"] {
+    display: inline-block;
+    width: var(--boss-size);
+    height: var(--boss-size);
+    font-size: 0;
+    background: center / 100% 100% no-repeat;
+}
+.boss-icon {
+    display: inline-block;
+    width: var(--boss-menu-size);
+    height: var(--boss-menu-size);
+    vertical-align: middle;
+    background: center / 100% 100% no-repeat;
+}
+.marker[data-marker-type="minotaur"] { background-image: var(--boss-minotaur, url('../img/boss/minotaur.png')); }
+.marker[data-marker-type="bangbang"] { background-image: var(--boss-bangbang, url('../img/boss/bangbang.png')); }
+.marker[data-marker-type="tyrant"] { background-image: var(--boss-tyrant, url('../img/boss/tyrant.png')); }
+.boss-icon[data-marker-type="minotaur"] { background-image: var(--boss-minotaur-menu, url('../img/boss/minotaur.png')); }
+.boss-icon[data-marker-type="bangbang"] { background-image: var(--boss-bangbang-menu, url('../img/boss/bangbang.png')); }
+.boss-icon[data-marker-type="tyrant"] { background-image: var(--boss-tyrant-menu, url('../img/boss/tyrant.png')); }
+
 /* 响应式设计 */
 @media (max-width: 600px) {
     :root {
         --cell-size: 30px;
         --wall-size: 9px;
         --marker-font: 12px;
+        --boss-size: 14px;
+        --boss-menu-size: 14px;
     }
 }
