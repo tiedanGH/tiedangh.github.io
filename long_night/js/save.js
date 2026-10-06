@@ -64,6 +64,7 @@ class SaveManager {
 
         // 收集所有非默认状态的单元格
         this.map.cells.forEach((cell, key) => {
+            if (this.map.isInitialCell(cell)) return;
             const cellData = {};
             let hasCustomData = false;
 

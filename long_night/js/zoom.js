@@ -44,16 +44,17 @@ function initZoomControls(map) {
         newIndex = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, newIndex));
         if (newIndex === zoomIndex) return;
 
+        // 以视口中心为锚点，缩放后保持地图位置不跳动
+        const cx = map.container.scrollLeft + map.container.clientWidth / 2;
+        const cy = map.container.scrollTop + map.container.clientHeight / 2;
+
         const before = getCellMetrics();
         zoomIndex = newIndex;
         const { size, wall } = applyCellMetricsVars();
 
-        // 以视口中心为锚点，缩放后保持地图位置不跳动
         const oldBase = before.size + before.wall;
         const newBase = size + wall;
         const ratio = newBase / oldBase;
-        const cx = map.container.scrollLeft + map.container.clientWidth / 2;
-        const cy = map.container.scrollTop + map.container.clientHeight / 2;
 
         map.updateCellPositions(size, wall);
         map.container.scrollLeft = Math.max(0, cx * ratio - map.container.clientWidth / 2);

@@ -39,7 +39,7 @@ class HistoryManager {
         });
     }
 
-    // 获取当前地图状态快照
+    // 获取当前地图状态快照：只保存与初始状态不同的格子，其余格子恢复时统一还原为初始状态
     getStateSnapshot() {
         const snapshot = {
             cells: new Map(),
@@ -49,27 +49,10 @@ class HistoryManager {
             timestamp: Date.now()
         };
 
-        // 查找并保存玩家位置
-        let playerCellElement = null;
-        this.map.cells.forEach((cell, _) => {
-            const markers = cell.querySelectorAll('.marker');
-            markers.forEach(marker => {
-                if (marker.textContent === '🧍' || marker.dataset.markerType === 'player') {
-                    playerCellElement = cell;
-                }
-            });
-        });
-        if (playerCellElement) {
-            snapshot.playerPosition = {
-                i: parseInt(playerCellElement.dataset.i, 10),
-                j: parseInt(playerCellElement.dataset.j, 10)
-            };
-        }
-
-        // 只保存可见区域的格子状态（优化性能）
         this.map.cells.forEach((cell, key) => {
+            if (this.map.isInitialCell(cell)) return;
+
             const cellCopy = {
-                element: cell.cloneNode(true),
                 i: cell.dataset.i,
                 j: cell.dataset.j,
                 type: cell.dataset.type,
@@ -85,7 +68,7 @@ class HistoryManager {
                 binding: getBlockBinding(cell)   // 区块交互
             };
 
-            // 保存标记
+            // 保存标记，同时记录玩家位置
             const markerContainer = cell.querySelector('.marker-container');
             if (markerContainer) {
                 markerContainer.querySelectorAll('.marker').forEach(marker => {
@@ -94,6 +77,12 @@ class HistoryManager {
                         color: marker.style.color,
                         type: marker.dataset.markerType
                     });
+                    if (marker.textContent === '🧍' || marker.dataset.markerType === 'player') {
+                        snapshot.playerPosition = {
+                            i: parseInt(cell.dataset.i, 10),
+                            j: parseInt(cell.dataset.j, 10)
+                        };
+                    }
                 });
             }
 
@@ -258,9 +247,9 @@ class HistoryManager {
             }
         });
 
-        // 快照之后才创建的格子（如拖动地图到新区域）在快照时必为初始状态，一并还原
+        // 快照外的格子在快照时为初始状态（含之后才创建的格子），只还原已改动过的
         this.map.cells.forEach((cell, key) => {
-            if (!snapshot.cells.has(key)) this.resetCellToInitial(cell);
+            if (!snapshot.cells.has(key) && !this.map.isInitialCell(cell)) this.resetCellToInitial(cell);
         });
 
         renderSubspaceBadge();
@@ -271,12 +260,12 @@ class HistoryManager {
     resetCellToInitial(cell) {
         cell.style.backgroundColor = '';
         cell.style.border = '';
-        if (cell.dataset.type === 'square') {
-            cell.style.backgroundImage = '';
-            setBlockBinding(cell, null);
-        } else if (cell.dataset.type === 'wall') {
+        if (cell.dataset.type === 'wall') {
             const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
             cell.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
+        } else {
+            cell.style.backgroundImage = '';
+            setBlockBinding(cell, null);
         }
     }
 

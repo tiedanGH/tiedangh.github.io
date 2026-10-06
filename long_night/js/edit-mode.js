@@ -182,6 +182,7 @@ class EditModeManager {
 
         const i = parseInt(cell.dataset.i, 10);
         const j = parseInt(cell.dataset.j, 10);
+        if (i === this.selectionEnd?.i && j === this.selectionEnd?.j) return;   // 仍在同一格内
 
         this.selectionEnd = { i, j };
         this.updateSelection();
