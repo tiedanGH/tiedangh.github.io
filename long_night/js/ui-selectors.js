@@ -470,10 +470,11 @@ const WALL_SIDE_OFFSET = {
     right:  [1, 0],
 };
 
+let quickTargetCell = null;   // 快速放置时高亮的格子（可能已移出页面）
+
 function clearQuickTargetHighlight() {
-    document.querySelectorAll('.quick-target-highlight').forEach(cell => {
-        cell.classList.remove('quick-target-highlight');
-    });
+    quickTargetCell?.classList.remove('quick-target-highlight');
+    quickTargetCell = null;
 }
 
 // 目标格子：竖墙取右侧，横墙取下方
@@ -543,6 +544,7 @@ function showWallQuickMenu(e, wallCell) {
     if (!target) return;
 
     // 高亮当前作用的格子，关闭或选择后取消
+    quickTargetCell = target.cell;
     target.cell.classList.add('quick-target-highlight');
 
     const panel = document.createElement('div');
@@ -882,4 +884,10 @@ function showPlayerSelector(e, onSelect, cell) {
 function removeSelector() {
     document.querySelectorAll('.selector').forEach(el => el.remove());
     clearQuickTargetHighlight();
+}
+
+// 地图开始拖动时关闭全部选择器及其附带的小弹窗（位置已随地图移动）
+function removeAllSelectors() {
+    document.querySelectorAll('.color-input-container').forEach(el => el.remove());
+    removeSelector();
 }

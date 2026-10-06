@@ -31,6 +31,15 @@ html, body {
     -webkit-overflow-scrolling: touch;
 }
 
+/* 撑开滚动范围的占位元素 */
+.map-extent {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 /* 地图网格样式 */
 .cell {
     position: absolute;

@@ -310,7 +310,7 @@ function teleportFromPortal(portalCell) {
 
 // [亚空间] 剩余步数显示为玩家右上角的角标
 function renderSubspaceBadge() {
-    document.querySelectorAll('.marker[data-subspace]').forEach(marker => delete marker.dataset.subspace);
+    currentMap.queryInCells('.marker[data-subspace]').forEach(marker => delete marker.dataset.subspace);
     if (!subspaceSteps || !window.playerCell) return;
     const marker = [...window.playerCell.querySelectorAll('.marker')].find(m => m.dataset.markerType === 'player');
     if (marker) marker.dataset.subspace = subspaceSteps;
@@ -437,7 +437,8 @@ function updatePassedWall(wallCell, isHedgeDash = false) {
 function addMarker(cell, marker, color = 'black') {
     const type = MARKER_TYPE[marker];
     if (type) {
-        document.querySelectorAll('.marker').forEach(m => {
+        // 唯一标记可能在已移出页面的格子中
+        currentMap.queryInCells('.marker').forEach(m => {
             if (m.dataset.markerType === type) {
                 m.remove();
             }

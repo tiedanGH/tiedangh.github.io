@@ -145,11 +145,11 @@ class HistoryManager {
 
     // 恢复到指定状态
     restoreState(snapshot) {
-        // 清除当前所有标记
-        document.querySelectorAll('.marker').forEach(marker => marker.remove());
+        // 清除当前所有标记（含已移出页面的格子）
+        this.map.queryInCells('.marker').forEach(marker => marker.remove());
 
         // 清除当前所有附着层
-        document.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
+        this.map.queryInCells('.attachment-layer').forEach(layer => layer.remove());
 
         // 恢复玩家位置全局变量
         if (snapshot.playerPosition) {

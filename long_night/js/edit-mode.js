@@ -13,6 +13,9 @@ class EditModeManager {
         this.selectionStart = null;
         this.selectionEnd = null;
         this.selectedRange = null;
+        // 带有选区、预览样式的格子（可能已移出页面）
+        this.selectedCells = [];
+        this.previewCells = [];
 
         // 区分“拖动地图”与“点击选点”
         this.pointerDownPos = null;
@@ -352,23 +355,26 @@ class EditModeManager {
                 const cell = this.map.cells.get(`${i},${j}`);
                 if (!cell || cell.classList.contains('center')) continue;
                 cell.classList.add('move-selected');
+                this.selectedCells.push(cell);
             }
         }
     }
 
     clearSelection(resetRange = true) {
-        this.map.container.querySelectorAll('.move-selected').forEach(cell => {
+        this.selectedCells.forEach(cell => {
             cell.classList.remove('move-selected');
         });
+        this.selectedCells = [];
         if (resetRange) this.selectedRange = null;
     }
 
     clearPreview() {
-        this.map.container.querySelectorAll('.move-preview-target, .move-preview-overwrite, .move-preview-anchor').forEach(cell => {
+        this.previewCells.forEach(cell => {
             cell.classList.remove('move-preview-target');
             cell.classList.remove('move-preview-overwrite');
             cell.classList.remove('move-preview-anchor');
         });
+        this.previewCells = [];
     }
 
     hasEffectiveCellContent(cell) {
@@ -514,6 +520,7 @@ class EditModeManager {
                 const targetKey = `${ti},${tj}`;
                 const willOverwrite = !sourceKeys.has(targetKey) && this.hasEffectiveCellContent(targetCell);
                 targetCell.classList.add(willOverwrite ? 'move-preview-overwrite' : 'move-preview-target');
+                this.previewCells.push(targetCell);
             }
         });
 
@@ -521,6 +528,7 @@ class EditModeManager {
             const anchorCell = this.map.cells.get(`${this.previewAnchor.i},${this.previewAnchor.j}`);
             if (anchorCell && !anchorCell.classList.contains('center')) {
                 anchorCell.classList.add('move-preview-anchor');
+                this.previewCells.push(anchorCell);
             }
         }
     }
