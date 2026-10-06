@@ -48,22 +48,22 @@
     --hover-bg: #1f8bff;
 }
 .save-button {
-    right: 10px;
+    left: 150px;
     background: #FFA500;
     --hover-bg: #FF8C00;
 }
 .redo-button {
-    right: 60px;
+    right: 10px;
     background: #4CAF50;
     --hover-bg: #45a049;
 }
 .undo-button {
-    right: 110px;
+    right: 60px;
     background: #FF6B6B;
     --hover-bg: #FF5252;
 }
 .edit-mode-button {
-    right: 160px;
+    right: 110px;
     background: #8A63D2;
     --hover-bg: #764fbd;
     font-size: 20px;
@@ -72,6 +72,17 @@
     background: #D9C8FF;
     color: #4A2E86;
     box-shadow: 0 0 0 3px rgba(138, 99, 210, 0.35), 0 2px 6px rgba(0,0,0,0.15);
+    transform: scale(1.04);
+}
+.track-button {
+    right: 160px;
+    background: #3949AB;
+    --hover-bg: #303F9F;
+    font-size: 20px;
+}
+.track-button.active {
+    background: #C5CAE9;
+    box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.35), 0 2px 6px rgba(0,0,0,0.15);
     transform: scale(1.04);
 }
 
@@ -206,15 +217,18 @@
         left: 84px;
     }
     .save-button {
-        right: 8px;
+        left: 124px;
     }
     .redo-button {
-        right: 48px;
+        right: 8px;
     }
     .undo-button {
-        right: 88px;
+        right: 48px;
     }
     .edit-mode-button {
+        right: 88px;
+    }
+    .track-button {
         right: 128px;
     }
     .zoom-in-button {

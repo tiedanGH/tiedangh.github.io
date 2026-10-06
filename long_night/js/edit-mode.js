@@ -48,7 +48,7 @@ class EditModeManager {
         window.addEventListener('touchcancel', e => this.onTouchEnd(e));
 
         document.addEventListener('keydown', e => {
-            if (e.key.toLowerCase() === 'm' && !this.isTypingTarget(e.target)) {
+            if (e.key.toLowerCase() === 'm' && !isTypingTarget(e.target)) {
                 e.preventDefault();
                 if (this.active) this.exitMode();
                 else this.enterMode();
@@ -92,8 +92,9 @@ class EditModeManager {
         }
     }
 
-    // 进入编辑模式：清理弹窗，锁定历史记录，显示横幅
+    // 进入编辑模式：清理弹窗，锁定历史记录，显示横幅（轨迹记录中禁用）
     enterMode() {
+        if (window.trackManager?.isActive()) return;
         this.clearOtherPopups();
         this.active = true;
         this.stage = 'selecting';
@@ -104,6 +105,7 @@ class EditModeManager {
         if (window.historyManager?.setLocked) {
             window.historyManager.setLocked(true);
         }
+        window.trackManager?.updateButtons();
     }
 
     // 退出编辑模式：清理状态，解锁历史记录，隐藏横幅
@@ -131,12 +133,7 @@ class EditModeManager {
         if (window.historyManager?.setLocked) {
             window.historyManager.setLocked(false);
         }
-    }
-
-    isTypingTarget(target) {
-        if (!target) return false;
-        const tag = target.tagName?.toLowerCase();
-        return tag === 'input' || tag === 'textarea' || target.isContentEditable;
+        window.trackManager?.updateButtons();
     }
 
     // 清理其他弹窗

@@ -167,6 +167,12 @@ function canBoxMoveTo(direction, fromI, fromJ, size, wall) {
     return { movable: true, boxTargetSquare, boxWallCell };
 }
 
+// 输入框内的按键不触发地图快捷键
+function isTypingTarget(target) {
+    const tag = target?.tagName?.toLowerCase();
+    return tag === 'input' || tag === 'textarea' || !!target?.isContentEditable;
+}
+
 function initKeyboardControls() {
     const keyMap = {
         ArrowUp: 'up',
@@ -180,7 +186,7 @@ function initKeyboardControls() {
     };
 
     document.addEventListener('keydown', (e) => {
-        if (!window.playerCell) return;
+        if (!window.playerCell || isTypingTarget(e.target)) return;
 
         const direction = keyMap[e.key];
 
@@ -217,6 +223,7 @@ function resetPlayerMoveHistory() {
     lastMoveDirection = null;
     subspaceSteps = 0;
     renderSubspaceBadge();
+    window.trackManager?.resetStart();   // [轨迹记录] 从新位置重新记录
 }
 
 function getPlayerMoveDirection() {
@@ -318,6 +325,7 @@ function movePlayer(direction) {
         lastMoveDirection = direction;
         if (--subspaceSteps === 0) teleportFromPortal(window.playerCell);
         renderSubspaceBadge();
+        window.trackManager?.record(direction);
         saveHistory();
         return;
     }
@@ -397,6 +405,7 @@ function movePlayer(direction) {
     if (targetSquare.dataset.portalTo && getTerrainType(targetSquare) === '传送门') subspaceSteps = 2;
     renderSubspaceBadge();
 
+    window.trackManager?.record(direction);   // [轨迹记录]
     saveHistory(); // 保存历史
 }
 

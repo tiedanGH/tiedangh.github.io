@@ -16,19 +16,21 @@
 
     <link rel="stylesheet" href="css/base.css?v=20261003">
     <link rel="stylesheet" href="css/selector.css?v=20261003">
-    <link rel="stylesheet" href="css/button.css?v=20260607">
+    <link rel="stylesheet" href="css/button.css?v=20261005b">
     <link rel="stylesheet" href="css/save.css?v=20260316">
-    <link rel="stylesheet" href="css/edit.css?v=20260903">
+    <link rel="stylesheet" href="css/edit.css?v=20261005">
+    <link rel="stylesheet" href="css/track.css?v=20261005b">
 
     <script src="js/zoom.js?v=20261003"></script>
-    <script src="js/main.js?v=20260607"></script>
+    <script src="js/main.js?v=20261005"></script>
     <script src="js/map.js?v=20260903"></script>
     <script src="js/ui-selectors.js?v=20261003"></script>
-    <script src="js/ui-interaction.js?v=20261001b"></script>
+    <script src="js/ui-interaction.js?v=20261005"></script>
     <script src="js/ui-core.js?v=20261003"></script>
     <script src="js/block.js?v=20261001b"></script>
     <script src="js/history.js?v=20261001c"></script>
-    <script src="js/edit-mode.js?v=20261001b"></script>
+    <script src="js/edit-mode.js?v=20261005"></script>
+    <script src="js/track.js?v=20261005"></script>
     <script src="js/save.js?v=20261001b"></script>
 </head>
 <body>
@@ -40,6 +42,7 @@
     <p><span>▪️</span> <b>[左键] 点击</b>格子角落的<b>黑点</b>，可选择区块进行放置</p>
     <p>🔼🔽◀️▶️ <b>[移动]</b> 玩家 🧍 来自动更新地图</p>
     <p>✂️ <b>[编辑模式]</b>或<b>[M]</b> 可框选后整体移动选择区域</p>
+    <p>🏃 <b>[轨迹导出]</b>或<b>[T]</b> 可记录玩家移动并导出轨迹</p>
     <p>↶ <b>[撤销]或[Ctrl+Z]</b> 最多可撤销 50 步操作</p>
     <p>↷ <b>[重做]或[Ctrl+Y]</b> 恢复撤销的操作</p>
     <p>⌨️ <b>[Shift]+[右键]</b> 快速清除格子所有标记</p>
@@ -83,11 +86,12 @@
 </div>
 
 <a href="../" class="back-home">返回主页</a>
+<button id="help-button" class="control-btn help-button" title="查看帮助">?</button>
+<button id="save-button" class="control-btn save-button" title="存档管理">📁</button>
+<button id="track-button" class="control-btn track-button" title="轨迹导出 (T)">🏃</button>
+<button id="edit-mode-button" class="control-btn edit-mode-button" title="编辑模式">✂️</button>
 <button id="undo-button" class="control-btn undo-button">↶</button>
 <button id="redo-button" class="control-btn redo-button">↷</button>
-<button id="edit-mode-button" class="control-btn edit-mode-button" title="编辑模式">✂️</button>
-<button id="save-button" class="control-btn save-button" title="存档管理">📁</button>
-<button id="help-button" class="control-btn help-button" title="查看帮助">?</button>
 <button id="zoom-out-button" class="control-btn zoom-out-button" title="缩小地图">－</button>
 <button id="zoom-in-button" class="control-btn zoom-in-button" title="放大地图">＋</button>
 
