@@ -436,7 +436,7 @@ function updatePassedWall(wallCell, isHedgeDash = false) {
 
 function addMarker(cell, marker, color = 'black') {
     const type = MARKER_TYPE[marker];
-    if (type) {
+    if (UNIQUE_MARKER_TYPES.has(type)) {
         // 唯一标记可能在已移出页面的格子中
         currentMap.queryInCells('.marker').forEach(m => {
             if (m.dataset.markerType === type) {

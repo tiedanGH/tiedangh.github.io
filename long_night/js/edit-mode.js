@@ -695,12 +695,11 @@ class EditModeManager {
         this.exitMode();
     }
 
-    // 复制时去掉全图唯一的标记（玩家/米诺陶斯/邦邦），避免出现重复
+    // 复制时去掉全图唯一的标记（玩家），避免出现重复
     stripUniqueMarkers(item) {
         if (item.type !== 'square' || !item.markers?.length) return item;
 
-        const uniqueTypes = new Set(Object.values(MARKER_TYPE));
-        const markers = item.markers.filter(m => !MARKER_TYPE[m.text] && !uniqueTypes.has(m.markerType));
+        const markers = item.markers.filter(m => !UNIQUE_MARKER_TYPES.has(m.markerType || MARKER_TYPE[m.text]));
         return { ...item, markers };
     }
 

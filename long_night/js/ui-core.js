@@ -40,13 +40,15 @@ const markerEmojis = [
     { emoji: '👑', color: 'black', name: '暴君', boss: true },
     { emoji: '★', color: 'red', name: '星星' },
 ];
-// 不允许重复的标记类型
+// 标记类型
 const MARKER_TYPE = {
     '🧍': 'player',
     '👹': 'minotaur',
     '💣': 'bangbang',
     '👑': 'tyrant',
 };
+// 全图唯一的标记类型
+const UNIQUE_MARKER_TYPES = new Set(['player']);
 
 /* ========== BOSS 图标 ========== */
 // 浏览器实时缩小原图会发糊，按实际绘制的设备像素尺寸用面积平均预先缩小，作为背景图
