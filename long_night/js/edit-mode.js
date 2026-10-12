@@ -424,7 +424,8 @@ class EditModeManager {
     isUnknownWall(cell) {
         const wallType = getCurrentWallType(cell);
         const hasCustomColor = !!(cell.style.backgroundColor && cell.style.backgroundColor !== 'transparent');
-        return wallType === '未知' && !hasCustomColor;
+        const hasAttach = cell.querySelectorAll('.attachment-layer').length > 0;
+        return wallType === '未知' && !hasCustomColor && !hasAttach;
     }
 
     capturePayload() {
@@ -461,7 +462,8 @@ class EditModeManager {
                         orientation: cell.classList.contains('horizontal') ? 'horizontal' : 'vertical',
                         wallType: getCurrentWallType(cell),
                         backgroundImage: cell.style.backgroundImage,
-                        backgroundColor: cell.style.backgroundColor
+                        backgroundColor: cell.style.backgroundColor,
+                        attachment: this.serializeAttachment(cell)
                     });
                 }
             }
@@ -612,6 +614,27 @@ class EditModeManager {
         const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
         cell.style.backgroundColor = '';
         cell.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
+        cell.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
+    }
+
+    // 写入附着（方块与墙壁共用）
+    applyAttachmentState(cell, attachment) {
+        if (!attachment) return;
+        const layer = getAttachmentLayer(cell);
+        if (attachment.kind === 'text') {
+            layer.classList.add('custom-attach-text');
+            layer.style.backgroundImage = 'none';
+            layer.style.backgroundColor = '';
+            layer.textContent = attachment.text || '';
+        } else if (attachment.kind === 'custom') {
+            layer.classList.add('custom-attach-circle');
+            layer.style.backgroundImage = 'none';
+            layer.style.backgroundColor = attachment.color;
+        } else {
+            layer.classList.remove('custom-attach-circle');
+            layer.style.backgroundColor = '';
+            layer.style.backgroundImage = attachment.backgroundImage;
+        }
     }
 
     // 应用到目标单元格
@@ -620,24 +643,7 @@ class EditModeManager {
         cell.style.backgroundImage = state.backgroundImage;
         cell.style.backgroundColor = state.backgroundColor;
         setBlockBinding(cell, state.binding);   // 相对坐标随区块一起移动 / 复制
-
-        if (state.attachment) {
-            const layer = getAttachmentLayer(cell);
-            if (state.attachment.kind === 'text') {
-                layer.classList.add('custom-attach-text');
-                layer.style.backgroundImage = 'none';
-                layer.style.backgroundColor = '';
-                layer.textContent = state.attachment.text || '';
-            } else if (state.attachment.kind === 'custom') {
-                layer.classList.add('custom-attach-circle');
-                layer.style.backgroundImage = 'none';
-                layer.style.backgroundColor = state.attachment.color;
-            } else {
-                layer.classList.remove('custom-attach-circle');
-                layer.style.backgroundColor = '';
-                layer.style.backgroundImage = state.attachment.backgroundImage;
-            }
-        }
+        this.applyAttachmentState(cell, state.attachment);
 
         if (state.markers?.length) {
             const container = getMarkerContainer(cell);
@@ -668,6 +674,7 @@ class EditModeManager {
             const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
             cell.style.backgroundImage = `url('${getWallImage(state.wallType, orientation)}')`;
         }
+        this.applyAttachmentState(cell, state.attachment);
     }
 
     // 删除选区：范围内全部内容（含空白格）重置为未知，然后退出编辑模式

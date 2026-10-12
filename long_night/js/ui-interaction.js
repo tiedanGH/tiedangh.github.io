@@ -47,39 +47,25 @@ function getMarkerContainer(cell) {
     return ctr;
 }
 
+// 玩家编号在特殊附着、地形上的颜色（同主游戏 GetColoredMark）
+const MARK_COLOR_BY_ATTACH = { '炸弹': '#FFFF00', '箱子': '#FFFF00', '小太阳': '#FFFF00', '屏蔽器': '#FFFF00', '金币': '#FF6EC7' };
+const MARK_COLOR_BY_GRID = { '传送门': '#FFFF00', '热源': '#00FFFF' };
+
 // 根据格子的地形和附着获取特殊颜色（附着 > 地形）
 function getGroundSpecialColor(cell) {
     if (!cell || cell.dataset.type !== 'square') return null;
-
-    const getFileName = bg =>
-        bg?.includes('none')
-            ? null
-            : bg?.match(/\/([^\/]+\.(png|jpg|jpeg))/)?.[1] ?? null;
-    const isTarget = (fileName, options, target) =>
-        fileName && options.find(([, file]) => file === fileName)?.[0] === target;
-
-    // 检查附着
-    const attachLayer = cell.querySelector('.attachment-layer');
-    if (attachLayer && !attachLayer.classList.contains('custom-attach-circle')) {
-        const fileName = getFileName(attachLayer.style.backgroundImage);
-        if (isTarget(fileName, attachOptions, '炸弹')) return '#FFFF00';
-    }
-    // 检查地形
-    const fileName = getFileName(cell.style.backgroundImage);
-    if (isTarget(fileName, gridOptions, '传送门')) return '#FFFF00';
-
-    return null;
+    return MARK_COLOR_BY_ATTACH[getAttachmentType(cell)] || MARK_COLOR_BY_GRID[getTerrainType(cell)] || null;
 }
 
-// 刷新指定格子内所有标记的颜色
+// 刷新指定格子内玩家编号的颜色与描边（彩色编号用黑色描边）
 function refreshMarkerColors(cell) {
     if (!cell || cell.dataset.type !== 'square') return;
-    const markers = cell.querySelectorAll('.marker');
-    markers.forEach(marker => {
-        const text = marker.textContent;
-        if (num.includes(text)) {
-            marker.style.color = getGroundSpecialColor(cell) || 'black';
-        }
+    const color = getGroundSpecialColor(cell);
+    cell.querySelectorAll('.marker').forEach(marker => {
+        if (!num.includes(marker.textContent)) return;
+        marker.style.color = color || 'black';
+        marker.classList.add('player-number');
+        marker.classList.toggle('colored', !!color);
     });
 }
 
@@ -381,6 +367,7 @@ function movePlayer(direction) {
             clearAttachment(targetSquare);
             setAttachment(boxTargetSquare, attachFileName);
             ensureKnownSquare(boxTargetSquare);
+            refreshMarkerColors(boxTargetSquare);   // 箱子上的玩家编号变色
             pushedBox = true;
             pushedBoxWallCell = boxWallCell;
         }

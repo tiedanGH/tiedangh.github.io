@@ -244,6 +244,7 @@ class HistoryManager {
                         }
                     });
                 }
+                refreshMarkerColors(existingCell);   // 玩家编号的颜色与描边样式刷新
             }
         });
 

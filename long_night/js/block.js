@@ -400,6 +400,7 @@ function clearArea(map, i0, j0) {
                 if (wall?.dataset.type === 'wall') {
                     const orientation = wall.classList.contains('horizontal') ? 'horizontal' : 'vertical';
                     wall.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
+                    clearAttachment(wall);
                 }
             });
         }

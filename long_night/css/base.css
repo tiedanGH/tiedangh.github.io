@@ -117,6 +117,14 @@ html, body {
     line-height: 1;
 }
 
+/* 玩家编号描边 */
+.marker.player-number {
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+.marker.player-number.colored {
+    text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000;
+}
+
 /* [亚空间] 右上角的剩余步数角标（非标记文字） */
 .marker[data-subspace] {
     position: relative;

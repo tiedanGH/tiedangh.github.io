@@ -292,6 +292,22 @@
     box-sizing: border-box;
 }
 
+/* 墙壁附着：墙内居中椭圆，文本随墙壁厚度缩放 */
+.cell.wall.horizontal .custom-attach-circle {
+    width: 50%;
+    height: 75%;
+}
+.cell.wall.vertical .custom-attach-circle {
+    width: 75%;
+    height: 50%;
+}
+.cell.wall .custom-attach-text {
+    font-size: calc(var(--wall-size) * 0.75);
+    line-height: 1;
+    padding: 0;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff;
+}
+
 /* 墙壁菜单标题行 + 快速放置入口 */
 .wall-title-row {
     display: flex;

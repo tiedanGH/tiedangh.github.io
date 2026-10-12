@@ -100,38 +100,6 @@ class SaveManager {
                     });
                     hasCustomData = true;
                 }
-                // 检查附着物
-                const attachments = cell.querySelectorAll('.attachment-layer');
-                if (attachments.length > 0) {
-                    attachments.forEach(attachment => {
-                        if (attachment.classList.contains('custom-attach-circle')) {
-                            // 自定义颜色附着
-                            if (!cellData.attachments) cellData.attachments = [];
-                            cellData.attachments.push({
-                                type: 'custom',
-                                color: attachment.style.backgroundColor
-                            });
-                            hasCustomData = true;
-                        } else if (attachment.classList.contains('custom-attach-text')) {
-                            // 自定义文本附着
-                            if (!cellData.attachments) cellData.attachments = [];
-                            cellData.attachments.push({
-                                type: 'text',
-                                text: attachment.textContent
-                            });
-                            hasCustomData = true;
-                        } else if (attachment.style.backgroundImage && attachment.style.backgroundImage !== 'none') {
-                            // 图片附着
-                            if (!cellData.attachments) cellData.attachments = [];
-                            const imgUrl = attachment.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
-                            cellData.attachments.push({
-                                type: 'image',
-                                url: imgUrl
-                            });
-                            hasCustomData = true;
-                        }
-                    });
-                }
                 // 区块交互
                 const binding = getBlockBinding(cell);
                 if (binding) {
@@ -155,6 +123,40 @@ class SaveManager {
                     hasCustomData = true;
                 }
             }
+
+            // 检查附着物（方块与墙壁）
+            const attachments = cell.querySelectorAll('.attachment-layer');
+            if (attachments.length > 0) {
+                attachments.forEach(attachment => {
+                    if (attachment.classList.contains('custom-attach-circle')) {
+                        // 自定义颜色附着
+                        if (!cellData.attachments) cellData.attachments = [];
+                        cellData.attachments.push({
+                            type: 'custom',
+                            color: attachment.style.backgroundColor
+                        });
+                        hasCustomData = true;
+                    } else if (attachment.classList.contains('custom-attach-text')) {
+                        // 自定义文本附着
+                        if (!cellData.attachments) cellData.attachments = [];
+                        cellData.attachments.push({
+                            type: 'text',
+                            text: attachment.textContent
+                        });
+                        hasCustomData = true;
+                    } else if (attachment.style.backgroundImage && attachment.style.backgroundImage !== 'none') {
+                        // 图片附着
+                        if (!cellData.attachments) cellData.attachments = [];
+                        const imgUrl = attachment.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+                        cellData.attachments.push({
+                            type: 'image',
+                            url: imgUrl
+                        });
+                        hasCustomData = true;
+                    }
+                });
+            }
+
             // 只保存有自定义数据的单元格
             if (hasCustomData) {
                 state.cells[key] = cellData;
@@ -414,6 +416,8 @@ class SaveManager {
                         cell.style.backgroundImage = `url('${wallImage}')`;
                     }
                 }
+
+                refreshMarkerColors(cell);   // 玩家编号的颜色与描边样式刷新
             });
         }
 

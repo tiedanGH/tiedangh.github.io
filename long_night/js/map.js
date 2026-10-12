@@ -263,14 +263,15 @@ class InfiniteMap {
     // 是否仍与 ensureCell 新建时一致：新建的格子只有 left、top，墙壁另有未知墙壁的背景图
     isInitialCell(cell) {
         const { style } = cell;
-        if (cell.dataset.type === 'wall') {
+        const type = cell.dataset.type;
+        if (type === 'wall') {
             const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
-            return style.length === 3 && style.backgroundImage === getInitialWallImage(orientation);
+            if (style.length !== 3 || style.backgroundImage !== getInitialWallImage(orientation)) return false;
+        } else if (style.length !== 2) {
+            return false;
         }
-        if (style.length !== 2) return false;
-        if (cell.dataset.type !== 'square') return true;
-        if (getBlockBinding(cell)) return false;
-        // 附着层或非空的标记层
+        if (type === 'square' && getBlockBinding(cell)) return false;
+        // 附着层（方块与墙壁）或非空的标记层
         for (const child of cell.children) {
             if (child.classList.contains('attachment-layer') || child.querySelector('.marker')) return false;
         }

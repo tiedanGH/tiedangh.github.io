@@ -399,13 +399,16 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
     });
     // 附着组“无”：直接移除附着层
     if (groupType === 'attach') {
-        ul.appendChild(createOptionItem('无', null, () => {
+        const onWall = cell.dataset.type === 'wall';
+        const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+        const noneIcon = onWall ? getWallImage('空', orientation) : null;
+        ul.appendChild(createOptionItem('无', noneIcon, () => {
             clearBlockBinding(cell, 'attach');
             clearAttachment(cell);
             refreshMarkerColors(cell);
             saveHistory();
             removeSelector();
-        }));
+        }, onWall ? 'wall-box' : 'square-box'));
     }
     // 添加自定义选项
     const customLi = createCustomOption(cell, groupType);
@@ -587,12 +590,17 @@ function showWallQuickMenu(e, wallCell) {
     }, 0);
 }
 
-// 墙壁选择器
+// 墙壁选择器：墙壁和墙壁附着
 function showWallSelector(e, cell, orientation) {
     const sel = document.createElement('div');
     sel.className = 'selector';
     sel.style.left = e.clientX + 'px';
     sel.style.top = e.clientY + 'px';
+    sel.style.display = 'flex';
+
+    const wallGroup = document.createElement('div');
+    wallGroup.style.flex = 'none';
+    wallGroup.style.padding = '0 10px';
 
     const title = document.createElement('div');
     title.className = 'option-title wall-title-row';
@@ -642,8 +650,14 @@ function showWallSelector(e, cell, orientation) {
     const customLi = createCustomOption(cell, 'wall');
     ul.appendChild(customLi);
 
-    sel.appendChild(title);
-    sel.appendChild(ul);
+    wallGroup.appendChild(title);
+    wallGroup.appendChild(ul);
+
+    // 墙壁附着
+    const attachGroup = createOptionGroup('附着', [], cell, 'attach');
+
+    sel.appendChild(wallGroup);
+    sel.appendChild(attachGroup);
     document.body.appendChild(sel);
 
     setTimeout(() => {
