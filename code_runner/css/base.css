@@ -249,6 +249,18 @@ select {
     color: var(--dark-color);
     background: none;
 }
+/* Glot token disabled (the new site needs no API Token) */
+.password-container input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+.password-toggle:disabled,
+.password-toggle:disabled:hover {
+    background: none;
+    color: var(--gray-color);
+    opacity: .5;
+    cursor: not-allowed;
+}
 
 /* Security notice */
 .security-notice {

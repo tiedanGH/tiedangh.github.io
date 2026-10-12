@@ -197,8 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Shared token (one per browser, all projects) ---
-    function loadApiKey() { el.apiKey.value = GlotProjects.loadToken(); checkApiKeyHint(); }
-    function persistApiKey() { GlotProjects.saveToken(el.apiKey.value); }
+    // The new Glot site needs no API Token: while the input is disabled it stays empty and a saved token is left as is.
+    function loadApiKey() { if (!el.apiKey.disabled) el.apiKey.value = GlotProjects.loadToken(); checkApiKeyHint(); }
+    function persistApiKey() { if (!el.apiKey.disabled) GlotProjects.saveToken(el.apiKey.value); }
 
     // --- Request method + docker config (one per browser, never exported) ---
     function loadRequestConfig() {
@@ -577,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function runCode() {
-        const data = Object.assign({ apiKey: el.apiKey.value }, collectProjectData(), {
+        const data = Object.assign(collectProjectData(), {
             requestMethod: el.requestMethod.value,
             dockerUrl: el.dockerUrl.value.trim(),
             dockerToken: el.dockerToken.value
@@ -587,9 +588,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!data.language) {
             showToast('请选择编程语言', 'error'); return;
         }
-        if (data.language !== 'text') {
-            if (isDocker && !data.dockerUrl) { showToast('请填写 Docker Run 请求地址', 'error'); return; }
-            if (!isDocker && !data.apiKey) { showToast('请填写 Glot API Token', 'error'); return; }
+        if (data.language !== 'text' && isDocker && !data.dockerUrl) {
+            showToast('请填写 Docker Run 请求地址', 'error'); return;
         }
         if (data.codeSource === 'url' && !data.codeUrl) {
             showToast('请提供代码 URL', 'error'); return;

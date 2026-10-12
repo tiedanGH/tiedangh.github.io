@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="代码执行器">
     <link rel="apple-touch-icon" href="../assets/icons/games/code_runner.png"/>
 
-    <link rel="stylesheet" href="css/base.css?v=20260609h">
+    <link rel="stylesheet" href="css/base.css?v=20261011">
     <link rel="stylesheet" href="css/projects.css?v=20260611">
     <link rel="stylesheet" href="css/storage.css?v=20260611b">
     <link rel="stylesheet" href="css/output.css?v=20260611d">
@@ -25,10 +25,10 @@
     <script src="js/store.js?v=20260904"></script>
     <script src="js/storage.js?v=20260608d"></script>
     <script src="js/output.js?v=20260904"></script>
-    <script src="js/executor.js?v=20260611b"></script>
+    <script src="js/executor.js?v=20261011"></script>
     <script src="js/storage-modal.js?v=20260609b"></script>
     <script src="js/env-modal.js?v=20260611b"></script>
-    <script src="js/main.js?v=20260904"></script>
+    <script src="js/main.js?v=20261011"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -96,14 +96,14 @@
                                                 </div>
                                             </span>
                                         </label>
-                                        <div id="apiKeyHint" class="api-key-hint" style="display: none;">
+                                        <div id="apiKeyHint" class="api-key-hint">
                                             <i class="fas fa-info-circle"></i>
-                                            <span>没有API Token？<a href="https://glot.io/account/token" target="_blank">前往官网3分钟注册一个</a></span>
+                                            <span>新版 <a href="https://glot.io" target="_blank">glot.io</a> 官网不需要 API Token</span>
                                         </div>
                                     </div>
                                     <div class="password-container">
-                                        <input type="password" id="apiKey" placeholder="请输入您的 Glot API Token">
-                                        <button type="button" id="togglePassword" class="password-toggle">
+                                        <input type="password" id="apiKey" placeholder="无需填写 API Token" disabled>
+                                        <button type="button" id="togglePassword" class="password-toggle" disabled>
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>

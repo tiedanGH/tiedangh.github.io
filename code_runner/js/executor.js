@@ -1,5 +1,6 @@
 const GlotExecutor = (() => {
     const ProxyURL = 'https://cors-anywhere.herokuapp.com/';
+    const GLOT_MUX_URL = 'https://glot.io/api/mux';   // the new site's run endpoint, no API Token
 
     async function fetchCodeFromUrl(url) {
         const supportedUrls = [
@@ -53,9 +54,50 @@ const GlotExecutor = (() => {
         return content;
     }
 
-    // glot/<lang> docker image, mirrors GlotAPI.runCode (c/cpp share the clang image)
-    function dockerImage(language) {
-        return (language === 'c' || language === 'cpp') ? 'glot/clang:latest' : 'glot/' + language + ':latest';
+    // --- glot run config, mirrors GlotLanguages.kt (data from glotcode/glot-languages) ---
+    // /api/mux requires explicit runInstructions.
+    // {file} = main file name, {stem} = that name without its extension, first letter capitalized (java).
+    const GLOT_LANGUAGES = {
+        bash:       { image: 'glot/bash:latest',       run: 'bash {file}' },
+        c:          { image: 'glot/clang:latest',      build: ['clang -O2 -o a.out -lm {file}'], run: './a.out' },
+        cpp:        { image: 'glot/clang:latest',      build: ['clang++ -std=c++17 -O2 -o a.out {file}'], run: './a.out' },
+        go:         { image: 'glot/golang:latest',     build: ['go build -o a.out {file}'], run: './a.out' },
+        java:       { image: 'glot/java:latest',       build: ['javac {file}'], run: 'java {stem}' },
+        javascript: { image: 'glot/javascript:latest', run: 'node {file}' },
+        php:        { image: 'glot/php:latest',        run: 'php {file}' },
+        python:     { image: 'glot/python:latest',     run: 'python {file}' },
+        ruby:       { image: 'glot/ruby:latest',       run: 'ruby {file}' },
+        rust:       { image: 'glot/rust:latest',       build: ['rustc -o a.out {file}'], run: './a.out' },
+        swift:      { image: 'glot/swift:latest',      run: 'swift {file}' },
+        typescript: { image: 'glot/typescript:latest', build: ['tsc {file}'], run: 'node {js}' }
+    };
+
+    // glot docker image, shared by /api/mux and Docker Run (image name is not always the language name)
+    function glotImage(language) {
+        const cfg = GLOT_LANGUAGES[language];
+        return cfg ? cfg.image : 'glot/' + language + ':latest';
+    }
+
+    function fillCommand(cmd, mainFile) {
+        const stem = mainFile.replace(/\.[^.]*$/, '');
+        return cmd.replaceAll('{file}', mainFile)
+            .replaceAll('{stem}', stem.charAt(0).toUpperCase() + stem.slice(1))
+            .replaceAll('{js}', stem + '.js');
+    }
+
+    function runInstructions(language, mainFile) {
+        const cfg = GLOT_LANGUAGES[language];
+        if (!cfg) throw new Error('不支持的语言 ' + language);
+        return {
+            buildCommands: (cfg.build || []).map(c => fillCommand(c, mainFile)),
+            runCommand: fillCommand(cfg.run, mainFile)
+        };
+    }
+
+    // glot reports duration in NANOSECONDS (docker-run and /api/mux alike); convert to ms for display
+    // (guard: only convert implausibly-large values, leave already-ms values untouched)
+    function nsToMs(duration) {
+        return (typeof duration === 'number' && duration > 100000) ? Math.round(duration / 1e6) : duration;
     }
 
     // --- util helper files (mirror the bot's data/utils) ---
@@ -96,7 +138,7 @@ const GlotExecutor = (() => {
         return text.replace(/image:\/\//g, imageBase).replace(/lgtbot:\/\//g, LGTBOT_BASE);
     }
 
-    async function execute({ apiKey, language, codeSource, codeUrl, code, stdin, requestMethod, dockerUrl, dockerToken }) {
+    async function execute({ language, codeSource, codeUrl, code, stdin, requestMethod, dockerUrl, dockerToken }) {
         let finalCode = code;
         if (codeSource === 'url') {
             finalCode = await fetchCodeFromUrl(codeUrl);
@@ -112,16 +154,17 @@ const GlotExecutor = (() => {
             };
         }
 
-        // Shared payload (files + optional stdin/command), same shape as the bot's RunCodeRequest
+        // Shared files[] (main file first, then util files), used by both request methods
+        const lang = language.toLowerCase();
         const files = [{ name: GlotUtils.getFileName(language), content: finalCode }];
         const utilFiles = await detectUtilFiles(language, finalCode);   // auto-include util files when referenced
         for (const f of utilFiles) files.push(f);
         const utilNames = utilFiles.map(f => f.name);   // surfaced in the Debug area by output.js
-        const command = GlotUtils.getCommand(language);
 
         // Docker Run：自定义请求地址，body 为 {image, payload}，鉴权头 X-Access-Token；无需用户脚本/代理
         if (requestMethod === 'docker') {
-            const payload = { language: language.toLowerCase(), files: files };
+            const command = GlotUtils.getCommand(language);
+            const payload = { language: lang, files: files };
             if (stdin && stdin.trim()) payload.stdin = stdin;
             if (command) payload.command = command;
             const headers = { 'Content-Type': 'application/json' };
@@ -130,51 +173,57 @@ const GlotExecutor = (() => {
             const response = await GlotUtils.fetchWithTimeout(dockerUrl, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify({ image: dockerImage(language), payload: payload })
+                body: JSON.stringify({ image: glotImage(lang), payload: payload })
             }, 30000, true);   // true = native fetch, never via userscript
             if (!response.ok) {
                 const errText = await response.text();
                 throw new Error(`HTTP错误: ${response.status} - ${errText}`);
             }
             const result = await response.json();
-            // glotcode/docker-run reports duration in NANOSECONDS; convert to ms for display
-            // (guard: only convert implausibly-large values, leave already-ms values untouched)
-            if (typeof result.duration === 'number' && result.duration > 100000) {
-                result.duration = Math.round(result.duration / 1e6);
-            }
+            result.duration = nsToMs(result.duration);
             if (utilNames.length) result.utilFiles = utilNames;
             result.stdout = replaceImageSchemes(result.stdout);
             return result;
         }
 
-        // Glot API（官网，默认）
-        const requestData = { files: files };
-        if (stdin && stdin.trim()) requestData.stdin = stdin;
-        if (command) {
-            requestData.command = command;
-            console.log('Run Command:', command);
-        }
+        // Glot（新版官网 /api/mux，默认），mirrors GlotAPI.runOnGlot：无需注册与 API Token
+        const instructions = runInstructions(lang, files[0].name);
+        const request = {
+            action: 'run',
+            data: {
+                image: glotImage(lang),
+                payload: { runInstructions: instructions, files: files, stdin: (stdin && stdin.trim()) ? stdin : null }
+            }
+        };
 
-        const targetUrl = `https://glot.io/api/run/${language}/latest`;
-        const finalUrl = window.corsFetch ? targetUrl : ProxyURL + targetUrl;
-        console.log(window.corsFetch ? '(Userscript)' : '(Proxy)', 'Sending request to:', finalUrl);
+        const finalUrl = window.corsFetch ? GLOT_MUX_URL : ProxyURL + GLOT_MUX_URL;
+        console.log(window.corsFetch ? '(Userscript)' : '(Proxy)', 'Sending request to:', finalUrl,
+            '| image:', request.data.image, '| run:', instructions.buildCommands.concat(instructions.runCommand).join(' && '));
 
         const response = await GlotUtils.fetchWithTimeout(finalUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Token ${apiKey}`,
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Origin': 'https://glot.io',    // Page headers only the userscript can set them
+                'Referer': 'https://glot.io/new/' + lang
             },
-            body: JSON.stringify(requestData)
+            body: JSON.stringify(request)
         }, 30000);
 
-        if (!response.ok) {
+        // HTTP 400 carries { error: { code, message, requestId } } in the body; other failures stop here
+        if (!response.ok && response.status !== 400) {
             const errText = await response.text();
             throw new Error(`HTTP错误: ${response.status} - ${errText}`);
         }
+        const body = await response.json();
+        if (!body.data) {
+            const err = body.error;
+            throw new Error((err ? `[${err.code}] ${err.message}` : '未获取到任何数据'));
+        }
 
-        const result = await response.json();
+        const result = body.data;
+        result.duration = nsToMs(result.duration);
         if (utilNames.length) result.utilFiles = utilNames;
         result.stdout = replaceImageSchemes(result.stdout);
         return result;
