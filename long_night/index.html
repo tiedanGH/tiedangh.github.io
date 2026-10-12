@@ -21,8 +21,8 @@
     <link rel="stylesheet" href="css/edit.css?v=20261005">
     <link rel="stylesheet" href="css/track.css?v=20261005b">
 
-    <script src="js/zoom.js?v=20261006"></script>
-    <script src="js/main.js?v=20261005"></script>
+    <script src="js/zoom.js?v=20261011"></script>
+    <script src="js/main.js?v=20261011"></script>
     <script src="js/map.js?v=20261011"></script>
     <script src="js/ui-selectors.js?v=20261011c"></script>
     <script src="js/ui-interaction.js?v=20261011c"></script>
@@ -31,7 +31,7 @@
     <script src="js/history.js?v=20261011c"></script>
     <script src="js/edit-mode.js?v=20261011c"></script>
     <script src="js/track.js?v=20261005"></script>
-    <script src="js/save.js?v=20261011"></script>
+    <script src="js/save.js?v=20261011b"></script>
 </head>
 <body>
 
@@ -42,12 +42,13 @@
     <p><span>▪️</span> <b>[左键] 点击</b>格子角落的<b>黑点</b>，可选择区块进行放置</p>
     <p>🔼🔽◀️▶️ <b>[移动]</b> 玩家 🧍 来自动更新地图</p>
     <p>✂️ <b>[编辑模式]</b>或<b>[M]</b> 可框选后整体移动选择区域</p>
-    <p>🏃 <b>[轨迹导出]</b>或<b>[T]</b> 可记录玩家移动并导出轨迹</p>
+    <p>🏃 <b>[轨迹记录]</b>或<b>[T]</b> 可记录玩家移动并导出轨迹</p>
     <p>↶ <b>[撤销]或[Ctrl+Z]</b> 最多可撤销 50 步操作</p>
     <p>↷ <b>[重做]或[Ctrl+Y]</b> 恢复撤销的操作</p>
     <p>⌨️ <b>[Shift]+[右键]</b> 快速清除格子所有标记</p>
     <p>✋ <b>拖动</b>来拓展地图，<b>刷新</b>将重置草稿本</p>
-    <p>📁 <b>[存档管理]</b> 可保存最多5个地图，支持导入导出</p>
+    <p>🔍 <b>[缩放]</b>或<b>[+]/[-]</b> 放大或缩小地图</p>
+    <p>📁 <b>[存档管理]</b>或<b>[C]</b> 可保存地图，支持导入导出</p>
     <button id="close-alert" class="close-help-button">我知道了</button>
 </div>
 
@@ -86,14 +87,14 @@
 </div>
 
 <a href="../" class="back-home">返回主页</a>
-<button id="help-button" class="control-btn help-button" title="查看帮助">?</button>
-<button id="save-button" class="control-btn save-button" title="存档管理">📁</button>
-<button id="track-button" class="control-btn track-button" title="轨迹导出 (T)">🏃</button>
-<button id="edit-mode-button" class="control-btn edit-mode-button" title="编辑模式">✂️</button>
+<button id="help-button" class="control-btn help-button" title="查看帮助 (H)">?</button>
+<button id="save-button" class="control-btn save-button" title="存档管理 (C)">📁</button>
+<button id="track-button" class="control-btn track-button" title="轨迹记录 (T)">🏃</button>
+<button id="edit-mode-button" class="control-btn edit-mode-button" title="编辑模式 (M)">✂️</button>
 <button id="undo-button" class="control-btn undo-button">↶</button>
 <button id="redo-button" class="control-btn redo-button">↷</button>
-<button id="zoom-out-button" class="control-btn zoom-out-button" title="缩小地图">－</button>
-<button id="zoom-in-button" class="control-btn zoom-in-button" title="放大地图">＋</button>
+<button id="zoom-out-button" class="control-btn zoom-out-button" title="缩小地图 (-)">－</button>
+<button id="zoom-in-button" class="control-btn zoom-in-button" title="放大地图 (+)">＋</button>
 
 <div id="map-container"></div>
 

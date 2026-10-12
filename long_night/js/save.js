@@ -27,6 +27,15 @@ class SaveManager {
         this.importButton.addEventListener('click', () => this.importFileInput.click());
         this.importFileInput.addEventListener('change', (e) => this.handleImportFile(e));
 
+        // 快捷键 C：打开 / 关闭存档管理（S 已用于 WASD 移动）
+        document.addEventListener('keydown', e => {
+            if (e.key.toLowerCase() !== 'c' || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+            if (isTypingTarget(e.target)) return;
+            e.preventDefault();
+            if (this.saveManager.style.display === 'flex') this.hideSaveManager();
+            else this.showSaveManager();
+        });
+
         // 初始化存档槽位
         this.renderSaveSlots();
     }

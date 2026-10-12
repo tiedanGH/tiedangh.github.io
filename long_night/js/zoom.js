@@ -67,6 +67,15 @@ function initZoomControls(map) {
     zoomInBtn.addEventListener('click', () => setZoom(zoomIndex + 1));
     zoomOutBtn.addEventListener('click', () => setZoom(zoomIndex - 1));
 
+    // 快捷键 + / -：放大 / 缩小（主键盘的 + 需按 Shift，= 键同样放大；Ctrl 组合留给浏览器缩放）
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return;
+        if (e.key === '+' || e.key === '=') setZoom(zoomIndex + 1);
+        else if (e.key === '-') setZoom(zoomIndex - 1);
+        else return;
+        e.preventDefault();
+    });
+
     applyCellMetricsVars();
     updateButtons();
 }
