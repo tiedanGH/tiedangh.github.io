@@ -440,6 +440,7 @@ function showSquareAttachSelector(e, cell) {
     sel.appendChild(gridGroup);
     sel.appendChild(attachGroup);
     document.body.appendChild(sel);
+    sharpenMenuIcons(sel);
 
     setTimeout(() => {
         adjustElementPosition(sel, e);
@@ -660,6 +661,7 @@ function showWallSelector(e, cell, orientation) {
     sel.appendChild(wallGroup);
     sel.appendChild(attachGroup);
     document.body.appendChild(sel);
+    sharpenMenuIcons(sel);
 
     setTimeout(() => {
         adjustElementPosition(sel, e);

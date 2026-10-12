@@ -66,7 +66,7 @@ function loadBossImage(name) {
 }
 
 // 每个目标像素取其覆盖源像素的面积加权均值（按透明度加权，避免边缘发黑）
-function downscaleImage(img, size) {
+function downscaleImage(img, width, height = width) {
     const sw = img.naturalWidth, sh = img.naturalHeight;
     const src = document.createElement('canvas');
     src.width = sw;
@@ -76,14 +76,15 @@ function downscaleImage(img, size) {
     const s = sctx.getImageData(0, 0, sw, sh).data;
 
     const out = document.createElement('canvas');
-    out.width = out.height = size;
+    out.width = width;
+    out.height = height;
     const octx = out.getContext('2d');
-    const o = octx.createImageData(size, size);
-    const fx = sw / size, fy = sh / size;
-    for (let dy = 0; dy < size; dy++) {
-        const y0 = dy * fy, y1 = y0 + fy;
-        for (let dx = 0; dx < size; dx++) {
-            const x0 = dx * fx, x1 = x0 + fx;
+    const o = octx.createImageData(width, height);
+    const fx = sw / width, fy = sh / height;
+    for (let dy = 0; dy < height; dy++) {
+        const y0 = dy * fy, y1 = Math.min((dy + 1) * fy, sh);
+        for (let dx = 0; dx < width; dx++) {
+            const x0 = dx * fx, x1 = Math.min((dx + 1) * fx, sw);
             let r = 0, g = 0, b = 0, a = 0, area = 0;
             for (let y = Math.floor(y0); y < Math.ceil(y1); y++) {
                 const wy = Math.min(y + 1, y1) - Math.max(y, y0);
@@ -93,7 +94,7 @@ function downscaleImage(img, size) {
                     r += s[k] * wa; g += s[k + 1] * wa; b += s[k + 2] * wa; a += wa; area += w;
                 }
             }
-            const i = (dy * size + dx) * 4;
+            const i = (dy * width + dx) * 4;
             if (a > 0) {
                 o.data[i] = r / a; o.data[i + 1] = g / a; o.data[i + 2] = b / a;
             }
@@ -129,6 +130,72 @@ async function refreshBossIcons(mapSize) {
         root.style.setProperty(`--boss-${name}`, bossIconUrl(img, mapPx));
         root.style.setProperty(`--boss-${name}-menu`, bossIconUrl(img, menuPx));
     }
+}
+
+/* ========== 图例图标、区块预览与地图图片 ========== */
+// 原图比显示尺寸大时，图标按显示的设备像素尺寸预先缩小，避免浏览器实时缩小发糊
+const scaledImageCache = new Map();   // `${src}@${宽}x${高}` → 缩小后的图片地址，无需缩小时为 null
+
+function getScaledImage(src, width, height) {
+    const key = `${src}@${width}x${height}`;
+    if (!scaledImageCache.has(key)) {
+        scaledImageCache.set(key, new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => {
+                if (width >= img.naturalWidth && height >= img.naturalHeight) return resolve(null);   // 放大时用原图
+                try {
+                    resolve(downscaleImage(img, width, height));
+                } catch {
+                    resolve(null);   // 画布无法读取像素时（如图片跨域）用原图
+                }
+            };
+            img.onerror = () => resolve(null);
+            img.src = src;
+        }));
+    }
+    return scaledImageCache.get(key);
+}
+
+// 菜单放入页面后调用：图例图标与区块预览按显示尺寸换成清晰版本
+function sharpenMenuIcons(container) {
+    const dpr = window.devicePixelRatio || 1;
+    container.querySelectorAll('img.square-box, img.wall-box, .preview img.attach').forEach(img => {
+        const src = img.getAttribute('src');
+        const width = Math.round(img.clientWidth * dpr);
+        const height = Math.round(img.clientHeight * dpr);
+        if (!src || !width || !height) return;
+        getScaledImage(src, width, height).then(url => {
+            if (url) img.src = url;
+        });
+    });
+    // 区块预览的地形格：背景按 cover 铺满，按较长边生成
+    container.querySelectorAll('.preview td').forEach(td => {
+        const src = td.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];
+        const size = Math.round(Math.max(td.clientWidth, td.clientHeight) * dpr);
+        if (!src || !size) return;
+        getScaledImage(src, size, size).then(url => {
+            if (url) td.style.backgroundImage = `url('${url}')`;
+        });
+    });
+}
+
+// 地图上的地形与附着：以样式覆盖格子的行内背景图，行内写法不变
+const mapImageStyle = document.createElement('style');
+let mapImagePx = 0;
+
+// 地图缩放、窗口尺寸或设备像素比变化时重新生成
+async function refreshMapImages(cellSize) {
+    const px = Math.round(cellSize * (window.devicePixelRatio || 1));
+    if (px === mapImagePx) return;
+    mapImagePx = px;
+    const groups = [['.cell.square', gridOptions], ['.attachment-layer', attachOptions]];
+    const rules = await Promise.all(groups.flatMap(([selector, options]) => options.map(async ([, file]) => {
+        const url = await getScaledImage(`./img/${file}`, px, px);
+        return url && `${selector}[style*="/${file}"] { background-image: url('${url}') !important; }`;
+    })));
+    if (px !== mapImagePx) return;   // 等待期间尺寸变化，交给新的一次生成
+    mapImageStyle.textContent = rules.filter(Boolean).join('\n');
+    if (!mapImageStyle.isConnected) document.head.appendChild(mapImageStyle);
 }
 
 // 玩家移动相关

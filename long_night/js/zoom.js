@@ -25,6 +25,7 @@ function applyCellMetricsVars() {
     root.style.setProperty('--marker-font', marker + 'px');
     root.style.setProperty('--boss-size', boss + 'px');
     refreshBossIcons(boss);
+    refreshMapImages(size);
     return { size, wall };
 }
 

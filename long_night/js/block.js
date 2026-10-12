@@ -300,6 +300,7 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
 
     panel.appendChild(container);
     document.body.appendChild(panel);
+    sharpenMenuIcons(panel);
 
     setTimeout(() => {
         adjustElementPosition(panel, e);
