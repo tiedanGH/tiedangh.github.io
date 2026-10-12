@@ -9,6 +9,7 @@
 // @match              http*://github.tiedan.site/tiedan/code_runner/*
 // @match              http*://*.tiedan.site/code_runner/*
 // @match              http*://127.0.0.1/*
+// @match              http*://localhost/*
 // @connect            pastebin.ubuntu.com
 // @connect            glot.io
 // @connect            pastebin.com
