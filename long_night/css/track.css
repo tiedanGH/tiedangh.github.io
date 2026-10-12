@@ -42,7 +42,8 @@
     display: flex;
 }
 
-.track-panel .track-count {
+.track-panel .track-count,
+.track-panel .track-segment-count {
     color: #3949ab;
     font-size: 15px;
 }
@@ -77,12 +78,59 @@
     cursor: not-allowed;
 }
 
+/* 导出轨迹弹窗：可折叠，可翻动，宽度固定 */
+.track-export-popup {
+    width: 340px;
+    box-sizing: border-box;
+}
+
+.track-export-title {
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+.track-export-list {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 50vh;
+    overflow-y: auto;
+    scrollbar-width: none;   /* 隐藏滚动条 */
+}
+
+.track-export-list::-webkit-scrollbar {
+    display: none;
+}
+
+.track-export-list[hidden] {
+    display: none;
+}
+
+.track-export-label {
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: #666;
+}
+
+.track-export-popup .text-confirm-btn.copied {
+    background: #1e7e34;
+}
+.track-export-popup .text-confirm-btn.copied:hover {
+    background: #19692c;
+}
+.track-export-popup .text-confirm-btn.copy-failed {
+    background: #ea4335;
+}
+.track-export-popup .text-confirm-btn.copy-failed:hover {
+    background: #d33426;
+}
+
 /* 导出轨迹弹窗中的方向字符串 */
 .track-export-text {
-    min-width: 120px;
-    max-width: 260px;
-    max-height: 30vh;
-    overflow-y: auto;
+    flex: 1;
+    min-width: 0;
     padding: 6px;
     border: 2px solid #ccc;
     border-radius: 4px;
@@ -113,8 +161,11 @@
         font-size: 12px;
     }
 
+    .track-export-popup {
+        width: min(340px, 90vw);
+    }
+
     .track-export-text {
-        max-width: 60vw;
         padding: 5px;
         font-size: 12px;
     }

@@ -221,7 +221,7 @@ function resetPlayerMoveHistory() {
     lastMoveDirection = null;
     subspaceSteps = 0;
     renderSubspaceBadge();
-    window.trackManager?.resetStart();   // [轨迹记录] 从新位置重新记录
+    window.trackManager?.startSegment();   // [轨迹记录] 重新放置玩家或读档时另起一段
 }
 
 function getPlayerMoveDirection() {
