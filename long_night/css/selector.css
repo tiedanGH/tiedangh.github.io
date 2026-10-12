@@ -292,6 +292,10 @@
     box-sizing: border-box;
     text-shadow: 0 0 2px #fff, 0 0 2px #fff;
 }
+/* 特殊地形，改用黑色描边 */
+.custom-attach-text.colored {
+    text-shadow: 0 0 2px #000, 0 0 2px #000;
+}
 
 /* 墙壁附着：墙内居中椭圆，文本随墙壁厚度缩放 */
 .cell.wall.horizontal .custom-attach-circle {

@@ -196,7 +196,7 @@ function createCustomTextInput(title, initialValue, onConfirm, options = {}) {
 
     const confirm = () => {
         const value = textInput.value.trim();
-        if (!value) return;
+        if (!value && !options.allowEmpty) return;
         onConfirm(value);
         if (document.body.contains(inputContainer)) {
             document.body.removeChild(inputContainer);
@@ -335,12 +335,11 @@ function createCustomTextOption(cell) {
 
     li.onclick = (e) => {
         const textInput = createCustomTextInput('自定义文本', getCurrentAttachText(cell), (text) => {
-            clearBlockBinding(cell, 'attach');
             setCustomTextAttachment(cell, text);
             refreshMarkerColors(cell);
             saveHistory();
             removeSelector();
-        });
+        }, { allowEmpty: true });   // 空文本移除文本层
 
         positionSelector(textInput.container, e.currentTarget, window.innerWidth <= 600);
 

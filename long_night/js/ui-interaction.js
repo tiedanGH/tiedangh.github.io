@@ -53,7 +53,7 @@ function getMarkerContainer(cell) {
     return ctr;
 }
 
-// 玩家编号在特殊附着、地形上的颜色（同主游戏 GetColoredMark）
+// 玩家编号与方块文本在特殊附着、地形上的颜色（同主游戏 GetColoredMark）
 const MARK_COLOR_BY_ATTACH = { '炸弹': '#FFFF00', '箱子': '#FFFF00', '小太阳': '#FFFF00', '屏蔽器': '#FFFF00', '金币': '#FF6EC7' };
 const MARK_COLOR_BY_GRID = { '传送门': '#FFFF00', '热源': '#00FFFF' };
 
@@ -63,7 +63,7 @@ function getGroundSpecialColor(cell) {
     return MARK_COLOR_BY_ATTACH[getAttachmentType(cell)] || MARK_COLOR_BY_GRID[getTerrainType(cell)] || null;
 }
 
-// 刷新指定格子内玩家编号的颜色与描边（彩色编号用黑色描边）
+// 刷新指定格子内玩家编号与自定义文本的颜色与描边（彩色时用黑色描边）
 function refreshMarkerColors(cell) {
     if (!cell || cell.dataset.type !== 'square') return;
     const color = getGroundSpecialColor(cell);
@@ -72,6 +72,10 @@ function refreshMarkerColors(cell) {
         marker.style.color = color || 'black';
         marker.classList.add('player-number');
         marker.classList.toggle('colored', !!color);
+    });
+    cell.querySelectorAll(TEXT_LAYER_SELECTOR).forEach(layer => {
+        layer.style.color = color || '';
+        layer.classList.toggle('colored', !!color);
     });
 }
 
