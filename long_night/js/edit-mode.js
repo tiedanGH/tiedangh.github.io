@@ -450,6 +450,7 @@ class EditModeManager {
                         backgroundColor: cell.style.backgroundColor,
                         markers: this.serializeMarkers(cell),
                         attachment: this.serializeAttachment(cell),
+                        text: getCurrentAttachText(cell),
                         binding: getBlockBinding(cell)
                     });
                 } else if (cell.dataset.type === 'wall') {
@@ -463,7 +464,8 @@ class EditModeManager {
                         wallType: getCurrentWallType(cell),
                         backgroundImage: cell.style.backgroundImage,
                         backgroundColor: cell.style.backgroundColor,
-                        attachment: this.serializeAttachment(cell)
+                        attachment: this.serializeAttachment(cell),
+                        text: getCurrentAttachText(cell)
                     });
                 }
             }
@@ -482,16 +484,10 @@ class EditModeManager {
         return markers;
     }
 
+    // 游戏内附着或自定义颜色（文本另存）
     serializeAttachment(cell) {
-        const layer = cell.querySelector('.attachment-layer');
+        const layer = cell.querySelector(ATTACH_LAYER_SELECTOR);
         if (!layer) return null;
-
-        if (layer.classList.contains('custom-attach-text')) {
-            return {
-                kind: 'text',
-                text: layer.textContent
-            };
-        }
 
         if (layer.classList.contains('custom-attach-circle')) {
             return {
@@ -621,12 +617,7 @@ class EditModeManager {
     applyAttachmentState(cell, attachment) {
         if (!attachment) return;
         const layer = getAttachmentLayer(cell);
-        if (attachment.kind === 'text') {
-            layer.classList.add('custom-attach-text');
-            layer.style.backgroundImage = 'none';
-            layer.style.backgroundColor = '';
-            layer.textContent = attachment.text || '';
-        } else if (attachment.kind === 'custom') {
+        if (attachment.kind === 'custom') {
             layer.classList.add('custom-attach-circle');
             layer.style.backgroundImage = 'none';
             layer.style.backgroundColor = attachment.color;
@@ -644,6 +635,7 @@ class EditModeManager {
         cell.style.backgroundColor = state.backgroundColor;
         setBlockBinding(cell, state.binding);   // 相对坐标随区块一起移动 / 复制
         this.applyAttachmentState(cell, state.attachment);
+        setCustomTextAttachment(cell, state.text);
 
         if (state.markers?.length) {
             const container = getMarkerContainer(cell);
@@ -675,6 +667,7 @@ class EditModeManager {
             cell.style.backgroundImage = `url('${getWallImage(state.wallType, orientation)}')`;
         }
         this.applyAttachmentState(cell, state.attachment);
+        setCustomTextAttachment(cell, state.text);
     }
 
     // 删除选区：范围内全部内容（含空白格）重置为未知，然后退出编辑模式

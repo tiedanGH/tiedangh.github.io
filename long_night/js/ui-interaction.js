@@ -1,4 +1,9 @@
 
+// 附着层：游戏内附着类型
+const ATTACH_LAYER_SELECTOR = '.attachment-layer:not(.custom-attach-text)';
+// 文本层：自定义文本单独一层，可与附着共存
+const TEXT_LAYER_SELECTOR = '.attachment-layer.custom-attach-text';
+
 function setAttachment(cell, imgFile) {
     const layer = getAttachmentLayer(cell);
     layer.style.backgroundColor = '';
@@ -8,33 +13,34 @@ function setAttachment(cell, imgFile) {
 }
 
 function getAttachmentLayer(cell) {
-    let layer = cell.querySelector('.attachment-layer');
+    let layer = cell.querySelector(ATTACH_LAYER_SELECTOR);
     if (!layer) {
         layer = document.createElement('div');
-        cell.appendChild(layer);
+        cell.insertBefore(layer, cell.querySelector(TEXT_LAYER_SELECTOR));   // 文本层在附着之上
     }
     layer.className = 'attachment-layer';
-    layer.textContent = '';   // 清除可能残留的自定义文本
     return layer;
 }
 
-// 设置自定义文本附着（空文本则清除附着）
+// 设置自定义文本：替换旧文本，不影响附着（空文本则清除文本层）
 function setCustomTextAttachment(cell, text) {
     const value = (text ?? '').trim();
     if (!value) {
-        clearAttachment(cell);
+        clearTextAttachment(cell);
         return;
     }
-    const layer = getAttachmentLayer(cell);
-    layer.classList.add('custom-attach-text');
-    layer.style.backgroundImage = 'none';
-    layer.style.backgroundColor = '';
+    let layer = cell.querySelector(TEXT_LAYER_SELECTOR);
+    if (!layer) {
+        layer = document.createElement('div');
+        layer.className = 'attachment-layer custom-attach-text';
+        cell.appendChild(layer);
+    }
     layer.textContent = value;
 }
 
 // 读取单元格当前的自定义文本（用于编辑时回填）
 function getCurrentAttachText(cell) {
-    const layer = cell?.querySelector('.attachment-layer.custom-attach-text');
+    const layer = cell?.querySelector(TEXT_LAYER_SELECTOR);
     return layer ? layer.textContent : '';
 }
 
@@ -70,7 +76,7 @@ function refreshMarkerColors(cell) {
 }
 
 function getAttachmentFileName(cell) {
-    const layer = cell?.querySelector('.attachment-layer');
+    const layer = cell?.querySelector(ATTACH_LAYER_SELECTOR);
     if (!layer || layer.classList.contains('custom-attach-circle')) return null;
     const bg = layer.style.backgroundImage;
     if (!bg || bg === 'none') return null;
@@ -88,8 +94,14 @@ function isPushableBoxAttachment(cell) {
     return !!type && pushableTypes.includes(type);
 }
 
+// 移除附着层或自定义颜色，但保留文本
 function clearAttachment(cell) {
-    cell?.querySelectorAll('.attachment-layer').forEach(layer => layer.remove());
+    cell?.querySelectorAll(ATTACH_LAYER_SELECTOR).forEach(layer => layer.remove());
+}
+
+// 移除文本层
+function clearTextAttachment(cell) {
+    cell?.querySelectorAll(TEXT_LAYER_SELECTOR).forEach(layer => layer.remove());
 }
 
 function ensureKnownSquare(square) {

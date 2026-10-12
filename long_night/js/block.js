@@ -384,12 +384,9 @@ function clearArea(map, i0, j0) {
                 // 清除地形
                 square.style.backgroundImage = 'url(./img/unknown.png)';
                 setBlockBinding(square, null);
-                // 清除附着
-                const attachmentLayer = square.querySelector('.attachment-layer');
-                if (attachmentLayer) {
-                    attachmentLayer.style.backgroundImage = '';
-                    attachmentLayer.remove();
-                }
+                // 清除附着与文本
+                clearAttachment(square);
+                clearTextAttachment(square);
             }
 
             const directions = [
@@ -401,6 +398,7 @@ function clearArea(map, i0, j0) {
                     const orientation = wall.classList.contains('horizontal') ? 'horizontal' : 'vertical';
                     wall.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
                     clearAttachment(wall);
+                    clearTextAttachment(wall);
                 }
             });
         }

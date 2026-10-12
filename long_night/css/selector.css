@@ -290,6 +290,7 @@
     overflow: hidden;
     padding: 1px;
     box-sizing: border-box;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff;
 }
 
 /* 墙壁附着：墙内居中椭圆，文本随墙壁厚度缩放 */
@@ -305,7 +306,6 @@
     font-size: calc(var(--wall-size) * 0.75);
     line-height: 1;
     padding: 0;
-    text-shadow: 0 0 2px #fff, 0 0 2px #fff;
 }
 
 /* 墙壁菜单标题行 + 快速放置入口 */

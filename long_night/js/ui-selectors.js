@@ -397,7 +397,7 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
         const li = createOptionItem(name, `./img/${val}`, onClick);
         ul.appendChild(li);
     });
-    // 附着组“无”：直接移除附着层
+    // 附着组“无”：直接移除附着层与文本
     if (groupType === 'attach') {
         const onWall = cell.dataset.type === 'wall';
         const orientation = cell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
@@ -405,6 +405,7 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
         ul.appendChild(createOptionItem('无', noneIcon, () => {
             clearBlockBinding(cell, 'attach');
             clearAttachment(cell);
+            clearTextAttachment(cell);
             refreshMarkerColors(cell);
             saveHistory();
             removeSelector();

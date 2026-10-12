@@ -86,9 +86,8 @@ class HistoryManager {
                 });
             }
 
-            // 保存附着
-            const attachLayer = cell.querySelector('.attachment-layer');
-            if (attachLayer) {
+            // 保存附着与文本
+            cell.querySelectorAll('.attachment-layer').forEach(attachLayer => {
                 if (attachLayer.classList.contains('custom-attach-text')) {
                     // 保存自定义文本附着
                     cellCopy.textAttach = attachLayer.textContent;
@@ -114,7 +113,7 @@ class HistoryManager {
                         if (attachName) cellCopy.attach = attachName;
                     }
                 }
-            }
+            });
 
             snapshot.cells.set(key, cellCopy);
         });
@@ -175,13 +174,7 @@ class HistoryManager {
                 setBlockBinding(existingCell, cellData.binding);
 
                 // 恢复附着
-                if (cellData.textAttach != null) {
-                    // 恢复自定义文本附着
-                    const layer = document.createElement('div');
-                    layer.className = 'attachment-layer custom-attach-text';
-                    layer.textContent = cellData.textAttach;
-                    existingCell.appendChild(layer);
-                } else if (cellData.customAttach) {
+                if (cellData.customAttach) {
                     // 恢复自定义附着
                     const layer = document.createElement('div');
                     layer.className = 'attachment-layer custom-attach-circle';
@@ -206,6 +199,14 @@ class HistoryManager {
                         layer.style.backgroundPosition  = 'center';
                         existingCell.appendChild(layer);
                     }
+                }
+
+                // 恢复自定义文本（叠在附着之上）
+                if (cellData.textAttach != null) {
+                    const layer = document.createElement('div');
+                    layer.className = 'attachment-layer custom-attach-text';
+                    layer.textContent = cellData.textAttach;
+                    existingCell.appendChild(layer);
                 }
 
                 // 恢复标记
