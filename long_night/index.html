@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/base.css?v=20261012b">
     <link rel="stylesheet" href="css/selector.css?v=20261012e">
     <link rel="stylesheet" href="css/button.css?v=20261005b">
-    <link rel="stylesheet" href="css/save.css?v=20260316">
+    <link rel="stylesheet" href="css/save.css?v=20261012c">
     <link rel="stylesheet" href="css/edit.css?v=20261012">
     <link rel="stylesheet" href="css/track.css?v=20261011f">
 
@@ -29,10 +29,10 @@
     <script src="js/ui-core.js?v=20261011c"></script>
     <script src="js/block.js?v=20261012b"></script>
     <script src="js/border.js?v=20261012"></script>
-    <script src="js/history.js?v=20261012"></script>
+    <script src="js/history.js?v=20261012b"></script>
     <script src="js/edit-mode.js?v=20261012"></script>
     <script src="js/track.js?v=20261011d"></script>
-    <script src="js/save.js?v=20261012"></script>
+    <script src="js/save.js?v=20261012b"></script>
 </head>
 <body>
 
@@ -60,7 +60,8 @@
 
     <div class="save-controls">
         <div class="save-stats">
-            <span class="save-count">存档：<span id="current-save-count">0</span> / 5</span>
+            <span class="save-count">存档：<span id="current-save-count">0</span> / <span id="max-save-count">20</span></span>
+            <input type="search" id="save-search" class="save-search" placeholder="搜索存档" autocomplete="off">
         </div>
         <div class="save-buttons">
             <button id="create-new-save" class="action-btn create-btn">+ 新建存档</button>

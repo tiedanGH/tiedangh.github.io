@@ -11,9 +11,12 @@ class SaveManager {
         this.createNewSaveButton = document.getElementById('create-new-save');
         this.emptySlotMessage = document.getElementById('empty-slot-message');
         this.currentSaveCountElement = document.getElementById('current-save-count');
+        this.maxSaveCountElement = document.getElementById('max-save-count');
+        this.searchInput = document.getElementById('save-search');
 
-        this.MAX_SAVES = 5;
+        this.MAX_SAVES = 20;
         this.STORAGE_KEY = 'LongNightSaves';
+        this.dragState = null;   // 拖动排序中的存档
 
         this.customAlert = new CustomAlert();
 
@@ -26,6 +29,9 @@ class SaveManager {
         this.createNewSaveButton.addEventListener('click', () => this.createNewSave());
         this.importButton.addEventListener('click', () => this.importFileInput.click());
         this.importFileInput.addEventListener('change', (e) => this.handleImportFile(e));
+        // 搜索：按名称筛选存档
+        this.searchInput.addEventListener('input', () => this.renderSaveSlots());
+        this.maxSaveCountElement.textContent = this.MAX_SAVES;
 
         // 快捷键 C：打开 / 关闭存档管理（S 已用于 WASD 移动）
         document.addEventListener('keydown', e => {
@@ -46,6 +52,7 @@ class SaveManager {
     }
 
     hideSaveManager() {
+        this.endSlotDrag();
         this.saveManager.style.display = 'none';
     }
 
@@ -54,9 +61,20 @@ class SaveManager {
         return savesJson ? JSON.parse(savesJson) : [];
     }
 
+    // 写入失败（如浏览器存储空间不足）时提示并返回 false
     saveSaves(saves) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(saves));
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(saves));
+        } catch (e) {
+            console.warn('存档保存失败:', e);
+            const quota = e?.name === 'QuotaExceededError' || /quota/i.test(e?.message || '');
+            this.customAlert.alert(quota
+                ? '浏览器存储空间不足，存档未保存。可先导出并删除部分存档后重试。'
+                : `存档保存失败：${e?.message || e}`);
+            return false;
+        }
         this.updateSaveCount();
+        return true;
     }
 
     updateSaveCount() {
@@ -195,16 +213,17 @@ class SaveManager {
             version: '1.0'
         };
         saves.push(save);
-        this.saveSaves(saves);
+        if (!this.saveSaves(saves)) return;
 
-        // 重新渲染存档槽位
+        // 重新渲染存档槽位：清空搜索，新存档可能不符合筛选条件
+        this.searchInput.value = '';
         this.renderSaveSlots();
 
         // 自动进入最后一个存档的编辑模式
         const lastIndex = saves.length - 1;
-        const nameElements = this.saveSlotsContainer.querySelectorAll('.save-name');
-        if (nameElements[lastIndex]) {
-            this.enableInlineRename(nameElements[lastIndex], lastIndex);
+        const nameElement = this.saveSlotsContainer.querySelector(`.save-slot[data-index="${lastIndex}"] .save-name`);
+        if (nameElement) {
+            this.enableInlineRename(nameElement, lastIndex);
         }
     }
 
@@ -240,7 +259,10 @@ class SaveManager {
 
             save.name = newName;
             saves[slotIndex] = save;
-            this.saveSaves(saves);
+            if (!this.saveSaves(saves)) {
+                nameElement.textContent = originalName;
+                return;
+            }
 
             nameElement.textContent = newName;
         };
@@ -298,7 +320,7 @@ class SaveManager {
                     version: '1.0'
                 };
 
-                this.saveSaves(saves);
+                if (!this.saveSaves(saves)) return;
                 this.renderSaveSlots();
                 this.customAlert.alert(`存档 "${save.name}" 已覆盖保存！`);
             },
@@ -318,8 +340,7 @@ class SaveManager {
             '确认删除',
             () => {
                 saves.splice(slotIndex, 1);
-                this.saveSaves(saves);
-                this.renderSaveSlots();
+                if (this.saveSaves(saves)) this.renderSaveSlots();
             },
             () => {
                 // 取消删除
@@ -536,7 +557,8 @@ class SaveManager {
         // 合并并保存
         const updatedSaves = [...currentSaves, saveToImport];
 
-        this.saveSaves(updatedSaves);
+        if (!this.saveSaves(updatedSaves)) return;
+        this.searchInput.value = '';
         this.renderSaveSlots();
 
         this.customAlert.alert('导入存档成功！');
@@ -558,10 +580,32 @@ class SaveManager {
             this.emptySlotMessage.style.display = 'none';
         }
 
+        // 按名称搜索筛选，序号仍对应完整列表
+        const query = this.searchInput.value.trim().toLowerCase();
+        const visible = saves.map((save, index) => ({ save, index }))
+            .filter(({ save }) => !query || String(save.name).toLowerCase().includes(query));
+        if (visible.length === 0) {
+            const noMatch = document.createElement('div');
+            noMatch.className = 'save-no-match';
+            noMatch.textContent = '没有匹配的存档';
+            this.saveSlotsContainer.appendChild(noMatch);
+            return;
+        }
+
         // 渲染所有存档
-        saves.forEach((save, index) => {
+        visible.forEach(({ save, index }) => {
             const slot = document.createElement('div');
             slot.className = 'save-slot';
+            slot.dataset.index = index;
+
+            // 拖动柄：长按后拖动调整顺序
+            const handle = document.createElement('div');
+            handle.className = 'save-drag-handle';
+            handle.title = '长按拖动调整顺序';
+            this.bindSlotDrag(handle, slot);
+
+            const body = document.createElement('div');
+            body.className = 'save-body';
 
             const info = document.createElement('div');
             info.className = 'save-info';
@@ -625,10 +669,145 @@ class SaveManager {
             actions.appendChild(deleteBtn);
             actions.appendChild(exportBtn);
 
-            slot.appendChild(info);
-            slot.appendChild(actions);
+            body.appendChild(info);
+            body.appendChild(actions);
+            slot.appendChild(handle);
+            slot.appendChild(body);
             this.saveSlotsContainer.appendChild(slot);
         });
+    }
+
+    /* ========== 拖动排序 ========== */
+    // 长按存档前的拖动柄开始拖动（鼠标按住后移动也可直接拖动）
+    bindSlotDrag(handle, slot) {
+        const LONG_PRESS_MS = 300;
+        let timer = null;
+        let startY = 0;
+        let lastY = 0;
+
+        const cancelPress = () => {
+            clearTimeout(timer);
+            timer = null;
+            handle.classList.remove('pressing');
+        };
+        const press = y => {
+            startY = lastY = y;
+            handle.classList.add('pressing');
+            timer = setTimeout(() => {
+                cancelPress();
+                this.startSlotDrag(slot, lastY);
+            }, LONG_PRESS_MS);
+        };
+
+        handle.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            e.preventDefault();   // 避免选中文字
+            press(e.clientY);
+            const move = ev => {
+                lastY = ev.clientY;
+                if (timer && Math.abs(lastY - startY) > 4) {
+                    cancelPress();
+                    this.startSlotDrag(slot, lastY);
+                }
+                this.moveSlotDrag(lastY);
+            };
+            const up = () => {
+                window.removeEventListener('mousemove', move);
+                window.removeEventListener('mouseup', up);
+                cancelPress();
+                this.endSlotDrag();
+            };
+            window.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', up);
+        });
+
+        // 触摸：长按前滑动视为滚动列表，开始拖动后不再滚动
+        handle.addEventListener('touchstart', e => {
+            if (e.touches.length === 1) press(e.touches[0].clientY);
+        }, { passive: true });
+        handle.addEventListener('touchmove', e => {
+            lastY = e.touches[0].clientY;
+            if (this.dragState) {
+                e.preventDefault();
+                this.moveSlotDrag(lastY);
+            } else if (timer && Math.abs(lastY - startY) > 8) {
+                cancelPress();
+            }
+        }, { passive: false });
+        const endTouch = () => {
+            cancelPress();
+            this.endSlotDrag();
+        };
+        handle.addEventListener('touchend', endTouch);
+        handle.addEventListener('touchcancel', endTouch);
+        handle.addEventListener('contextmenu', e => e.preventDefault());
+    }
+
+    startSlotDrag(slot, clientY) {
+        if (this.dragState) return;
+        this.dragState = { slot, lastY: clientY, frame: 0 };
+        slot.classList.add('dragging');
+        this.saveManager.classList.add('sorting');
+
+        // 拖到列表上下边缘时自动滚动
+        const EDGE = 40;
+        const step = () => {
+            const state = this.dragState;
+            if (!state) return;
+            const box = this.saveSlotsContainer.getBoundingClientRect();
+            let dy = 0;
+            if (state.lastY < box.top + EDGE) dy = -Math.ceil((box.top + EDGE - state.lastY) / 4);
+            else if (state.lastY > box.bottom - EDGE) dy = Math.ceil((state.lastY - box.bottom + EDGE) / 4);
+            if (dy) {
+                this.saveSlotsContainer.scrollTop += dy;
+                this.placeDraggedSlot(state.lastY);
+            }
+            state.frame = requestAnimationFrame(step);
+        };
+        this.dragState.frame = requestAnimationFrame(step);
+    }
+
+    moveSlotDrag(clientY) {
+        if (!this.dragState) return;
+        this.dragState.lastY = clientY;
+        this.placeDraggedSlot(clientY);
+    }
+
+    // 越过相邻存档的中线时换位
+    placeDraggedSlot(clientY) {
+        const { slot } = this.dragState;
+        const others = [...this.saveSlotsContainer.querySelectorAll('.save-slot')].filter(el => el !== slot);
+        const next = others.find(el => {
+            const r = el.getBoundingClientRect();
+            return clientY < r.top + r.height / 2;
+        });
+        if (next) {
+            if (slot.nextElementSibling !== next) this.saveSlotsContainer.insertBefore(slot, next);
+        } else if (others.length && others[others.length - 1].nextElementSibling !== slot) {
+            others[others.length - 1].after(slot);
+        }
+    }
+
+    // 松开后保存顺序：可见存档按新顺序填回它们原来的位置，搜索时未显示的存档不动
+    endSlotDrag() {
+        const state = this.dragState;
+        if (!state) return;
+        this.dragState = null;
+        cancelAnimationFrame(state.frame);
+        state.slot.classList.remove('dragging');
+        this.saveManager.classList.remove('sorting');
+
+        const order = [...this.saveSlotsContainer.querySelectorAll('.save-slot')].map(el => Number(el.dataset.index));
+        const positions = [...order].sort((a, b) => a - b);
+        if (order.every((index, k) => index === positions[k])) return;
+
+        const saves = this.getAllSaves();
+        const sorted = [...saves];
+        positions.forEach((position, k) => {
+            sorted[position] = saves[order[k]];
+        });
+        this.saveSaves(sorted);
+        this.renderSaveSlots();
     }
 }
 
@@ -665,8 +844,8 @@ class CustomAlert {
             btn.className = `custom-alert-btn custom-alert-${button.type || 'neutral'}`;
             btn.textContent = button.text;
             btn.onclick = () => {
-                if (button.callback) button.callback();
                 this.hide();
+                if (button.callback) button.callback();
             };
             this.buttons.appendChild(btn);
         });

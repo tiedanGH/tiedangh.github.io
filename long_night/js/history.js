@@ -24,7 +24,7 @@ class HistoryManager {
         }
         // 绑定键盘快捷键
         document.addEventListener('keydown', (e) => {
-            if (this.locked) return;
+            if (this.locked || isTypingTarget(e.target)) return;
             const key = e.key.toLowerCase();
             // Ctrl+Z - 撤销
             if ((e.ctrlKey || e.metaKey) && key === 'z' && !e.shiftKey) {
