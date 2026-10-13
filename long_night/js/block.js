@@ -107,6 +107,13 @@ function getCurrentWallType(wallCell) {
     return wallOption ? wallOption[0] : '未知';
 }
 
+// 地图边框的可选边长
+const BORDER_SIZES = [
+    { label: '9×9', gridWidth: 9, gridHeight: 9 },
+    { label: '10×10', gridWidth: 10, gridHeight: 10 },
+    { label: '12×12', gridWidth: 12, gridHeight: 12 }
+];
+
 function blockCellEvent(map) {
     map.container.addEventListener('click', e => {
         if (window.editModeManager?.isActive()) return;
@@ -195,14 +202,16 @@ function blockCellEvent(map) {
                 });
             });
 
+            window.borderManager?.syncWallsIn(i0, i0 + 6, j0, j0 + 6);   // [边框] 对侧边界墙同步
+
             setTimeout(() => {
                 if (window.historyManager) window.historyManager.saveState(); // 区块放置后保存历史
             }, 10);
-        }, map, i0, j0);
+        }, i0, j0);
     });
 }
 
-function showBlockSelector(e, onSelect, map, i0, j0) {
+function showBlockSelector(e, onSelect, i0, j0) {
     removeBlockSelector();
 
     const panel = document.createElement('div');
@@ -213,8 +222,63 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
     const ids = Object.keys(blocksData);
 
     const title = document.createElement('div');
-    title.className = 'title';
-    title.textContent = '放置区块';
+    title.className = 'title block-title';
+
+    const saveBorderHistory = () => setTimeout(() => {
+        if (window.historyManager) window.historyManager.saveState();
+    }, 10);
+
+    const borderBtn = document.createElement('button');
+    borderBtn.type = 'button';
+    let sizeMenu = null;
+    if (window.borderManager?.get(i0, j0)) {
+        borderBtn.className = 'title-btn border-remove-btn';
+        borderBtn.textContent = '移除边框';
+        borderBtn.onclick = () => {
+            window.borderManager.remove(i0, j0);
+            removeBlockSelector();
+            saveBorderHistory();
+        };
+    } else {
+        borderBtn.className = 'title-btn border-place-btn';
+        borderBtn.textContent = '放置边框';
+
+        // 边长列表：竖排展开，点击外部收起
+        sizeMenu = document.createElement('div');
+        sizeMenu.className = 'border-size-menu';
+        sizeMenu.hidden = true;
+        BORDER_SIZES.forEach(size => {
+            const sizeBtn = document.createElement('button');
+            sizeBtn.type = 'button';
+            sizeBtn.textContent = size.label;
+            sizeBtn.onclick = () => {
+                window.borderManager.add(i0, j0, size.gridWidth, size.gridHeight);
+                removeBlockSelector();
+                saveBorderHistory();
+            };
+            sizeMenu.appendChild(sizeBtn);
+        });
+        borderBtn.onclick = () => {
+            sizeMenu.hidden = !sizeMenu.hidden;
+        };
+        panel.addEventListener('mousedown', ev => {
+            if (!sizeMenu.contains(ev.target) && ev.target !== borderBtn) sizeMenu.hidden = true;
+        });
+    }
+
+    const titleText = document.createElement('span');
+    titleText.textContent = '放置区块';
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'title-btn clear-block-btn';
+    clearBtn.textContent = '清除区块';
+    clearBtn.onclick = () => onSelect('__CLEAR__');
+
+    title.appendChild(borderBtn);
+    title.appendChild(titleText);
+    title.appendChild(clearBtn);
+    if (sizeMenu) title.appendChild(sizeMenu);
     panel.appendChild(title);
 
     const container = document.createElement('div');
@@ -256,38 +320,6 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
     // 网页端自带的全空白区块
     addBlockButton(specialGrid, BLANK_BLOCK_ID, BLANK_BLOCK.name, BLANK_BLOCK);
 
-    // 预设地图边框按钮
-    const borderSizes = [
-        { label: '9×9', gridWidth: 9, gridHeight: 9 },
-        { label: '10×10', gridWidth: 10, gridHeight: 10 },
-        { label: '12×12', gridWidth: 12, gridHeight: 12 }
-    ];
-    const borderContainer = document.createElement('div');
-    borderContainer.style.display = 'flex';
-    borderContainer.style.marginTop = '5px';
-
-    borderSizes.forEach(border => {
-        const borderBtn = document.createElement('button');
-        borderBtn.textContent = border.label;
-        borderBtn.style.flex = '1';
-        borderBtn.style.margin = '0 2px';
-
-        borderBtn.onclick = () => {
-            createMapBorder(map, i0, j0, border.gridWidth, border.gridHeight);
-            removeBlockSelector();
-            setTimeout(() => {
-                if (window.historyManager) window.historyManager.saveState();
-            }, 10);
-        };
-
-        borderContainer.appendChild(borderBtn);
-    });
-
-    const clearBtn = document.createElement('button');
-    clearBtn.textContent = '清除区块';
-    clearBtn.className = 'clear-btn';
-    clearBtn.onclick = () => onSelect('__CLEAR__');
-
     container.appendChild(normalGrid);
     if (exitGrid.children.length > 0) {
         container.appendChild(exitGrid);
@@ -295,8 +327,6 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
     if (specialGrid.children.length > 0) {
         container.appendChild(specialGrid);
     }
-    container.appendChild(borderContainer);
-    container.appendChild(clearBtn);
 
     panel.appendChild(container);
     document.body.appendChild(panel);
@@ -305,38 +335,6 @@ function showBlockSelector(e, onSelect, map, i0, j0) {
     setTimeout(() => {
         adjustElementPosition(panel, e);
     }, 0);
-}
-
-// 创建地图边框
-function createMapBorder(map, startI, startJ, gridWidth, gridHeight) {
-    const wallsX = gridWidth + 1;
-    const wallsY = gridHeight + 1;
-
-    const endI = startI + (wallsX - 1) * 2;
-    const endJ = startJ + (wallsY - 1) * 2;
-
-    const { size, wall } = getCellMetrics();
-
-    function ensureWhiteWall(map, i, j, size, wall) {
-        map.ensureCell(i, j, size, wall);
-        const wallCell = map.cells.get(`${i},${j}`);
-
-        if (wallCell && wallCell.dataset.type === 'wall') {
-            if (getCurrentWallType(wallCell) === '未知') {
-                const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
-                wallCell.style.backgroundImage = `url('${getWallImage('空', orientation)}')`;
-            }
-        }
-    }
-
-    for (let i = startI; i <= endI; i++) {
-        ensureWhiteWall(map, i, startJ, size, wall); // 上
-        ensureWhiteWall(map, i, endJ, size, wall);   // 下
-    }
-    for (let j = startJ; j <= endJ; j++) {
-        ensureWhiteWall(map, startI, j, size, wall); // 左
-        ensureWhiteWall(map, endI, j, size, wall);   // 右
-    }
 }
 
 // 边界检查：确保菜单不会超出屏幕
@@ -404,6 +402,7 @@ function clearArea(map, i0, j0) {
             });
         }
     }
+    window.borderManager?.syncWallsIn(i0, i0 + 6, j0, j0 + 6);   // [边框] 对侧边界墙同步移除
 }
 
 function createPreview(block) {

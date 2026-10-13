@@ -22,6 +22,14 @@
     z-index: 9;
 }
 
+/* 边框的目标位置预览，冲突将被替换的边框 */
+.map-border.preview rect {
+    stroke: rgba(255, 140, 80, 0.95);
+}
+.map-border.conflict rect {
+    stroke: rgba(255, 0, 0, 0.98);
+}
+
 .move-confirm-bar {
     position: fixed;
     top: 58px;

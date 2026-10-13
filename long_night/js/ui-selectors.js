@@ -293,6 +293,7 @@ function createCustomOption(cell, groupType) {
                 cell.style.backgroundImage = 'none';
                 cell.style.backgroundColor = color;
             }
+            syncBorderWall(cell);   // [边框] 墙壁及其附着同步对侧
             refreshMarkerColors(cell);  // 刷新标记颜色
             saveHistory();
             removeSelector();
@@ -336,6 +337,7 @@ function createCustomTextOption(cell) {
     li.onclick = (e) => {
         const textInput = createCustomTextInput('自定义文本', getCurrentAttachText(cell), (text) => {
             setCustomTextAttachment(cell, text);
+            syncBorderWall(cell);
             refreshMarkerColors(cell);
             saveHistory();
             removeSelector();
@@ -405,6 +407,7 @@ function createOptionGroup(titleText, options, cell, groupType = 'grid') {
             clearBlockBinding(cell, 'attach');
             clearAttachment(cell);
             clearTextAttachment(cell);
+            syncBorderWall(cell);
             refreshMarkerColors(cell);
             saveHistory();
             removeSelector();
@@ -527,6 +530,7 @@ function setWallByPriority(wi, wj, type) {
     const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
     wallCell.style.backgroundColor = '';
     wallCell.style.backgroundImage = `url('${getWallImage(type, orientation)}')`;
+    syncBorderWall(wallCell);   // [边框] 对侧边界墙同步
 }
 
 function createQuickPatternIcon(sides) {
@@ -641,6 +645,7 @@ function showWallSelector(e, cell, orientation) {
             const wallImage = getWallImage(name, orientation);
             cell.style.backgroundImage = `url('${wallImage}')`;
             cell.style.backgroundColor = '';
+            syncBorderWall(cell);   // [边框] 对侧边界墙同步
             saveHistory();
             removeSelector();
         };
@@ -767,8 +772,7 @@ function applyPathRecord(startCell, ops) {
         }
 
         setWallByPriority(i + delta[0] / 2, j + delta[1] / 2, '空');
-        i += delta[0];
-        j += delta[1];
+        [i, j] = wrapBorderTarget(i, j, i + delta[0], j + delta[1]);   // [边框] 框内越过边框时绕到对侧
         setPathTerrain(i, j, op.terrain || '空地', !op.terrain);
     });
 }

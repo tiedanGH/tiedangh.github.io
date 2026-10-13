@@ -172,6 +172,8 @@ class SaveManager {
             }
         });
 
+        state.borders = window.borderManager?.list() || [];   // [边框]
+
         return state;
     }
 
@@ -428,6 +430,14 @@ class SaveManager {
 
                 refreshMarkerColors(cell);   // 玩家编号的颜色与描边样式刷新
             });
+        }
+
+        // [边框] 同一黑点的旧边框被替换；墙壁同步对侧，不一致的边界墙按优先级
+        const borderManager = window.borderManager;
+        if (borderManager) {
+            const placed = (saveData.borders || []).map(({ i, j, w, h }) => borderManager.add(i, j, w, h, false));
+            Object.keys(saveData.cells || {}).forEach(key => syncBorderWall(this.map.cells.get(key)));
+            placed.forEach(border => borderManager.reconcile(border));
         }
 
         // 重新渲染视口

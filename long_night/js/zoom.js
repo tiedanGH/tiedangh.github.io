@@ -24,6 +24,7 @@ function applyCellMetricsVars() {
     root.style.setProperty('--wall-size', wall + 'px');
     root.style.setProperty('--marker-font', marker + 'px');
     root.style.setProperty('--boss-size', boss + 'px');
+    root.style.setProperty('--border-line', Math.max(2, Math.round(wall * 0.3)) + 'px');   // 地图边框线宽
     refreshBossIcons(boss);
     refreshMapImages(size);
     return { size, wall };

@@ -142,6 +142,9 @@ function canBoxMoveTo(direction, fromI, fromJ, size, wall) {
             break;
     }
 
+    // [边框] 框内的箱子越过边框时绕到对侧
+    [boxTargetI, boxTargetJ] = wrapBorderTarget(fromI, fromJ, boxTargetI, boxTargetJ);
+
     currentMap.ensureCell(boxTargetI, boxTargetJ, size, wall);
     currentMap.ensureCell(boxWallI, boxWallJ, size, wall);
 
@@ -297,6 +300,7 @@ function pressBlockButton(cell) {
         const orientation = wallCell.classList.contains('horizontal') ? 'horizontal' : 'vertical';
         wallCell.style.backgroundColor = '';
         wallCell.style.backgroundImage = `url('${getWallImage(next, orientation)}')`;
+        syncBorderWall(wallCell);   // [边框] 对侧边界墙同步
     });
 }
 
@@ -358,6 +362,9 @@ function movePlayer(direction) {
             wallI = i + 1;
             break;
     }
+
+    // [边框] 框内越过边框时从对侧出现
+    [targetI, targetJ] = wrapBorderTarget(i, j, targetI, targetJ);
 
     const { size, wall } = getCellMetrics();
 
@@ -435,6 +442,7 @@ function updatePassedWall(wallCell, isHedgeDash = false) {
     }
 
     wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
+    syncBorderWall(wallCell);   // [边框] 对侧边界墙同步
 }
 
 function addMarker(cell, marker, color = 'black') {

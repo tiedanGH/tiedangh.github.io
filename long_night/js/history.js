@@ -46,6 +46,7 @@ class HistoryManager {
             playerPosition: null,
             lastMoveDirection: getPlayerMoveDirection(),   // [树篱] 冲刺链
             subspaceSteps: getPlayerSubspace(),            // [亚空间] 剩余步数
+            borders: window.borderManager?.list() || [],   // [边框]
             timestamp: Date.now()
         };
 
@@ -253,6 +254,7 @@ class HistoryManager {
         this.map.cells.forEach((cell, key) => {
             if (!snapshot.cells.has(key) && !this.map.isInitialCell(cell)) this.resetCellToInitial(cell);
         });
+        window.borderManager?.setAll(snapshot.borders);   // [边框] 两侧边界墙已随格子恢复
 
         renderSubspaceBadge();
         this.updateButtons();

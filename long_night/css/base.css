@@ -17,6 +17,7 @@ html, body {
     --marker-font: 14px;
     --boss-size: 16px;
     --boss-menu-size: 15px;
+    --border-line: 3px;
 }
 
 #map-container {
@@ -38,6 +39,20 @@ html, body {
     height: 1px;
     visibility: hidden;
     pointer-events: none;
+}
+
+/* 地图边框：边界的虚线框 */
+.map-border {
+    position: absolute;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 4;
+}
+.map-border rect {
+    fill: none;
+    stroke: #2f6fd0;
+    stroke-width: var(--border-line);
+    stroke-dasharray: calc(var(--border-line) * 3) calc(var(--border-line) * 2);
 }
 
 /* 地图网格样式 */

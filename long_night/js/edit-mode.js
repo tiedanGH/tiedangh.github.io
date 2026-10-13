@@ -22,6 +22,10 @@ class EditModeManager {
         this.pointerMoved = false;
 
         this.payload = [];
+        this.payloadBorders = [];   // 随选区移动、复制或删除的边框
+        this.selectedBorders = [];
+        this.previewBorders = [];   // 目标位置的边框预览
+        this.conflictBorders = [];  // 目标黑点上将被替换的边框
         this.sourceAnchor = null;
         this.previewAnchor = null;
         this.previewDelta = null;
@@ -125,6 +129,7 @@ class EditModeManager {
         this.banner.classList.remove('show');
 
         this.payload = [];
+        this.payloadBorders = [];
         this.sourceAnchor = null;
         this.previewAnchor = null;
         this.previewDelta = null;
@@ -200,8 +205,8 @@ class EditModeManager {
 
         this.capturePayload();
 
-        // 选区内没有有效地形/墙壁可移动
-        if (this.payload.length === 0) {
+        // 选区内没有有效地形 / 墙壁 / 边框可移动
+        if (!this.hasPayload()) {
             this.clearSelection();
             this.selectedRange = null;
             this.sourceAnchor = null;
@@ -324,9 +329,13 @@ class EditModeManager {
         });
     }
 
+    hasPayload() {
+        return this.payload.length > 0 || this.payloadBorders.length > 0;
+    }
+
     // 确认选区，进入选目标阶段
     confirmSelection() {
-        if (this.stage !== 'selection-ready' || this.payload.length === 0) return;
+        if (this.stage !== 'selection-ready' || !this.hasPayload()) return;
         this.stage = 'choosing-target';
         this.showTargetBar();
     }
@@ -358,6 +367,16 @@ class EditModeManager {
                 this.selectedCells.push(cell);
             }
         }
+
+        // 选区覆盖整个边框时，边框一并选中
+        this.selectedBorders = window.borderManager?.inRange(this.selectedRange) || [];
+        this.selectedBorders.forEach(border => {
+            window.borderManager.edgePairs(border).flat().forEach(cell => {
+                if (cell.classList.contains('move-selected')) return;
+                cell.classList.add('move-selected');
+                this.selectedCells.push(cell);
+            });
+        });
     }
 
     clearSelection(resetRange = true) {
@@ -365,6 +384,7 @@ class EditModeManager {
             cell.classList.remove('move-selected');
         });
         this.selectedCells = [];
+        this.selectedBorders = [];
         if (resetRange) this.selectedRange = null;
     }
 
@@ -375,6 +395,10 @@ class EditModeManager {
             cell.classList.remove('move-preview-anchor');
         });
         this.previewCells = [];
+        this.previewBorders.forEach(el => el.remove());
+        this.previewBorders = [];
+        this.conflictBorders.forEach(border => border.el.classList.remove('conflict'));
+        this.conflictBorders = [];
     }
 
     hasEffectiveCellContent(cell) {
@@ -405,6 +429,7 @@ class EditModeManager {
         this.previewDelta = null;
         this.previewAnchor = null;
         this.payload = [];
+        this.payloadBorders = [];
         this.sourceAnchor = null;
         this.selectionStart = null;
         this.selectionEnd = null;
@@ -432,44 +457,56 @@ class EditModeManager {
         if (!this.selectedRange) return;
         this.payload = [];
 
+        const captured = new Set();
+        const capture = (i, j) => {
+            const key = `${i},${j}`;
+            const cell = this.map.cells.get(key);
+            if (!cell || cell.classList.contains('center') || captured.has(key)) return;
+            captured.add(key);
+
+            if (cell.dataset.type === 'square') {
+                if (this.isUnknownSquare(cell)) return;
+                this.payload.push({
+                    key,
+                    type: 'square',
+                    i,
+                    j,
+                    backgroundImage: cell.style.backgroundImage,
+                    backgroundColor: cell.style.backgroundColor,
+                    markers: this.serializeMarkers(cell),
+                    attachment: this.serializeAttachment(cell),
+                    text: getCurrentAttachText(cell),
+                    binding: getBlockBinding(cell)
+                });
+            } else if (cell.dataset.type === 'wall') {
+                if (this.isUnknownWall(cell)) return;
+                this.payload.push({
+                    key,
+                    type: 'wall',
+                    i,
+                    j,
+                    orientation: cell.classList.contains('horizontal') ? 'horizontal' : 'vertical',
+                    wallType: getCurrentWallType(cell),
+                    backgroundImage: cell.style.backgroundImage,
+                    backgroundColor: cell.style.backgroundColor,
+                    attachment: this.serializeAttachment(cell),
+                    text: getCurrentAttachText(cell)
+                });
+            }
+        };
+
         const { minI, maxI, minJ, maxJ } = this.selectedRange;
         for (let i = minI; i <= maxI; i++) {
             for (let j = minJ; j <= maxJ; j++) {
-                const key = `${i},${j}`;
-                const cell = this.map.cells.get(key);
-                if (!cell || cell.classList.contains('center')) continue;
-
-                if (cell.dataset.type === 'square') {
-                    if (this.isUnknownSquare(cell)) continue;
-                    this.payload.push({
-                        key,
-                        type: 'square',
-                        i,
-                        j,
-                        backgroundImage: cell.style.backgroundImage,
-                        backgroundColor: cell.style.backgroundColor,
-                        markers: this.serializeMarkers(cell),
-                        attachment: this.serializeAttachment(cell),
-                        text: getCurrentAttachText(cell),
-                        binding: getBlockBinding(cell)
-                    });
-                } else if (cell.dataset.type === 'wall') {
-                    if (this.isUnknownWall(cell)) continue;
-                    this.payload.push({
-                        key,
-                        type: 'wall',
-                        i,
-                        j,
-                        orientation: cell.classList.contains('horizontal') ? 'horizontal' : 'vertical',
-                        wallType: getCurrentWallType(cell),
-                        backgroundImage: cell.style.backgroundImage,
-                        backgroundColor: cell.style.backgroundColor,
-                        attachment: this.serializeAttachment(cell),
-                        text: getCurrentAttachText(cell)
-                    });
-                }
+                capture(i, j);
             }
         }
+
+        // 随选区移动的边框
+        this.payloadBorders = this.selectedBorders.map(({ i, j, w, h }) => ({ i, j, w, h }));
+        this.selectedBorders.forEach(border => {
+            window.borderManager.edgePairs(border).flat().forEach(cell => capture(+cell.dataset.i, +cell.dataset.j));
+        });
     }
 
     serializeMarkers(cell) {
@@ -529,6 +566,19 @@ class EditModeManager {
                 this.previewCells.push(anchorCell);
             }
         }
+
+        // 边框的目标位置预览；冲突的边框将被替换
+        const borderManager = window.borderManager;
+        this.payloadBorders.forEach(border => {
+            const i = border.i + this.previewDelta.i;
+            const j = border.j + this.previewDelta.j;
+            this.previewBorders.push(borderManager.createOverlay({ ...border, i, j }, 'preview'));
+            const existing = borderManager.get(i, j);
+            if (existing && !this.payloadBorders.some(b => b.i === i && b.j === j)) {
+                existing.el.classList.add('conflict');
+                this.conflictBorders.push(existing);
+            }
+        });
     }
 
     // 确认栏
@@ -670,12 +720,22 @@ class EditModeManager {
         setCustomTextAttachment(cell, state.text);
     }
 
-    // 删除选区：范围内全部内容（含空白格）重置为未知，然后退出编辑模式
+    // 删除选区：范围内全部内容（含空白格）重置为未知，覆盖的边框一并删除，然后退出编辑模式
     deleteSelection() {
         if (this.stage !== 'selection-ready' || !this.selectedRange) return;
 
         const { size, wall } = getCellMetrics();
         const { minI, maxI, minJ, maxJ } = this.selectedRange;
+
+        // 选区覆盖的边框连同边界墙一并删除
+        this.payloadBorders.forEach(border => {
+            const edges = window.borderManager.edgePairs(border).flat();
+            window.borderManager.remove(border.i, border.j);
+            edges.forEach(cell => {
+                this.resetWallCell(cell);
+                syncBorderWall(cell);
+            });
+        });
 
         for (let i = minI; i <= maxI; i++) {
             for (let j = minJ; j <= maxJ; j++) {
@@ -684,7 +744,10 @@ class EditModeManager {
                 if (!cell || cell.classList.contains('center')) continue;
 
                 if (cell.dataset.type === 'square') this.resetSquareCell(cell);
-                else if (cell.dataset.type === 'wall') this.resetWallCell(cell);
+                else if (cell.dataset.type === 'wall') {
+                    this.resetWallCell(cell);
+                    syncBorderWall(cell);   // [边框] 对侧边界墙同步移除
+                }
             }
         }
 
@@ -706,18 +769,27 @@ class EditModeManager {
     // 将选区写入目标位置：clearSource 为 true 是移动，false 是复制
     applyPayloadToTarget(clearSource) {
         if (this.stage !== 'preview-ready') return;
-        if (!this.previewDelta || this.payload.length === 0) return;
+        if (!this.previewDelta || !this.hasPayload()) return;
 
         const { size, wall } = getCellMetrics();
+        const borderManager = window.borderManager;
 
         if (clearSource) {
             this.payload.forEach(item => {
                 const sourceCell = this.map.cells.get(item.key);
                 if (!sourceCell) return;
                 if (item.type === 'square') this.resetSquareCell(sourceCell);
-                else this.resetWallCell(sourceCell);
+                else {
+                    this.resetWallCell(sourceCell);
+                    syncBorderWall(sourceCell);   // [边框] 对侧边界墙同步移除
+                }
             });
+            this.payloadBorders.forEach(border => borderManager.remove(border.i, border.j));
         }
+
+        // 边框放到目标黑点，目标黑点已有的边框被替换
+        const placedBorders = this.payloadBorders.map(border =>
+            borderManager.add(border.i + this.previewDelta.i, border.j + this.previewDelta.j, border.w, border.h, false));
 
         this.payload.forEach(item => {
             const ti = item.i + this.previewDelta.i;
@@ -732,8 +804,10 @@ class EditModeManager {
                 this.applySquareState(targetCell, state);
             } else if (item.type === 'wall' && targetCell.dataset.type === 'wall') {
                 this.applyWallState(targetCell, state);
+                syncBorderWall(targetCell);   // [边框] 对侧边界墙同步
             }
         });
+        placedBorders.forEach(border => borderManager.reconcile(border));
 
         if (window.historyManager) {
             window.historyManager.saveState();

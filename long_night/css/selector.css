@@ -48,6 +48,49 @@
     margin-right: auto;
 }
 
+/* 区块菜单标题行 */
+.selector .block-title {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    column-gap: 6px;
+}
+.selector .title-btn {
+    width: auto;
+    margin: 0;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+.selector .block-title .border-place-btn,
+.selector .block-title .border-remove-btn {
+    justify-self: start;
+}
+.selector .block-title .clear-block-btn {
+    justify-self: end;
+}
+
+/* 放置边框边长列表 */
+.selector .border-size-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.selector .border-size-menu[hidden] {
+    display: none;
+}
+.selector .border-size-menu button {
+    width: 72px;
+    margin: 0;
+}
+
 .selector .preview {
     width: 36px;
     height: 36px;
@@ -391,12 +434,30 @@
     display: block;
     margin-top: 6px;
     padding: 4px 2px;
+}
+/* 赛况快捷路径、放置边框 */
+.selector button.path-btn,
+.selector button.border-place-btn,
+.selector .border-size-menu button {
     background: #d9ecff;
     border-color: #4a90d9;
     font-weight: bold;
 }
-.selector button.path-btn:hover {
+.selector button.path-btn:hover,
+.selector button.border-place-btn:hover,
+.selector .border-size-menu button:hover {
     background: #bfdcff;
+}
+/* 移除边框与清除区块 */
+.selector button.border-remove-btn,
+.selector button.clear-block-btn {
+    background: #ffdede;
+    border-color: #e06666;
+    font-weight: bold;
+}
+.selector button.border-remove-btn:hover,
+.selector button.clear-block-btn:hover {
+    background: #ffc8c8;
 }
 .color-input-container input.path-input {
     width: 260px;
@@ -428,6 +489,12 @@
         margin-top: 5px;
         padding: 1px;
         font-size: 12px;
+    }
+    .selector .title-btn {
+        padding: 1px 5px;
+    }
+    .selector .border-size-menu button {
+        width: 60px;
     }
 
     .selector .preview {

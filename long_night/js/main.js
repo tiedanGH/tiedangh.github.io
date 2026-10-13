@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.playerCell = null;
 
+    // 地图边框
+    window.borderManager = new BorderManager(gameMap);
     // 历史管理器
     window.historyManager = new HistoryManager(gameMap);
     // 存档管理器
