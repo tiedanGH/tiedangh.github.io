@@ -145,6 +145,7 @@ function blockCellEvent(map) {
                     const key = `${i},${j}`;
                     const square = map.cells.get(key);
                     if (square?.dataset.type === 'square') {
+                        square.style.backgroundColor = '';
                         square.style.backgroundImage = `url('./img/empty.png')`;
                         setBlockBinding(square, null);
                     }
@@ -156,6 +157,7 @@ function blockCellEvent(map) {
                             const wall = map.cells.get(key);
                             if (wall?.dataset.type === 'wall') {
                                 const orientation = wall.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                                wall.style.backgroundColor = '';
                                 wall.style.backgroundImage = `url('${getWallImage('空', orientation)}')`;
                             }
                         }
@@ -196,6 +198,7 @@ function blockCellEvent(map) {
                         // 比较优先级，仅当新墙壁优先级更高时才更新
                         const higherPriorityType = compareWallPriority(getCurrentWallType(wallCell), newWallType);
                         if (higherPriorityType === newWallType) {
+                            wallCell.style.backgroundColor = '';
                             wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
                         }
                     }
@@ -381,6 +384,7 @@ function clearArea(map, i0, j0) {
             const square = map.cells.get(`${i},${j}`);
             if (square?.dataset.type === 'square') {
                 // 清除地形
+                square.style.backgroundColor = '';
                 square.style.backgroundImage = 'url(./img/unknown.png)';
                 setBlockBinding(square, null);
                 // 清除附着与文本
@@ -395,6 +399,7 @@ function clearArea(map, i0, j0) {
                 const wall = map.cells.get(`${wi},${wj}`);
                 if (wall?.dataset.type === 'wall') {
                     const orientation = wall.classList.contains('horizontal') ? 'horizontal' : 'vertical';
+                    wall.style.backgroundColor = '';
                     wall.style.backgroundImage = `url('${getWallImage('未知', orientation)}')`;
                     clearAttachment(wall);
                     clearTextAttachment(wall);

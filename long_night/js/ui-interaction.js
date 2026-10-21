@@ -439,8 +439,11 @@ function updatePassedWall(wallCell, isHedgeDash = false) {
         newWallType = '空';  // 如果是空墙，保持为空
     } else if (currentWallType === '普通') {
         newWallType = '空';  // 如果是普通墙，设为空墙
+    } else if (currentWallType === '自定义') {
+        newWallType = '空';  // 如果是自定义颜色墙，清除颜色设为空墙
     }
 
+    wallCell.style.backgroundColor = '';
     wallCell.style.backgroundImage = `url('${getWallImage(newWallType, orientation)}')`;
     syncBorderWall(wallCell);   // [边框] 对侧边界墙同步
 }
