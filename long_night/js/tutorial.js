@@ -1,11 +1,17 @@
 
-// 新手教程：按草稿本帮助的顺序逐步高亮界面并介绍功能，完成提示的操作后进入下一步
-// 教程在空白地图上进行，结束后恢复教程开始前的地图、撤销记录与视野
-const TUTORIAL_PADDING = 6;        // 高亮区域比目标外扩的像素
+// 使用教程：逐步高亮界面并介绍功能
+// 教程在空白地图上进行，结束后恢复开始前的地图、撤销记录与视野
+const TUTORIAL_PADDING = 6;        // 高亮区域外扩的像素
 const TUTORIAL_MARGIN = 12;        // 说明卡片与屏幕边缘、高亮区域的间距
 const TUTORIAL_TOP_SAFE = 110;     // 顶部按钮占用的高度，教程选取的格子避开这里
 const TUTORIAL_DONE_DELAY = 700;   // 完成操作后停留片刻再进入下一步
+// 说明卡片遮挡的代价（按面积）：可操作的高亮区域最不能挡，其次是菜单、弹窗与需要避开的区域，提示区域最后
+const TUTORIAL_COVER_WEIGHT = { target: 1000, popup: 20, outline: 1 };
+const TUTORIAL_POPUP_DELAY = 400;  // 菜单弹出片刻后说明卡片才避让：手机双击时第一下弹出的菜单不会让卡片移动到格子上
 const TUTORIAL_MOVE_STEPS = 3;     // 移动玩家需要走的步数
+const TUTORIAL_START_RATIO = 0.4;  // 第一个教学格子的横向位置：视野中央偏左
+const TUTORIAL_KEEP_DISTANCE = 120;   // 换到下一步时，说明卡片离新的高亮区域不超过这个距离就留在原处
+const TUTORIAL_PATH_SAMPLE = '↓↓[→沙沙]→(逃生)';   // 赛况快捷路径步骤预先填入的示例赛况
 
 // 手机布局：与样式中显示方向按钮的断点一致
 function isTutorialMobile() {
@@ -29,21 +35,23 @@ function isSaveManagerOpen() {
 /* ========== 教程步骤 ========== */
 // 有 done 的步骤需要完成操作，完成后自动进入下一步；没有 done 的步骤只看说明，点击按钮继续
 // targets 为高亮并可操作的区域（元素或屏幕矩形），outlines 为只作提示的虚线框，avoid 为说明卡片需要避开的区域
-// block 为 false 时遮罩不拦截点击，dim 为 false 时不压暗；skipIf 成立时跳过该步
+// block 为 false 时遮罩不拦截点击，dim 为 false 时不压暗；skipIf 成立时跳过该步；tick 每帧调用，处理步骤中的辅助操作
+// aroundStart 为在起始格子附近操作的步骤，起始格子上方按其中最高的说明卡片留出位置
 const TUTORIAL_STEPS = [
     {
         title: '欢迎使用漫漫长夜草稿本',
-        text: '接下来会一步步介绍草稿本的主要功能，按提示完成操作就会自动进入下一步。<br>教程在一张空白地图上进行，结束后会恢复你现在的地图。',
+        text: '接下来将会一步步介绍草稿本的主要功能，按提示完成操作自动进入下一步。<br>教程将在一张空白地图上进行，结束后自动恢复现在的地图。',
         next: '开始',
         quit: '跳过教程',
     },
     {
         title: '设置地形',
+        aroundStart: true,
         text: byLayout(
             '<b>左键点击</b>高亮的格子，在弹出的菜单中选择一种<b>地形</b>，例如「空地」或「树丛」。菜单右侧的<b>附着</b>可以放置按钮、箱子等物品。',
             '<b>点击</b>高亮的格子，在弹出的菜单中选择一种<b>地形</b>，例如「空地」或「树丛」。菜单右侧的<b>附着</b>可以放置按钮、箱子等物品。'),
         setup: t => {
-            t.ctx.square = t.centerSquare();
+            t.ctx.square = t.startSquare();
         },
         targets: t => [t.cellRect(t.ctx.square.i, t.ctx.square.j)],
         done: t => {
@@ -53,7 +61,8 @@ const TUTORIAL_STEPS = [
     },
     {
         title: '设置墙壁',
-        text: '格子之间的细条是<b>墙壁</b>。点击高亮的墙壁，选择一种墙壁类型，例如「普通」或「门」。墙壁菜单标题旁的 <b>+</b> 可以一次设置一个格子四周的墙。',
+        aroundStart: true,
+        text: '格子之间的细条是<b>墙壁</b>。<br>点击高亮的墙壁，选择一种墙壁类型，例如「普通」或「门」。',
         targets: t => [t.cellRect(t.ctx.square.i + 1, t.ctx.square.j)],
         done: t => {
             const wall = t.cell(t.ctx.square.i + 1, t.ctx.square.j);
@@ -61,7 +70,32 @@ const TUTORIAL_STEPS = [
         },
     },
     {
+        title: '快速放置墙壁',
+        aroundStart: true,
+        text: '再次点击这面<b>墙壁</b>，点击墙壁菜单标题旁的 <kbd><b>+</b></kbd>，选择一种图案，可以一次设置虚线框中格子<b>四周</b>的墙壁。',
+        setup: t => {
+            const { i, j } = t.ctx.square;
+            t.ctx.quickWall = { i: i + 1, j };
+            const target = getQuickTargetSquare(t.cell(i + 1, j));   // 竖墙作用于右侧的格子
+            t.ctx.quickSquare = { i: target.i, j: target.j };
+        },
+        // 依次高亮墙壁、菜单中的 +、快速放置的图案
+        targets: t => {
+            const panel = document.querySelector('.wall-quick-panel');
+            if (panel) return [panel];
+            const plus = document.querySelector('.selector .wall-quick-btn');
+            if (plus) return [plus];
+            return [t.cellRect(t.ctx.quickWall.i, t.ctx.quickWall.j)];
+        },
+        outlines: t => [t.cellRect(t.ctx.quickSquare.i, t.ctx.quickSquare.j)],
+        done: t => {
+            const { i, j } = t.ctx.quickSquare;
+            return Object.values(WALL_SIDE_OFFSET).every(([di, dj]) => getCurrentWallType(t.cell(i + di, j + dj)) !== '未知');
+        },
+    },
+    {
         title: '标记玩家',
+        aroundStart: true,
         text: byLayout(
             '<b>右键点击</b>或<b>双击</b>高亮的格子打开标记菜单，选择 🧍 放置玩家。菜单中还可以标记 BOSS、星星和玩家编号。',
             '<b>双击</b>高亮的格子打开标记菜单，选择 🧍 放置玩家。菜单中还可以标记 BOSS、星星和玩家编号。'),
@@ -69,9 +103,54 @@ const TUTORIAL_STEPS = [
         done: () => !!window.trackManager?.hasPlayer(),
     },
     {
-        title: '移动玩家',
+        title: '赛况快捷路径',
+        aroundStart: true,
         text: byLayout(
-            '按 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。',
+            '<b>右键点击</b>玩家格子，点击「<b>赛况快捷路径</b>」，已填好示例赛况，点击「确定」画出路径和地形；平时粘贴游戏中的赛况即可。',
+            '<b>双击</b>玩家格子，点击「<b>赛况快捷路径</b>」，已填好示例赛况，点击「确定」画出路径和地形；平时粘贴游戏中的赛况即可。'),
+        setup: t => {
+            t.ctx.pathCell = t.reveal(t.ensurePlayer());
+            t.ctx.pathInputOpen = false;
+            t.ctx.pathDrawn = false;
+        },
+        // 打开输入框时填入示例；输入框关闭后地图上多出已知格子即为画出了路径，点击外部关闭则继续等待
+        tick: t => {
+            const input = document.querySelector('.color-input-container input.path-input');
+            if (input) {
+                if (!t.ctx.pathInputOpen) {
+                    t.ctx.pathInputOpen = true;
+                    t.ctx.knownSquares = t.knownSquareCount();
+                }
+                if (!input.dataset.tutorialFilled) {
+                    input.dataset.tutorialFilled = '1';
+                    if (!input.value) input.value = TUTORIAL_PATH_SAMPLE;
+                }
+            } else if (t.ctx.pathInputOpen) {
+                t.ctx.pathInputOpen = false;
+                t.ctx.pathDrawn = t.knownSquareCount() > t.ctx.knownSquares;
+            }
+        },
+        // 依次高亮格子、菜单中的赛况快捷路径、输入框
+        targets: t => {
+            const input = document.querySelector('.color-input-container input.path-input');
+            if (input) return [input.closest('.color-input-container')];
+            const btn = document.querySelector('.selector .path-btn');
+            if (btn) return [btn];
+            return [t.cellRect(+t.ctx.pathCell.dataset.i, +t.ctx.pathCell.dataset.j)];
+        },
+        // 示例赛况经过的范围：向下两格、向右两格
+        outlines: t => {
+            const i = +t.ctx.pathCell.dataset.i;
+            const j = +t.ctx.pathCell.dataset.j;
+            return [t.areaRect(i, j, i + 4, j + 4)];
+        },
+        done: t => t.ctx.pathDrawn,
+    },
+    {
+        title: '移动玩家',
+        aroundStart: true,
+        text: byLayout(
+            '按 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开、同方向连续移动可以冲刺穿过树篱。',
             '点击屏幕下方的<b>方向按钮</b>移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。'),
         setup: t => {
             t.reveal(t.ensurePlayer());
@@ -85,8 +164,8 @@ const TUTORIAL_STEPS = [
     {
         title: '放置区块',
         text: byLayout(
-            '点击格子角落高亮的<b>黑点</b>，从列表中选择一个游戏区块（鼠标悬停可查看名称），它会铺满虚线框中的 3×3 格子。列表顶部还可以放置地图边框。',
-            '点击格子角落高亮的<b>黑点</b>，从列表中选择一个游戏区块，它会铺满虚线框中的 3×3 格子。列表顶部还可以放置地图边框。'),
+            '点击格子角落高亮的<b>黑点</b>，从列表中选择一个游戏区块（鼠标悬停可查看名称），它会铺满虚线框中的 3×3 格子。列表顶部还可以放置<b>地图边框</b>。',
+            '点击格子角落高亮的<b>黑点</b>，从列表中选择一个游戏区块，它会铺满虚线框中的 3×3 格子。列表顶部还可以放置<b>地图边框</b>。'),
         setup: t => {
             t.ctx.dot = t.findBlockDot();
             t.ctx.blockSignature = t.blockSignature();
@@ -114,7 +193,7 @@ const TUTORIAL_STEPS = [
     {
         title: '缩放地图',
         text: byLayout(
-            '点击 <b>＋</b> / <b>－</b> 放大或缩小地图，也可以按 <kbd>+</kbd> / <kbd>-</kbd>。试着缩放一次。',
+            '点击 <b>＋</b> / <b>－</b> 放大或缩小地图，也可以使用键盘 <kbd>+</kbd> / <kbd>-</kbd>。试着缩放一次。',
             '点击 <b>＋</b> / <b>－</b> 放大或缩小地图，试着缩放一次。'),
         setup: t => {
             t.ctx.zoom = zoomIndex;
@@ -149,8 +228,8 @@ const TUTORIAL_STEPS = [
     {
         title: '编辑模式',
         text: byLayout(
-            '点击 <b>✂️</b> 进入编辑模式，也可以按 <kbd>M</kbd>。编辑模式中可以框选一片区域，整体移动、复制或删除。',
-            '点击 <b>✂️</b> 进入编辑模式，可以框选一片区域，整体移动、复制或删除。'),
+            '点击 <b>✂️</b> 进入<b>编辑模式</b>，也可以按 <kbd>M</kbd>。编辑模式中可以框选一片区域，整体移动、复制或删除。',
+            '点击 <b>✂️</b> 进入<b>编辑模式</b>，可以框选一片区域，整体移动、复制或删除。'),
         targets: () => [document.getElementById('edit-mode-button')],
         done: () => window.editModeManager.isActive(),
     },
@@ -163,7 +242,9 @@ const TUTORIAL_STEPS = [
         dim: false,
         skipIf: () => !window.editModeManager.isActive(),
         setup: t => {
-            t.ctx.content = t.contentBounds();
+            // 拖动、缩放地图后内容可能已移出视野，框选时地图不能拖动，先滚回视野
+            const c = t.ctx.content = t.contentBounds();
+            if (c) t.revealArea(c.i0, c.j0, c.i1, c.j1);
         },
         outlines: t => {
             const c = t.ctx.content;
@@ -175,8 +256,8 @@ const TUTORIAL_STEPS = [
     {
         title: '移动、复制或删除',
         text: byLayout(
-            '点击「确认选区」，再点击地图上的目标位置预览，然后选择「确认并移动」或「确认并复制」；也可以「删除区域」。完成后自动退出编辑模式，按 <kbd>Esc</kbd> 可以逐步返回。',
-            '点击「确认选区」，再点击地图上的目标位置预览，然后选择「确认并移动」或「确认并复制」；也可以「删除区域」。完成后自动退出编辑模式。'),
+            '点击「确认选区」，再点击地图上的目标位置预览，然后选择「确认并移动」或「确认并复制」，也可以「删除区域」。完成后自动退出编辑模式，按 <kbd>Esc</kbd> 可以逐步返回。',
+            '点击「确认选区」，再点击地图上的目标位置预览，然后选择「确认并移动」或「确认并复制」，也可以「删除区域」。完成后自动退出编辑模式。'),
         block: false,
         dim: false,
         skipIf: () => !window.editModeManager.isActive(),
@@ -194,8 +275,8 @@ const TUTORIAL_STEPS = [
     {
         title: '轨迹记录',
         text: byLayout(
-            '点击 <b>🏃</b> 开启轨迹记录，也可以按 <kbd>T</kbd>。开启后玩家的每一步移动都会被记录下来。',
-            '点击 <b>🏃</b> 开启轨迹记录，开启后玩家的每一步移动都会被记录下来。'),
+            '点击 <b>🏃</b> 开启<b>轨迹记录</b>，也可以按 <kbd>T</kbd>。开启后每一步移动都会被记录下来。',
+            '点击 <b>🏃</b> 开启<b>轨迹记录</b>，开启后每一步移动都会被记录下来。'),
         setup: t => {
             t.reveal(t.ensurePlayer());
         },
@@ -235,14 +316,14 @@ const TUTORIAL_STEPS = [
     {
         title: '存档管理',
         text: byLayout(
-            '刷新页面会重置草稿本。点击 <b>📁</b> 打开存档管理，也可以按 <kbd>C</kbd>，把地图保存在浏览器中。',
-            '刷新页面会重置草稿本。点击 <b>📁</b> 打开存档管理，把地图保存在浏览器中。'),
+            '刷新页面会重置草稿本。点击 <b>📁</b> 打开<b>存档管理</b>，也可以按 <kbd>C</kbd>，把地图保存在本地浏览器中。',
+            '刷新页面会重置草稿本。点击 <b>📁</b> 打开<b>存档管理</b>，把地图保存在本地浏览器中。'),
         targets: () => [document.getElementById('save-button')],
         done: () => isSaveManagerOpen(),
     },
     {
         title: '保存与导入导出',
-        text: '这里可以新建、加载、覆盖和删除存档；「导出」会下载存档文件，「导入存档」可以读取文件，按住存档左侧的手柄可以拖动排序。教程中新建的存档会被保留。关闭面板以继续。',
+        text: '这里可以新建、加载、覆盖和删除存档。<br>「导出」会下载存档文件，「导入存档」可以读取文件，按住存档左侧的手柄可以拖动排序。教程中新建的存档会被保留。<br><b>点击右上角 × 关闭面板以继续</b>',
         skipIf: () => !isSaveManagerOpen(),
         targets: () => [document.getElementById('save-manager')],
         done: () => !isSaveManagerOpen(),
@@ -251,14 +332,14 @@ const TUTORIAL_STEPS = [
     {
         title: '随时查看帮助',
         text: byLayout(
-            '点击 <b>?</b> 可以随时打开帮助，也可以按 <kbd>H</kbd>；在帮助中可以重新开始本教程。',
+            '点击 <b>?</b> 可以随时打开帮助，也可以按 <kbd>H</kbd>，在帮助中可以重新开始本教程。',
             '点击 <b>?</b> 可以随时打开帮助，在帮助中可以重新开始本教程。'),
         targets: () => [document.getElementById('help-button')],
         next: '下一步',
     },
     {
         title: '教程完成 🎉',
-        text: '你已经了解了草稿本的主要功能。点击「进入草稿本」开始使用，地图会恢复为教程开始前的状态。',
+        text: '你已经了解了草稿本的主要功能。<br>点击「<b>进入草稿本</b>」开始使用，地图会恢复为教程开始前的状态。',
         next: '进入草稿本',
     },
 ];
@@ -275,6 +356,13 @@ function unionRect(a, b) {
         right: Math.max(a.right, b.right),
         bottom: Math.max(a.bottom, b.bottom),
     };
+}
+
+// 两个矩形之间的距离，相交时为 0
+function rectGap(a, b) {
+    const dx = Math.max(0, a.left - b.right, b.left - a.right);
+    const dy = Math.max(0, a.top - b.bottom, b.top - a.bottom);
+    return Math.hypot(dx, dy);
 }
 
 function overlapArea(a, b) {
@@ -323,10 +411,8 @@ class TutorialManager {
         this.observer = null;      // 统计玩家移动的页面监听
         this.drawn = { path: '', rings: '' };   // 上次写入页面的图形，未变化时不重复写入
         this.cardPos = null;
-
-        this.shade = this.createShade();
-        this.blocker = this.createBlocker();
-        this.card = this.createCard();
+        this.cardStep = -1;                // 说明卡片当前位置是哪一步选定的
+        this.popupSince = new WeakMap();   // 菜单与弹窗开始显示的时间
 
         this.init();
     }
@@ -366,6 +452,9 @@ class TutorialManager {
 
         this.active = true;
         this.ctx = {};
+        this.shade = this.createShade();
+        this.blocker = this.createBlocker();
+        this.card = this.createCard();
         document.body.classList.add('tutorial-active');
         this.go(0);
         this.loop();
@@ -381,12 +470,14 @@ class TutorialManager {
         this.stopWatching();
         this.closeOtherUI();
 
+        // 移除全部教程元素，下次开始时重新创建
         document.body.classList.remove('tutorial-active');
-        this.blocker.classList.remove('show');
-        this.card.classList.remove('placed', 'done', 'enter', 'nudge');
+        [this.shade, this.ringLayer, this.blocker, this.card].forEach(el => el?.remove());
+        this.shade = this.ringLayer = this.blocker = this.card = null;
         this.holes = [];
         this.drawn = { path: '', rings: '' };
         this.cardPos = null;
+        this.cardStep = -1;
 
         const history = window.historyManager;
         const { snapshot, records, index, scroll } = this.saved;
@@ -421,8 +512,9 @@ class TutorialManager {
             return;
         }
         this.index = index;
+        this.renderCard();          // 先换上这一步的说明，setup 中可以按说明卡片的尺寸选取位置
         this.step.setup?.(this);
-        this.renderCard();
+        this.layout();              // 立即放好说明卡片，不在上一步的位置停留一帧
     }
 
     // 跳过当前步骤：关闭这一步打开的菜单
@@ -436,6 +528,7 @@ class TutorialManager {
         this.completing = true;
         this.card.classList.add('done');
         this.shade.classList.add('done');
+        this.ringLayer.classList.add('done');
         this.statusText.textContent = '✓ 完成';
         this.advanceTimer = setTimeout(() => this.go(this.index + 1), TUTORIAL_DONE_DELAY);
     }
@@ -445,6 +538,7 @@ class TutorialManager {
         this.frame = requestAnimationFrame(() => this.loop());
         const step = this.step;
         if (!step) return;
+        step.tick?.(this);
         if (step.done && !this.completing) {
             if (step.done(this)) this.complete();
             else if (step.status) this.setStatus(step.status(this));
@@ -474,17 +568,24 @@ class TutorialManager {
     }
 
     /* ========== 遮罩与说明卡片 ========== */
-    // 遮罩：镂空处可以操作下方的界面，其余位置拦截点击
+    // 遮罩：镂空处可以操作下方的界面，其余位置拦截点击；提示用的虚线框画在遮罩上
+    // 可操作区域的高亮边框单独一层，显示在教程中打开的菜单之上，菜单里的按钮也能看到高亮
     createShade() {
         const svg = document.createElementNS(SVG_NS, 'svg');
         svg.classList.add('tutorial-shade');
         this.shadeFill = document.createElementNS(SVG_NS, 'path');
         this.shadeFill.classList.add('tutorial-shade-fill');
-        this.ringGroup = document.createElementNS(SVG_NS, 'g');
+        this.outlineGroup = document.createElementNS(SVG_NS, 'g');
         svg.appendChild(this.shadeFill);
-        svg.appendChild(this.ringGroup);
+        svg.appendChild(this.outlineGroup);
         this.blockPointer(this.shadeFill);
         document.body.appendChild(svg);
+
+        this.ringLayer = document.createElementNS(SVG_NS, 'svg');
+        this.ringLayer.classList.add('tutorial-rings');
+        this.ringGroup = document.createElementNS(SVG_NS, 'g');
+        this.ringLayer.appendChild(this.ringGroup);
+        document.body.appendChild(this.ringLayer);
         return svg;
     }
 
@@ -546,7 +647,7 @@ class TutorialManager {
         const total = TUTORIAL_STEPS.length;
         const needsAction = !!step.done;
 
-        this.countText.textContent = `新手教程 ${this.index + 1} / ${total}`;
+        this.countText.textContent = `使用教程 ${this.index + 1} / ${total}`;
         this.progressBar.style.width = `${(this.index + 1) / total * 100}%`;
         this.titleText.textContent = step.title;
         this.bodyText.innerHTML = typeof step.text === 'function' ? step.text(this) : step.text;
@@ -574,6 +675,7 @@ class TutorialManager {
         void this.card.offsetWidth;   // 重新触发进入动画
         this.card.classList.add('enter');
         this.shade.classList.remove('done');
+        this.ringLayer.classList.remove('done');
         this.shade.classList.toggle('clear', step.dim === false);
         this.shadeFill.style.pointerEvents = step.block === false ? 'none' : '';
         this.blocker.classList.toggle('show', !needsAction);
@@ -596,7 +698,7 @@ class TutorialManager {
             ...this.holes.map(r => ({ r, outline: false })),
             ...outlines.map(r => ({ r, outline: true })),
         ]);
-        this.placeCard([...targets, ...outlines], [...this.popupRects(), ...this.resolveRects(step.avoid)]);
+        this.placeCard(targets, outlines, [...this.popupRects(), ...this.resolveRects(step.avoid)]);
     }
 
     // 元素或屏幕矩形统一为矩形，隐藏的元素不计入
@@ -627,35 +729,68 @@ class TutorialManager {
         if (key === this.drawn.rings) return;
         this.drawn.rings = key;
 
-        const group = this.ringGroup;
-        while (group.children.length > list.length) group.lastChild.remove();
-        while (group.children.length < list.length) group.appendChild(document.createElementNS(SVG_NS, 'rect'));
-        list.forEach(({ r, outline }, k) => {
-            const rect = group.children[k];
-            rect.setAttribute('class', outline ? 'tutorial-ring outline' : 'tutorial-ring');
-            rect.setAttribute('x', Math.round(r.left));
-            rect.setAttribute('y', Math.round(r.top));
-            rect.setAttribute('width', Math.max(0, Math.round(r.right - r.left)));
-            rect.setAttribute('height', Math.max(0, Math.round(r.bottom - r.top)));
-            rect.setAttribute('rx', 8);
-        });
+        const fill = (group, rects, className) => {
+            while (group.children.length > rects.length) group.lastChild.remove();
+            while (group.children.length < rects.length) group.appendChild(document.createElementNS(SVG_NS, 'rect'));
+            rects.forEach((r, k) => {
+                const rect = group.children[k];
+                rect.setAttribute('class', className);
+                rect.setAttribute('x', Math.round(r.left));
+                rect.setAttribute('y', Math.round(r.top));
+                rect.setAttribute('width', Math.max(0, Math.round(r.right - r.left)));
+                rect.setAttribute('height', Math.max(0, Math.round(r.bottom - r.top)));
+                rect.setAttribute('rx', 8);
+            });
+        };
+        fill(this.ringGroup, list.filter(item => !item.outline).map(item => item.r), 'tutorial-ring');
+        fill(this.outlineGroup, list.filter(item => item.outline).map(item => item.r), 'tutorial-ring outline');
     }
 
-    // 打开的菜单与弹窗，说明卡片避开它们
+    // 打开的菜单与弹窗，说明卡片避开它们，刚弹出的先不避让
     popupRects() {
-        return [...document.querySelectorAll('.selector, .color-input-container, #save-manager, #custom-alert')]
-            .map(el => el.getBoundingClientRect())
-            .filter(r => r.width > 0 && r.height > 0);
+        const now = performance.now();
+        const rects = [];
+        document.querySelectorAll('.selector, .color-input-container, #save-manager, #custom-alert').forEach(el => {
+            const r = el.getBoundingClientRect();
+            if (r.width <= 0 || r.height <= 0) {
+                this.popupSince.delete(el);
+                return;
+            }
+            if (!this.popupSince.has(el)) this.popupSince.set(el, now);
+            if (now - this.popupSince.get(el) >= TUTORIAL_POPUP_DELAY) rects.push(r);
+        });
+        return rects;
     }
 
-    // 说明卡片依次尝试放在全部高亮区域、各个高亮区域的下、上、右、左以及屏幕底部、顶部，选遮挡最少的位置
-    placeCard(focus, others) {
+    // 说明卡片依次尝试放在全部高亮区域、各个高亮区域与弹窗的上、左、下、右，以及屏幕底部、顶部与四角，按遮挡代价选最小的位置
+    // 菜单多在点击处的右下方弹出，先试上方与左侧，弹出菜单时卡片不必移动
+    placeCard(targets, outlines, others) {
         const card = this.card;
         const W = window.innerWidth;
         const H = window.innerHeight;
         const m = TUTORIAL_MARGIN;
         const cw = card.offsetWidth;
         const ch = card.offsetHeight;
+        const rectAt = pos => ({ left: pos.left, top: pos.top, right: pos.left + cw, bottom: pos.top + ch });
+        const isOutside = rect => rect.left < m - 1 || rect.top < m - 1 || rect.right > W - m + 1 || rect.bottom > H - m + 1;
+        const focus = [...targets, ...outlines];
+
+        // 操作过程中说明卡片尽量不动：同一步内只在挡住可操作区域或弹窗时移动；
+        // 换到下一步时，原位置不挡任何区域且离新的高亮区域不远就留在原处
+        const pos = this.cardPos;
+        const current = pos && rectAt({ left: pos.left, top: pos.anchorBottom ? pos.bottom - ch : pos.top });
+        if (current && !isOutside(current) && ![...targets, ...others].some(r => overlapArea(current, r) > 0)) {
+            const nearby = pos.focused && focus.length > 0 && !outlines.some(r => overlapArea(current, r) > 0) &&
+                rectGap(current, focus.reduce(unionRect)) <= TUTORIAL_KEEP_DISTANCE;
+            if (this.cardStep === this.index || nearby) {
+                this.cardStep = this.index;
+                this.setCardPos(current.left, current.top, pos.anchorBottom, pos.focused);
+                return;
+            }
+        }
+        const stepChanged = this.cardStep !== this.index;
+        this.cardStep = this.index;
+
         const clampX = x => Math.max(m, Math.min(W - cw - m, x));
         const clampY = y => Math.max(m, Math.min(H - ch - m, y));
         const bottom = { left: clampX((W - cw) / 2), top: H - ch - m };
@@ -665,42 +800,63 @@ class TutorialManager {
             const x = clampX((r.left + r.right - cw) / 2);
             const y = clampY((r.top + r.bottom - ch) / 2);
             return [
-                { left: x, top: r.bottom + m },
                 { left: x, top: r.top - m - ch },
-                { left: r.right + m, top: y },
                 { left: r.left - m - cw, top: y },
+                { left: x, top: r.bottom + m },
+                { left: r.right + m, top: y },
             ];
         };
+        const corners = [
+            { left: m, top: m },
+            { left: W - cw - m, top: m },
+            { left: m, top: H - ch - m },
+            { left: W - cw - m, top: H - ch - m },
+        ];
 
         let candidates;
         if (focus.length) {
-            // 高亮区域相距较远时，围绕整体的位置都可能放不下，再尝试各个区域旁边
+            // 围绕整体的位置都放不下时，尝试各个区域与弹窗旁边
             const each = focus.length > 1 ? focus.flatMap(around) : [];
-            candidates = [...around(focus.reduce(unionRect)), ...each, bottom, top];
+            candidates = [...around(focus.reduce(unionRect)), ...each, ...others.flatMap(around), bottom, top, ...corners];
         } else if (this.step.placement === 'bottom') {
             candidates = [bottom, top];
         } else {
             candidates = [{ left: clampX((W - cw) / 2), top: clampY((H - ch) / 2) }, bottom, top];
         }
 
-        const avoid = [...focus, ...others];
+        const { target, popup, outline } = TUTORIAL_COVER_WEIGHT;
+        const avoid = [
+            ...targets.map(r => [r, target]),
+            ...others.map(r => [r, popup]),
+            ...outlines.map(r => [r, outline]),
+        ];
         let best = null;
         candidates.forEach(pos => {
-            const rect = { left: pos.left, top: pos.top, right: pos.left + cw, bottom: pos.top + ch };
-            const outside = rect.left < m - 1 || rect.top < m - 1 || rect.right > W - m + 1 || rect.bottom > H - m + 1;
-            const score = (outside ? 1e9 : 0) + avoid.reduce((sum, r) => sum + overlapArea(rect, r), 0);
+            const rect = rectAt(pos);
+            const score = (isOutside(rect) ? 1e12 : 0) + avoid.reduce((sum, [r, weight]) => sum + overlapArea(rect, r) * weight, 0);
             if (!best || score < best.score) best = { ...pos, score };
         });
 
-        const left = Math.round(best.left);
-        const topPx = Math.round(best.top);
-        if (left !== this.cardPos?.left || topPx !== this.cardPos?.top) {
+        const above = focus.length > 0 && best.top + ch <= focus.reduce(unionRect).top;
+        // 换到新的一步时直接出现在新位置，同一步内避让时平滑移动
+        this.setCardPos(best.left, best.top, above, focus.length > 0, !stepChanged);
+    }
+
+    // anchorBottom：放在高亮区域上方，按下边缘对齐；focused：位置是围绕高亮区域选的
+    setCardPos(left, top, anchorBottom, focused, animate = true) {
+        const card = this.card;
+        left = Math.round(left);
+        top = Math.round(top);
+        if (left !== this.cardPos?.left || top !== this.cardPos?.top) {
+            if (!animate) card.classList.remove('placed');
             card.style.left = left + 'px';
-            card.style.top = topPx + 'px';
-            this.cardPos = { left, top: topPx };
+            card.style.top = top + 'px';
+            if (!animate) {
+                void card.offsetWidth;   // 先定位再恢复过渡，不播放移动动画
+                card.classList.add('placed');
+            }
         }
-        // 首次定位不播放移动动画
-        if (!card.classList.contains('placed')) requestAnimationFrame(() => card.classList.add('placed'));
+        this.cardPos = { left, top, bottom: top + card.offsetHeight, anchorBottom, focused };
     }
 
     /* ========== 地图坐标工具 ========== */
@@ -753,6 +909,50 @@ class TutorialManager {
         return { i: Math.floor(x / base) * 2, j: Math.floor(y / base) * 2 };
     }
 
+    // 起始格子：横向在视野中央偏左；纵向尽量靠上，上方刚好放说明卡片
+    startSquare() {
+        const { size, wall } = getCellMetrics();
+        const base = size + wall;
+        const container = this.map.container;
+        const box = container.getBoundingClientRect();
+        const cardHeight = Math.max(...TUTORIAL_STEPS.filter(s => s.aroundStart).map(s => this.cardHeightFor(s)));
+        const top = Math.max(TUTORIAL_TOP_SAFE, this.cardSpace(cardHeight));   // 格子上边缘在屏幕上的最高位置
+        const x = container.scrollLeft + container.clientWidth * TUTORIAL_START_RATIO;
+        const y = container.scrollTop + top - box.top;
+        return { i: Math.floor(x / base) * 2, j: Math.ceil(y / base) * 2 };
+    }
+
+    // 说明卡片放在高亮区域上方需要的高度
+    cardSpace(cardHeight = this.card.offsetHeight) {
+        return cardHeight + 2 * TUTORIAL_MARGIN + TUTORIAL_PADDING;
+    }
+
+    // 说明卡片显示某一步的说明时的高度
+    cardHeightFor(step) {
+        const title = this.titleText.textContent;
+        const html = this.bodyText.innerHTML;
+        this.titleText.textContent = step.title;
+        this.bodyText.innerHTML = typeof step.text === 'function' ? step.text(this) : step.text;
+        const height = this.card.offsetHeight;
+        this.titleText.textContent = title;
+        this.bodyText.innerHTML = html;
+        return height;
+    }
+
+    // 菜单从点击处向下展开的最大高度：样式中随屏幕高度设置，另加内边距与边框，手机上菜单还会整体下移几像素
+    selectorMaxHeight() {
+        const probe = document.createElement('div');
+        probe.className = 'selector';
+        probe.style.visibility = 'hidden';
+        document.body.appendChild(probe);
+        const cs = getComputedStyle(probe);
+        const extra = ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth'].reduce((sum, k) => sum + (parseFloat(cs[k]) || 0), 0);
+        const shift = cs.transform && cs.transform !== 'none' ? Math.max(0, new DOMMatrixReadOnly(cs.transform).m42) : 0;
+        const max = (parseFloat(cs.maxHeight) || window.innerHeight * 0.7) + extra + shift;
+        probe.remove();
+        return max;
+    }
+
     // 以格子为单位的滚动位置
     scrollInCells() {
         const { size, wall } = getCellMetrics();
@@ -762,7 +962,13 @@ class TutorialManager {
 
     // 格子不在视野内时滚动地图，让它位于视野中央
     reveal(cell) {
-        const r = this.cellRect(+cell.dataset.i, +cell.dataset.j);
+        this.revealArea(+cell.dataset.i, +cell.dataset.j, +cell.dataset.i, +cell.dataset.j);
+        return cell;
+    }
+
+    // 区域不完全在视野内时滚动地图，让它位于视野中央（避开顶部按钮与底部方向按钮）
+    revealArea(i0, j0, i1, j1) {
+        const r = this.areaRect(i0, j0, i1, j1);
         const W = window.innerWidth;
         const H = window.innerHeight;
         const bottom = H - tutorialBottomSafe();
@@ -774,7 +980,6 @@ class TutorialManager {
             container.scrollTop += (r.top + r.bottom - TUTORIAL_TOP_SAFE - bottom) / 2;
             this.map.renderViewport();
         }
-        return cell;
     }
 
     // 后续步骤需要玩家：没有时在视野中央放置一个
@@ -800,14 +1005,21 @@ class TutorialManager {
         return true;
     }
 
-    // 视野中央附近、右下方 3×3 区域全空的黑点，用来放置区块
+    // 放置区块的黑点：右下方 3×3 区域全空且在视野内，先比较区块列表高度（尽量靠上，让列表完整显示），再取离前面操作的格子近的（同样距离取靠上的）
     findBlockDot() {
-        const { i: ci, j: cj } = this.centerSquare();
+        const { wall } = getCellMetrics();
+        const { i: ci, j: cj } = this.ctx.square || this.centerSquare();
         const W = window.innerWidth;
         const H = window.innerHeight;
+        const listHeight = this.selectorMaxHeight();
+        const cardSpace = this.cardSpace();
+        const better = (a, b) => {
+            for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return a[k] < b[k];
+            return false;
+        };
         let best = null;
-        for (let a = -6; a <= 6; a++) {
-            for (let b = -6; b <= 6; b++) {
+        for (let a = -8; a <= 8; a++) {
+            for (let b = -8; b <= 8; b++) {
                 const i = ci + 2 * a - 1;
                 const j = cj + 2 * b - 1;
                 if (i < 1 || j < 1) continue;
@@ -815,11 +1027,24 @@ class TutorialManager {
                 if (r.left < TUTORIAL_MARGIN || r.right > W - TUTORIAL_MARGIN ||
                     r.top < TUTORIAL_TOP_SAFE || r.bottom > H - tutorialBottomSafe()) continue;
                 if (!this.isBlankArea(i, j, i + 6, j + 6)) continue;
-                const distance = a * a + b * b;
-                if (!best || distance < best.distance) best = { i, j, distance };
+                // 点击黑点后列表从点击处向下展开，放不下时会被缩短（同 adjustElementPosition）
+                // 手机上列表旁放不下说明卡片，卡片放不进区域上方时会盖住列表下部
+                const overflow = Math.max(0, r.top + wall / 2 + listHeight - (H - 10));
+                const covered = r.top >= cardSpace || !isTutorialMobile() ? 0 : this.card.offsetHeight;
+                const key = [Math.round(overflow + covered), a * a + b * b + Math.max(0, b)];
+                if (!best || better(key, best.key)) best = { i, j, key };
             }
         }
         return best || { i: ci + 1, j: cj + 1 };
+    }
+
+    // 地形已知的格子数量
+    knownSquareCount() {
+        let count = 0;
+        this.map.cells.forEach(cell => {
+            if (cell.dataset.type === 'square' && !isUnknownTerrain(cell)) count++;
+        });
+        return count;
     }
 
     // 区块区域的地形与边框数量：放置区块、清除区块或放置边框后会变化

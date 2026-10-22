@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.editModeManager = new EditModeManager(gameMap);
     // 轨迹记录
     window.trackManager = new TrackManager(gameMap);
-    // 新手教程
+    // 使用教程
     window.tutorialManager = new TutorialManager(gameMap);
 
     uiCellEvents(gameMap);

@@ -1,14 +1,16 @@
-/* 新手教程：遮罩、高亮与说明卡片 */
+/* 使用教程：遮罩、高亮与说明卡片 */
 .tutorial-shade,
+.tutorial-rings,
 .tutorial-card {
     display: none;
 }
 body.tutorial-active .tutorial-shade,
+body.tutorial-active .tutorial-rings,
 body.tutorial-active .tutorial-card {
     display: block;
 }
 
-/* 遮罩只有填充部分拦截点击，镂空处可以操作下方的界面 */
+/* 遮罩填充部分拦截点击，镂空处可以操作 */
 .tutorial-shade {
     position: fixed;
     top: 0;
@@ -28,7 +30,18 @@ body.tutorial-active .tutorial-card {
     fill-opacity: 0;
 }
 
-/* 高亮边框：可操作的区域为呼吸闪烁的实线，提示区域为虚线，完成后变绿 */
+/* 可操作区域的高亮边框：位于教程中打开的菜单之上、说明卡片之下 */
+.tutorial-rings {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2650;
+    pointer-events: none;
+}
+
+/* 高亮边框：提示区域为虚线，完成后变绿 */
 .tutorial-ring {
     fill: none;
     stroke: #01b0f1;
@@ -41,7 +54,8 @@ body.tutorial-active .tutorial-card {
     stroke-dasharray: 6 4;
     animation: none;
 }
-.tutorial-shade.done .tutorial-ring {
+.tutorial-shade.done .tutorial-ring,
+.tutorial-rings.done .tutorial-ring {
     stroke: #35a853;
     animation: none;
 }

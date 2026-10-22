@@ -198,7 +198,7 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 帮助底部按钮：新手教程与关闭 */
+/* 帮助底部按钮 */
 .help-actions {
     display: flex;
     justify-content: center;
