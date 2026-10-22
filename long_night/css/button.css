@@ -198,6 +198,35 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* 帮助底部按钮：新手教程与关闭 */
+.help-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+}
+.help-actions .close-help-button {
+    margin-top: 0;
+}
+.tutorial-start-button {
+    padding: 8px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #fff;
+    color: #01b0f1;
+    border: 2px solid #01b0f1;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+.tutorial-start-button:hover {
+    background-color: #e6f7fe;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* 响应式设计 */
 @media (max-width: 600px) {
     .back-home {
@@ -261,5 +290,16 @@
         font-size: 15px;
         padding: 10px 20px;
         width: 100%;
+    }
+    .help-actions button {
+        flex: 1;
+        width: auto;
+        font-size: 15px;
+    }
+    .help-actions .close-help-button {
+        padding: 10px 12px;
+    }
+    .help-actions .tutorial-start-button {
+        padding: 8px 12px;
     }
 }

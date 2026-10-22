@@ -16,13 +16,14 @@
 
     <link rel="stylesheet" href="css/base.css?v=20261012b">
     <link rel="stylesheet" href="css/selector.css?v=20261012e">
-    <link rel="stylesheet" href="css/button.css?v=20261005b">
+    <link rel="stylesheet" href="css/button.css?v=20261021">
     <link rel="stylesheet" href="css/save.css?v=20261012c">
     <link rel="stylesheet" href="css/edit.css?v=20261012">
     <link rel="stylesheet" href="css/track.css?v=20261011f">
+    <link rel="stylesheet" href="css/tutorial.css?v=20261021">
 
     <script src="js/zoom.js?v=20261012b"></script>
-    <script src="js/main.js?v=20261012"></script>
+    <script src="js/main.js?v=20261021"></script>
     <script src="js/map.js?v=20261011"></script>
     <script src="js/ui-selectors.js?v=20261012c"></script>
     <script src="js/ui-interaction.js?v=20261021"></script>
@@ -33,6 +34,7 @@
     <script src="js/edit-mode.js?v=20261012"></script>
     <script src="js/track.js?v=20261011d"></script>
     <script src="js/save.js?v=20261012b"></script>
+    <script src="js/tutorial.js?v=20261021"></script>
 </head>
 <body>
 
@@ -49,7 +51,10 @@
     <p>⌨️ <b>[Shift]+[右键]</b> 快速清除格子所有标记</p>
     <p>✋ <b>拖动</b>来拓展地图，<b>刷新</b>将重置草稿本</p>
     <p>📁 <b>[存档管理]</b>或<b>[C]</b> 可保存地图，支持导入导出</p>
-    <button id="close-alert" class="close-help-button">我知道了</button>
+    <div class="help-actions">
+        <button id="tutorial-start-button" class="tutorial-start-button">新手教程</button>
+        <button id="close-alert" class="close-help-button">我知道了</button>
+    </div>
 </div>
 
 <div id="save-manager" class="save-manager">

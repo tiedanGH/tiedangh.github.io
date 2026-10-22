@@ -1,0 +1,239 @@
+/* 新手教程：遮罩、高亮与说明卡片 */
+.tutorial-shade,
+.tutorial-card {
+    display: none;
+}
+body.tutorial-active .tutorial-shade,
+body.tutorial-active .tutorial-card {
+    display: block;
+}
+
+/* 遮罩只有填充部分拦截点击，镂空处可以操作下方的界面 */
+.tutorial-shade {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2500;
+    pointer-events: none;
+}
+.tutorial-shade-fill {
+    fill: rgba(15, 23, 42, 0.55);
+    fill-rule: evenodd;
+    pointer-events: auto;
+    transition: fill-opacity 0.25s;
+}
+.tutorial-shade.clear .tutorial-shade-fill {
+    fill-opacity: 0;
+}
+
+/* 高亮边框：可操作的区域为呼吸闪烁的实线，提示区域为虚线，完成后变绿 */
+.tutorial-ring {
+    fill: none;
+    stroke: #01b0f1;
+    stroke-width: 3px;
+    pointer-events: none;
+    animation: tutorial-ring-pulse 1.4s ease-in-out infinite;
+}
+.tutorial-ring.outline {
+    stroke-width: 2px;
+    stroke-dasharray: 6 4;
+    animation: none;
+}
+.tutorial-shade.done .tutorial-ring {
+    stroke: #35a853;
+    animation: none;
+}
+@keyframes tutorial-ring-pulse {
+    0%, 100% { stroke-opacity: 1; stroke-width: 3px; }
+    50% { stroke-opacity: 0.5; stroke-width: 6px; }
+}
+
+/* 只看说明的步骤拦截全部点击 */
+.tutorial-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 2550;
+    display: none;
+}
+body.tutorial-active .tutorial-blocker.show {
+    display: block;
+}
+
+/* 教程中打开的菜单与弹窗显示在遮罩之上 */
+body.tutorial-active .selector,
+body.tutorial-active .color-input-container,
+body.tutorial-active .save-manager {
+    z-index: 2600;
+}
+
+/* 说明卡片 */
+.tutorial-card {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3100;
+    width: 300px;
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+    padding: 12px 16px 14px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+    color: #333;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.tutorial-card.placed {
+    transition: left 0.25s ease, top 0.25s ease;
+}
+.tutorial-card.enter {
+    animation: tutorial-card-enter 0.25s ease-out;
+}
+.tutorial-card.nudge {
+    animation: tutorial-card-nudge 0.4s ease;
+}
+@keyframes tutorial-card-enter {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes tutorial-card-nudge {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+.tutorial-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #888;
+}
+.tutorial-quit-btn {
+    padding: 2px 4px;
+    border: none;
+    background: none;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+}
+.tutorial-quit-btn:hover {
+    color: #e53935;
+}
+
+.tutorial-progress {
+    height: 4px;
+    margin: 6px 0 10px;
+    border-radius: 2px;
+    background: #e8eef3;
+    overflow: hidden;
+}
+.tutorial-progress-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: #01b0f1;
+    transition: width 0.3s ease;
+}
+
+.tutorial-title {
+    margin-bottom: 4px;
+    font-size: 17px;
+    font-weight: bold;
+    color: #01b0f1;
+}
+.tutorial-text kbd {
+    display: inline-block;
+    min-width: 1.4em;
+    margin: 0 1px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: #f7f7f7;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* 等待操作的提示，完成后变绿 */
+.tutorial-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #888;
+}
+.tutorial-status[hidden] {
+    display: none;
+}
+.tutorial-status::before {
+    content: '';
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #01b0f1;
+    animation: tutorial-status-blink 1.2s ease-in-out infinite;
+}
+.tutorial-card.done .tutorial-status {
+    color: #35a853;
+    font-weight: bold;
+}
+.tutorial-card.done .tutorial-status::before {
+    display: none;
+}
+@keyframes tutorial-status-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+}
+
+.tutorial-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+.tutorial-actions button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.tutorial-actions .primary {
+    background: #01b0f1;
+    color: #fff;
+}
+.tutorial-actions .primary:hover {
+    background: #1f8bff;
+}
+.tutorial-actions .secondary {
+    background: #eef2f5;
+    color: #555;
+}
+.tutorial-actions .secondary:hover {
+    background: #e0e6eb;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .tutorial-card {
+        padding: 10px 14px 12px;
+        font-size: 13px;
+    }
+    .tutorial-title {
+        font-size: 15px;
+    }
+    .tutorial-actions button {
+        padding: 5px 12px;
+        font-size: 13px;
+    }
+}

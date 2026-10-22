@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.editModeManager = new EditModeManager(gameMap);
     // 轨迹记录
     window.trackManager = new TrackManager(gameMap);
+    // 新手教程
+    window.tutorialManager = new TutorialManager(gameMap);
 
     uiCellEvents(gameMap);
     blockCellEvent(gameMap);
@@ -33,10 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('help-container').style.display = 'block';
     });
 
-    // 快捷键 H：打开 / 关闭帮助
+    // 快捷键 H：打开 / 关闭帮助（教程中不响应）
     document.addEventListener('keydown', e => {
         if (e.key.toLowerCase() !== 'h' || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
-        if (isTypingTarget(e.target)) return;
+        if (isTypingTarget(e.target) || window.tutorialManager?.isActive()) return;
         e.preventDefault();
         const help = document.getElementById('help-container');
         help.style.display = help.style.display === 'none' ? 'block' : 'none';
