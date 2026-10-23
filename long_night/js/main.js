@@ -1,5 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initDirectionToggle();  // 方向按钮的显示切换
     await loadBlocks();
     const container = document.getElementById('map-container');
     const gameMap = new InfiniteMap(container);

@@ -10,6 +10,10 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
+/* 触屏设备上错开触摸点 */
+html.touch-input .selector {
+    transform: translate(6px, 6px);
+}
 
 .selector .title {
     text-align: center;

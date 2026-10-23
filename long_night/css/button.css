@@ -100,6 +100,20 @@
     --hover-bg: #009b8e;
 }
 
+/* 方向按钮的显示切换：方向按钮显示时高亮 */
+.direction-toggle-button {
+    top: 60px;
+    right: 110px;
+    background: #01b0f1;
+    --hover-bg: #1f8bff;
+    font-size: 20px;
+}
+.direction-toggle-button.active {
+    background: #C8EEFD;
+    box-shadow: 0 0 0 3px rgba(1, 176, 241, 0.35), 0 2px 6px rgba(0,0,0,0.15);
+    transform: scale(1.04);
+}
+
 /* 方向控制按钮 */
 .direction-controls {
     position: fixed;
@@ -113,6 +127,13 @@
     justify-content: center;
     padding: 10px;
     pointer-events: none;
+}
+/* 默认按屏幕宽度显示，点击切换按钮后按选择显示或隐藏 */
+html.direction-controls-show .direction-controls {
+    display: flex;
+}
+html.direction-controls-hide .direction-controls {
+    display: none;
 }
 
 .direction-row {
@@ -268,8 +289,12 @@
         top: 51px;
         right: 48px;
     }
+    .direction-toggle-button {
+        top: 51px;
+        right: 88px;
+    }
 
-    /* 按钮仅在移动端显示 */
+    /* 默认状态下方向按钮仅在手机布局显示 */
     .direction-controls {
         display: flex;
     }

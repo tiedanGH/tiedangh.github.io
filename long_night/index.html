@@ -15,15 +15,16 @@
     <link rel="apple-touch-icon" href="../assets/icons/games/long_night.png"/>
 
     <link rel="stylesheet" href="css/base.css?v=20261012b">
-    <link rel="stylesheet" href="css/selector.css?v=20261012e">
-    <link rel="stylesheet" href="css/button.css?v=20261021b">
+    <link rel="stylesheet" href="css/selector.css?v=20261023">
+    <link rel="stylesheet" href="css/button.css?v=20261023">
     <link rel="stylesheet" href="css/save.css?v=20261012c">
     <link rel="stylesheet" href="css/edit.css?v=20261012">
     <link rel="stylesheet" href="css/track.css?v=20261011f">
     <link rel="stylesheet" href="css/tutorial.css?v=20261021b">
 
     <script src="js/zoom.js?v=20261012b"></script>
-    <script src="js/main.js?v=20261021b"></script>
+    <script src="js/direction-controls.js?v=20261023"></script>
+    <script src="js/main.js?v=20261023"></script>
     <script src="js/map.js?v=20261011"></script>
     <script src="js/ui-selectors.js?v=20261012c"></script>
     <script src="js/ui-interaction.js?v=20261021"></script>
@@ -34,7 +35,7 @@
     <script src="js/edit-mode.js?v=20261012"></script>
     <script src="js/track.js?v=20261011d"></script>
     <script src="js/save.js?v=20261012b"></script>
-    <script src="js/tutorial.js?v=20261022b"></script>
+    <script src="js/tutorial.js?v=20261023"></script>
 </head>
 <body>
 
@@ -42,7 +43,7 @@
     <h2>草稿本使用帮助</h2>
     <p>🖱️ <b>[左键] 点击</b>格子或墙壁以设置地形</p>
     <p>🖱️ <b>[右键]或[双击]</b> 格子来标记玩家位置</p>
-    <p><span>▪️</span> <b>[左键] 点击</b>角落的<b>黑点</b>，放置完整区块或边框</p>
+    <p><span>▪️</span> <b>[左键] 点击</b>角落的<b>黑点</b>，放置区块或边框</p>
     <p>🔼🔽◀️▶️ <b>[移动]</b> 玩家 🧍 来自动更新地图</p>
     <p>✂️ <b>[编辑模式]</b>或<b>[M]</b> 可框选后整体移动选择区域</p>
     <p>🏃 <b>[轨迹记录]</b>或<b>[T]</b> 可记录玩家移动并导出轨迹</p>
@@ -99,6 +100,7 @@
 <button id="edit-mode-button" class="control-btn edit-mode-button" title="编辑模式 (M)">✂️</button>
 <button id="undo-button" class="control-btn undo-button">↶</button>
 <button id="redo-button" class="control-btn redo-button">↷</button>
+<button id="direction-toggle-button" class="control-btn direction-toggle-button" title="显示方向按钮">🎮</button>
 <button id="zoom-out-button" class="control-btn zoom-out-button" title="缩小地图 (-)">－</button>
 <button id="zoom-in-button" class="control-btn zoom-in-button" title="放大地图 (+)">＋</button>
 

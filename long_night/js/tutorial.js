@@ -13,19 +13,32 @@ const TUTORIAL_START_RATIO = 0.4;  // 第一个教学格子的横向位置：视
 const TUTORIAL_KEEP_DISTANCE = 120;   // 换到下一步时，说明卡片离新的高亮区域不超过这个距离就留在原处
 const TUTORIAL_PATH_SAMPLE = '↓↓[→沙沙]→(逃生)';   // 赛况快捷路径步骤预先填入的示例赛况
 
-// 手机布局：与样式中显示方向按钮的断点一致
+// 手机布局：与样式中的断点一致
 function isTutorialMobile() {
     return window.innerWidth <= 600;
 }
 
-// 底部方向按钮占用的高度
-function tutorialBottomSafe() {
-    return isTutorialMobile() ? 140 : 20;
+// 触屏操作：手机布局，或触摸过屏幕（如平板）
+function isTutorialTouch() {
+    return isTutorialMobile() || hasTouchInput();
 }
 
-// 电脑与手机使用不同的说明文字
+// 底部方向按钮占用的高度
+function tutorialBottomSafe() {
+    return isDirectionControlsVisible() ? 140 : 20;
+}
+
+// 电脑与触屏使用不同的说明文字
 function byLayout(desktop, mobile) {
-    return () => isTutorialMobile() ? mobile : desktop;
+    return () => isTutorialTouch() ? mobile : desktop;
+}
+
+// 移动端说明：显示方向按钮时高亮方向按钮；隐藏时高亮切换按钮并显示提示
+function byDirectionControls(keyboard, buttons, touchHidden) {
+    return () => {
+        if (isDirectionControlsVisible()) return buttons;
+        return isTutorialTouch() ? touchHidden : `${keyboard}<br><b>不能使用键盘时，点击 🎮 显示方向按钮</b>`;
+    };
 }
 
 function isSaveManagerOpen() {
@@ -149,16 +162,17 @@ const TUTORIAL_STEPS = [
     {
         title: '移动玩家',
         aroundStart: true,
-        text: byLayout(
-            '按 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开、同方向连续移动可以冲刺穿过树篱。',
-            '点击屏幕下方的<b>方向按钮</b>移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。'),
+        text: byDirectionControls(
+            '按 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动玩家，地图会自动更新，例如门会被打开、同方向连续移动可以冲刺穿过树篱。',
+            '点击屏幕下方的<b>方向按钮</b>移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。',
+            '<b>点击 🎮 显示方向按钮</b>，用方向按钮移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。'),
         setup: t => {
             t.reveal(t.ensurePlayer());
             t.ctx.moves = 0;
             t.watchPlayerMoves(() => t.ctx.moves++);
         },
         status: t => `已移动 ${Math.min(t.ctx.moves, TUTORIAL_MOVE_STEPS)} / ${TUTORIAL_MOVE_STEPS} 步`,
-        targets: t => [t.playerRect(), t.directionRect()],
+        targets: t => [t.playerRect(), t.directionRect(), t.directionToggle()],
         done: t => t.ctx.moves >= TUTORIAL_MOVE_STEPS,
     },
     {
@@ -285,12 +299,13 @@ const TUTORIAL_STEPS = [
     },
     {
         title: '导出轨迹',
-        text: byLayout(
-            '用方向键移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。',
-            '用方向按钮移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。'),
+        text: byDirectionControls(
+            '用键盘方向键移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。',
+            '用方向按钮移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。',
+            '<b>点击 🎮 显示方向按钮</b>，用方向按钮移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。'),
         skipIf: () => !window.trackManager.isActive(),
         status: () => `已记录 ${window.trackManager.getRecordedSegments().reduce((sum, steps) => sum + steps.length, 0)} 步`,
-        targets: t => [window.trackManager.panel, t.playerRect(), t.directionRect()],
+        targets: t => [window.trackManager.panel, t.playerRect(), t.directionRect(), t.directionToggle()],
         done: () => !!window.trackManager.exportPopup,
     },
     {
@@ -543,6 +558,7 @@ class TutorialManager {
             if (step.done(this)) this.complete();
             else if (step.status) this.setStatus(step.status(this));
         }
+        this.refreshText();
         this.layout();
     }
 
@@ -650,7 +666,7 @@ class TutorialManager {
         this.countText.textContent = `使用教程 ${this.index + 1} / ${total}`;
         this.progressBar.style.width = `${(this.index + 1) / total * 100}%`;
         this.titleText.textContent = step.title;
-        this.bodyText.innerHTML = typeof step.text === 'function' ? step.text(this) : step.text;
+        this.bodyText.innerHTML = this.renderedText = this.textFor(step);
         this.quitButton.hidden = this.index === total - 1;
         this.statusText.hidden = !needsAction;
         this.statusText.textContent = '完成操作后自动进入下一步';
@@ -679,6 +695,17 @@ class TutorialManager {
         this.shade.classList.toggle('clear', step.dim === false);
         this.shadeFill.style.pointerEvents = step.block === false ? 'none' : '';
         this.blocker.classList.toggle('show', !needsAction);
+    }
+
+    textFor(step) {
+        return typeof step.text === 'function' ? step.text(this) : step.text;
+    }
+
+    // 说明文字随布局、触摸与方向按钮的显示状态变化
+    refreshText() {
+        const html = this.textFor(this.step);
+        if (html === this.renderedText) return;
+        this.bodyText.innerHTML = this.renderedText = html;
     }
 
     layout() {
@@ -890,13 +917,18 @@ class TutorialManager {
         return cell ? this.cellRect(+cell.dataset.i, +cell.dataset.j) : null;
     }
 
-    // 手机上的方向按钮
+    // 屏幕下方的方向按钮，隐藏时没有
     directionRect() {
-        if (!isTutorialMobile()) return null;
         const rects = [...document.querySelectorAll('.direction-btn')]
             .map(btn => btn.getBoundingClientRect())
             .filter(r => r.width > 0);
         return rects.length ? rects.reduce(unionRect) : null;
+    }
+
+    // 方向按钮的显示切换：电脑上一直高亮，触屏上只在方向按钮隐藏时高亮
+    directionToggle() {
+        if (isTutorialTouch() && isDirectionControlsVisible()) return null;
+        return document.getElementById('direction-toggle-button');
     }
 
     // 视野中央（避开顶部按钮与底部方向按钮）的格子
@@ -932,7 +964,7 @@ class TutorialManager {
         const title = this.titleText.textContent;
         const html = this.bodyText.innerHTML;
         this.titleText.textContent = step.title;
-        this.bodyText.innerHTML = typeof step.text === 'function' ? step.text(this) : step.text;
+        this.bodyText.innerHTML = this.textFor(step);
         const height = this.card.offsetHeight;
         this.titleText.textContent = title;
         this.bodyText.innerHTML = html;
