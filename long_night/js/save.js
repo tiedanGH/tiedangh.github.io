@@ -396,7 +396,8 @@ class SaveManager {
                         span.className = 'marker';
                         span.textContent = markerData.text;
                         if (markerData.color) span.style.color = markerData.color;
-                        if (markerData.type) span.dataset.markerType = markerData.type;
+                        const type = markerData.type || MARKER_TYPE[markerData.text];   // 旧存档没有记录类型
+                        if (type) span.dataset.markerType = type;
 
                         const container = getMarkerContainer(cell);
                         container.appendChild(span);

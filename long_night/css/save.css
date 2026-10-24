@@ -97,6 +97,10 @@
 }
 
 .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     padding: 8px 16px;
     border: none;
     border-radius: 6px;
@@ -104,6 +108,11 @@
     font-size: 14px;
     font-weight: 600;
     transition: all 0.2s;
+}
+.action-btn .icon {
+    width: 19px;
+    height: 19px;
+    stroke-width: 2.6;
 }
 .create-btn {
     background-color: #4CAF50;
@@ -277,9 +286,14 @@
     text-align: center;
 }
 .empty-icon {
-    font-size: 48px;
+    display: flex;
+    font-size: 60px;
     margin-bottom: 16px;
+    color: #FFA500;
     opacity: 0.5;
+}
+.empty-icon .icon {
+    stroke-width: 1.8;
 }
 .empty-text {
     font-size: 15px;
@@ -394,6 +408,13 @@
 
     .action-btn {
         flex: 1;
+    }
+    .action-btn .icon {
+        width: 17px;
+        height: 17px;
+    }
+    .empty-icon {
+        font-size: 54px;
     }
 
     .save-search {

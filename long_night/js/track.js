@@ -133,7 +133,7 @@ class TrackManager {
         this.button.disabled = !this.active && (editing || !hasPlayer);
         if (this.active) this.button.title = '退出轨迹记录 (T)';
         else if (editing) this.button.title = '编辑模式中无法记录轨迹';
-        else if (!hasPlayer) this.button.title = '请先放置玩家 🧍（右键或双击格子）';
+        else if (!hasPlayer) this.button.title = '请先放置玩家（右键或双击格子）';
         else this.button.title = '轨迹记录 (T)';
 
         const editButton = window.editModeManager?.button;

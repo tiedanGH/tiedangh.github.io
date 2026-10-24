@@ -1,0 +1,121 @@
+/* 图标：页面顶部的 SVG 图标集，圆头线条，颜色跟随文字颜色 */
+.icon-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+.icon {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* 说明文字中的圆形图标：与顶部按钮的样式、颜色一致 */
+.icon-chip {
+    --icon-size: 25px;
+    display: inline-block;
+    overflow: hidden;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    border-radius: 50%;
+    color: #fff;
+    vertical-align: calc(0.365em - var(--icon-size) / 2);
+}
+.icon-chip .icon {
+    display: block;
+    width: calc(var(--icon-size) - 8px);
+    height: calc(var(--icon-size) - 8px);
+    margin: 4px;
+    stroke-width: 2.6;
+}
+.tutorial-text .icon-chip {
+    --icon-size: 22px;
+}
+.chip-help,
+.chip-direction {
+    background: #01b0f1;
+}
+.chip-save {
+    background: #FFA500;
+}
+.chip-track {
+    background: #3949AB;
+}
+.chip-edit {
+    background: #8A63D2;
+}
+.chip-undo {
+    background: #FF6B6B;
+}
+.chip-redo {
+    background: #4CAF50;
+}
+.chip-zoom {
+    background: #00B8A9;
+}
+/* 鼠标、键盘、拖动等操作方式 */
+.chip-input {
+    background: #8a94a6;
+}
+.chip-mouse .icon {
+    width: calc(var(--icon-size) - 6px);
+    height: calc(var(--icon-size) - 6px);
+    margin: 3px;
+}
+.chip-direction .icon {
+    width: calc(var(--icon-size) - 4px);
+    height: calc(var(--icon-size) - 4px);
+    margin: 2px;
+}
+/* 区块放置黑点：像草稿本中黑点处的截图，上下左右墙壁两侧的黑色边线 */
+.chip-dot {
+    --dot-size: 11px;
+    --dot-start: calc((var(--icon-size) - var(--dot-size)) / 2);
+    --dot-end: calc((var(--icon-size) + var(--dot-size)) / 2);
+    background:
+        linear-gradient(to right, transparent var(--dot-start), #000 0 calc(var(--dot-start) + 1px),
+            transparent 0 calc(var(--dot-end) - 1px), #000 0 var(--dot-end), transparent 0),
+        linear-gradient(to bottom, transparent var(--dot-start), #000 0 calc(var(--dot-start) + 1px),
+            transparent 0 calc(var(--dot-end) - 1px), #000 0 var(--dot-end), transparent 0),
+        #D9D9D9;
+}
+.map-dot {
+    display: block;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    margin: var(--dot-start) auto 0;
+    background: url('../img/walls/corner.png') center / cover no-repeat;
+}
+
+/* 玩家图标：与地图玩家标记相同（见 base.css） */
+.player-icon {
+    --icon-size: 1.4em;
+    display: inline-block;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    vertical-align: calc(0.365em - var(--icon-size) / 2);
+    background: url('../img/player.svg') center / contain no-repeat;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .icon-chip {
+        --icon-size: 21px;
+    }
+    .tutorial-text .icon-chip {
+        --icon-size: 19px;
+    }
+    .chip-dot {
+        --dot-size: 9px;
+    }
+    .player-icon {
+        --icon-size: 1.3em;
+    }
+}

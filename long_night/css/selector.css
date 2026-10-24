@@ -424,6 +424,10 @@ html.touch-input .selector {
     gap: 6px;
     margin-top: 10px;
 }
+.marker-btn .player-icon {
+    --icon-size: 1.5em;
+    vertical-align: middle;
+}
 .player-hint {
     flex: 1;
     font-size: 12px;
@@ -554,5 +558,8 @@ html.touch-input .selector {
     }
     .quick-item {
         font-size: 11px;
+    }
+    .marker-btn .player-icon {
+        --icon-size: 1.35em;
     }
 }

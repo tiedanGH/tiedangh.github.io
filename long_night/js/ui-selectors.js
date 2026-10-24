@@ -831,6 +831,10 @@ function showPlayerSelector(e, onSelect, cell) {
             icon.className = 'boss-icon';
             icon.dataset.markerType = MARKER_TYPE[emoji];
             btn.appendChild(icon);
+        } else if (MARKER_TYPE[emoji] === 'player') {
+            const icon = document.createElement('span');
+            icon.className = 'player-icon';
+            btn.appendChild(icon);
         } else {
             btn.textContent = emoji;
         }

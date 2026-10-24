@@ -28,11 +28,17 @@
     color: #fff;
     border: none;
     border-radius: 50%;
-    font-size: 24px;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     transition: background 0.2s;
+}
+.control-btn .icon {
+    width: 24px;
+    height: 24px;
 }
 .control-btn:disabled {
     background: #CCCCCC;
@@ -40,6 +46,10 @@
 }
 .control-btn:not(:disabled):hover {
     background: var(--hover-bg);
+}
+/* 开启状态为浅色底深色图标，悬停时换回深色底白色图标 */
+.control-btn.active:not(:disabled):hover {
+    color: #fff;
 }
 
 .help-button {
@@ -66,7 +76,6 @@
     right: 110px;
     background: #8A63D2;
     --hover-bg: #764fbd;
-    font-size: 20px;
 }
 .edit-mode-button.active {
     background: #D9C8FF;
@@ -78,10 +87,10 @@
     right: 160px;
     background: #3949AB;
     --hover-bg: #303F9F;
-    font-size: 20px;
 }
 .track-button.active {
     background: #C5CAE9;
+    color: #3949AB;
     box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.35), 0 2px 6px rgba(0,0,0,0.15);
     transform: scale(1.04);
 }
@@ -106,10 +115,14 @@
     right: 110px;
     background: #01b0f1;
     --hover-bg: #1f8bff;
-    font-size: 20px;
+}
+.direction-toggle-button .icon {
+    width: 31px;
+    height: 31px;
 }
 .direction-toggle-button.active {
     background: #C8EEFD;
+    color: #0288D1;
     box-shadow: 0 0 0 3px rgba(1, 176, 241, 0.35), 0 2px 6px rgba(0,0,0,0.15);
     transform: scale(1.04);
 }
@@ -150,8 +163,6 @@ html.direction-controls-hide .direction-controls {
     color: white;
     border: none;
     border-radius: 50%;
-    font-size: 20px;
-    font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -161,6 +172,11 @@ html.direction-controls-hide .direction-controls {
     touch-action: manipulation;
     user-select: none;
     pointer-events: auto;
+}
+.direction-btn .icon {
+    width: 22px;
+    height: 22px;
+    stroke-width: 2.8;
 }
 .direction-btn:active {
     background-color: rgba(31, 139, 255, 0.9);
@@ -194,9 +210,6 @@ html.direction-controls-hide .direction-controls {
     margin: 10px 0;
     font-size: 16px;
     text-align: left;
-}
-#help-container span {
-    font-size: 22px;
 }
 
 .close-help-button {
@@ -260,8 +273,15 @@ html.direction-controls-hide .direction-controls {
     .control-btn {
         width: 35px;
         height: 35px;
-        font-size: 20px;
         top: 8px;
+    }
+    .control-btn .icon {
+        width: 19px;
+        height: 19px;
+    }
+    .direction-btn .icon {
+        width: 20px;
+        height: 20px;
     }
     .help-button {
         left: 84px;
@@ -292,6 +312,10 @@ html.direction-controls-hide .direction-controls {
     .direction-toggle-button {
         top: 51px;
         right: 88px;
+    }
+    .direction-toggle-button .icon {
+        width: 26px;
+        height: 26px;
     }
 
     /* 默认状态下方向按钮仅在手机布局显示 */

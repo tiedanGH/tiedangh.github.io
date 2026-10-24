@@ -33,11 +33,28 @@ function byLayout(desktop, mobile) {
     return () => isTutorialTouch() ? mobile : desktop;
 }
 
+// 说明文字中的图标：小号圆形图标，玩家标记保持一致（样式见 icon.css）
+function tutorialChip(icon, color) {
+    return `<span class="icon-chip chip-${color}"><svg class="icon"><use href="#icon-${icon}"></use></svg></span>`;
+}
+const TUTORIAL_ICONS = {
+    help: tutorialChip('help', 'help'),
+    save: tutorialChip('folder', 'save'),
+    track: tutorialChip('run', 'track'),
+    edit: tutorialChip('scissors', 'edit'),
+    undo: tutorialChip('undo', 'undo'),
+    redo: tutorialChip('redo', 'redo'),
+    zoomIn: tutorialChip('plus', 'zoom'),
+    zoomOut: tutorialChip('minus', 'zoom'),
+    direction: tutorialChip('direction', 'direction'),
+    player: '<i class="player-icon"></i>',
+};
+
 // 移动端说明：显示方向按钮时高亮方向按钮；隐藏时高亮切换按钮并显示提示
 function byDirectionControls(keyboard, buttons, touchHidden) {
     return () => {
         if (isDirectionControlsVisible()) return buttons;
-        return isTutorialTouch() ? touchHidden : `${keyboard}<br><b>不能使用键盘时，点击 🎮 显示方向按钮</b>`;
+        return isTutorialTouch() ? touchHidden : `${keyboard}<br><b>不能使用键盘时，点击 ${TUTORIAL_ICONS.direction} 显示方向按钮</b>`;
     };
 }
 
@@ -110,8 +127,8 @@ const TUTORIAL_STEPS = [
         title: '标记玩家',
         aroundStart: true,
         text: byLayout(
-            '<b>右键点击</b>或<b>双击</b>高亮的格子打开标记菜单，选择 🧍 放置玩家。菜单中还可以标记 BOSS、星星和玩家编号。',
-            '<b>双击</b>高亮的格子打开标记菜单，选择 🧍 放置玩家。菜单中还可以标记 BOSS、星星和玩家编号。'),
+            `<b>右键点击</b>或<b>双击</b>高亮的格子打开标记菜单，选择 ${TUTORIAL_ICONS.player} 放置玩家。菜单中还可以标记 BOSS、星星和玩家编号。`,
+            `<b>双击</b>高亮的格子打开标记菜单，选择 ${TUTORIAL_ICONS.player} 放置玩家。菜单中还可以标记 BOSS、星星和玩家编号。`),
         targets: t => [t.cellRect(t.ctx.square.i, t.ctx.square.j)],
         done: () => !!window.trackManager?.hasPlayer(),
     },
@@ -165,7 +182,7 @@ const TUTORIAL_STEPS = [
         text: byDirectionControls(
             '按 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动玩家，地图会自动更新，例如门会被打开、同方向连续移动可以冲刺穿过树篱。',
             '点击屏幕下方的<b>方向按钮</b>移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。',
-            '<b>点击 🎮 显示方向按钮</b>，用方向按钮移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。'),
+            `<b>点击 ${TUTORIAL_ICONS.direction} 显示方向按钮</b>，用方向按钮移动玩家，经过的未知格子和墙壁会自动更新，例如门会被打开；同方向连续移动可以冲刺穿过树篱。`),
         setup: t => {
             t.reveal(t.ensurePlayer());
             t.ctx.moves = 0;
@@ -207,8 +224,8 @@ const TUTORIAL_STEPS = [
     {
         title: '缩放地图',
         text: byLayout(
-            '点击 <b>＋</b> / <b>－</b> 放大或缩小地图，也可以使用键盘 <kbd>+</kbd> / <kbd>-</kbd>。试着缩放一次。',
-            '点击 <b>＋</b> / <b>－</b> 放大或缩小地图，试着缩放一次。'),
+            `点击 ${TUTORIAL_ICONS.zoomIn} / ${TUTORIAL_ICONS.zoomOut} 放大或缩小地图，也可以使用键盘 <kbd>+</kbd> / <kbd>-</kbd>。试着缩放一次。`,
+            `点击 ${TUTORIAL_ICONS.zoomIn} / ${TUTORIAL_ICONS.zoomOut} 放大或缩小地图，试着缩放一次。`),
         setup: t => {
             t.ctx.zoom = zoomIndex;
         },
@@ -218,8 +235,8 @@ const TUTORIAL_STEPS = [
     {
         title: '撤销',
         text: byLayout(
-            '点击 <b>↶</b> 撤销上一步操作，也可以按 <kbd>Ctrl</kbd>+<kbd>Z</kbd>，最多可以撤销 50 步。',
-            '点击 <b>↶</b> 撤销上一步操作，最多可以撤销 50 步。'),
+            `点击 ${TUTORIAL_ICONS.undo} 撤销上一步操作，也可以按 <kbd>Ctrl</kbd>+<kbd>Z</kbd>，最多可以撤销 50 步。`,
+            `点击 ${TUTORIAL_ICONS.undo} 撤销上一步操作，最多可以撤销 50 步。`),
         skipIf: () => window.historyManager.currentIndex <= 0,
         setup: t => {
             t.ctx.historyIndex = window.historyManager.currentIndex;
@@ -230,8 +247,8 @@ const TUTORIAL_STEPS = [
     {
         title: '重做',
         text: byLayout(
-            '点击 <b>↷</b> 恢复刚才撤销的操作，也可以按 <kbd>Ctrl</kbd>+<kbd>Y</kbd>。',
-            '点击 <b>↷</b> 恢复刚才撤销的操作。'),
+            `点击 ${TUTORIAL_ICONS.redo} 恢复刚才撤销的操作，也可以按 <kbd>Ctrl</kbd>+<kbd>Y</kbd>。`,
+            `点击 ${TUTORIAL_ICONS.redo} 恢复刚才撤销的操作。`),
         skipIf: () => window.historyManager.currentIndex >= window.historyManager.history.length - 1,
         setup: t => {
             t.ctx.historyIndex = window.historyManager.currentIndex;
@@ -242,8 +259,8 @@ const TUTORIAL_STEPS = [
     {
         title: '编辑模式',
         text: byLayout(
-            '点击 <b>✂️</b> 进入<b>编辑模式</b>，也可以按 <kbd>M</kbd>。编辑模式中可以框选一片区域，整体移动、复制或删除。',
-            '点击 <b>✂️</b> 进入<b>编辑模式</b>，可以框选一片区域，整体移动、复制或删除。'),
+            `点击 ${TUTORIAL_ICONS.edit} 进入<b>编辑模式</b>，也可以按 <kbd>M</kbd>。编辑模式中可以框选一片区域，整体移动、复制或删除。`,
+            `点击 ${TUTORIAL_ICONS.edit} 进入<b>编辑模式</b>，可以框选一片区域，整体移动、复制或删除。`),
         targets: () => [document.getElementById('edit-mode-button')],
         done: () => window.editModeManager.isActive(),
     },
@@ -289,8 +306,8 @@ const TUTORIAL_STEPS = [
     {
         title: '轨迹记录',
         text: byLayout(
-            '点击 <b>🏃</b> 开启<b>轨迹记录</b>，也可以按 <kbd>T</kbd>。开启后每一步移动都会被记录下来。',
-            '点击 <b>🏃</b> 开启<b>轨迹记录</b>，开启后每一步移动都会被记录下来。'),
+            `点击 ${TUTORIAL_ICONS.track} 开启<b>轨迹记录</b>，也可以按 <kbd>T</kbd>。开启后每一步移动都会被记录下来。`,
+            `点击 ${TUTORIAL_ICONS.track} 开启<b>轨迹记录</b>，开启后每一步移动都会被记录下来。`),
         setup: t => {
             t.reveal(t.ensurePlayer());
         },
@@ -302,7 +319,7 @@ const TUTORIAL_STEPS = [
         text: byDirectionControls(
             '用键盘方向键移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。',
             '用方向按钮移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。',
-            '<b>点击 🎮 显示方向按钮</b>，用方向按钮移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。'),
+            `<b>点击 ${TUTORIAL_ICONS.direction} 显示方向按钮</b>，用方向按钮移动玩家几步，右上角会显示已记录的步数，然后点击「<b>导出轨迹</b>」。`),
         skipIf: () => !window.trackManager.isActive(),
         status: () => `已记录 ${window.trackManager.getRecordedSegments().reduce((sum, steps) => sum + steps.length, 0)} 步`,
         targets: t => [window.trackManager.panel, t.playerRect(), t.directionRect(), t.directionToggle()],
@@ -311,8 +328,8 @@ const TUTORIAL_STEPS = [
     {
         title: '退出轨迹记录',
         text: byLayout(
-            '导出的「上下左右」可以直接用于游戏中的多步行动，点击「复制」即可复制。最后再次点击 <b>🏃</b> 或按 <kbd>T</kbd> 退出轨迹记录。',
-            '导出的「上下左右」可以直接用于游戏中的多步行动，点击「复制」即可复制。最后再次点击 <b>🏃</b> 退出轨迹记录。'),
+            `导出的「上下左右」可以直接用于游戏中的多步行动，点击「复制」即可复制。最后再次点击 ${TUTORIAL_ICONS.track} 或按 <kbd>T</kbd> 退出轨迹记录。`,
+            `导出的「上下左右」可以直接用于游戏中的多步行动，点击「复制」即可复制。最后再次点击 ${TUTORIAL_ICONS.track} 退出轨迹记录。`),
         skipIf: () => !window.trackManager.isActive(),
         targets: () => [document.getElementById('track-button'), window.trackManager.exportPopup],
         done: () => !window.trackManager.isActive(),
@@ -331,8 +348,8 @@ const TUTORIAL_STEPS = [
     {
         title: '存档管理',
         text: byLayout(
-            '刷新页面会重置草稿本。点击 <b>📁</b> 打开<b>存档管理</b>，也可以按 <kbd>C</kbd>，把地图保存在本地浏览器中。',
-            '刷新页面会重置草稿本。点击 <b>📁</b> 打开<b>存档管理</b>，把地图保存在本地浏览器中。'),
+            `刷新页面会重置草稿本。点击 ${TUTORIAL_ICONS.save} 打开<b>存档管理</b>，也可以按 <kbd>C</kbd>，把地图保存在本地浏览器中。`,
+            `刷新页面会重置草稿本。点击 ${TUTORIAL_ICONS.save} 打开<b>存档管理</b>，把地图保存在本地浏览器中。`),
         targets: () => [document.getElementById('save-button')],
         done: () => isSaveManagerOpen(),
     },
@@ -347,8 +364,8 @@ const TUTORIAL_STEPS = [
     {
         title: '随时查看帮助',
         text: byLayout(
-            '点击 <b>?</b> 可以随时打开帮助，也可以按 <kbd>H</kbd>，在帮助中可以重新开始本教程。',
-            '点击 <b>?</b> 可以随时打开帮助，在帮助中可以重新开始本教程。'),
+            `点击 ${TUTORIAL_ICONS.help} 可以随时打开帮助，也可以按 <kbd>H</kbd>，在帮助中可以重新开始本教程。`,
+            `点击 ${TUTORIAL_ICONS.help} 可以随时打开帮助，在帮助中可以重新开始本教程。`),
         targets: () => [document.getElementById('help-button')],
         next: '下一步',
     },
