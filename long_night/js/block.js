@@ -137,6 +137,12 @@ function blockCellEvent(map) {
             const block = getBlock(blockId);
             if (!block) return;
 
+            // 区块范围可能伸出视野，范围内的格子与四周墙壁先建出
+            const { size, wall } = getCellMetrics();
+            for (let i = i0; i <= i0 + 6; i++) {
+                for (let j = j0; j <= j0 + 6; j++) map.ensureCell(i, j, size, wall);
+            }
+
             // 先清空区域
             for (let dx = 0; dx < 3; dx++) {
                 for (let dy = 0; dy < 3; dy++) {

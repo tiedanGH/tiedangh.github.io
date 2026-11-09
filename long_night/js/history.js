@@ -151,11 +151,11 @@ class HistoryManager {
         // 清除当前所有附着层
         this.map.queryInCells('.attachment-layer').forEach(layer => layer.remove());
 
-        // 恢复玩家位置全局变量
+        // 恢复玩家位置全局变量（移出视野的空白格子已被丢弃，快照中的格子需要时重新创建）
+        const { size, wall } = getCellMetrics();
         if (snapshot.playerPosition) {
-            const playerKey = `${snapshot.playerPosition.i},${snapshot.playerPosition.j}`;
-            const playerCell = this.map.cells.get(playerKey);
-            window.playerCell = playerCell || null;
+            const { i, j } = snapshot.playerPosition;
+            window.playerCell = this.map.ensureCell(i, j, size, wall);
         } else {
             window.playerCell = null;
         }
@@ -166,7 +166,8 @@ class HistoryManager {
 
         // 恢复每个单元格的状态
         snapshot.cells.forEach((cellData, key) => {
-            const existingCell = this.map.cells.get(key);
+            const [i, j] = key.split(',').map(Number);
+            const existingCell = this.map.ensureCell(i, j, size, wall);
             if (existingCell) {
                 // 恢复地形
                 existingCell.style.backgroundImage = cellData.style.backgroundImage;

@@ -13,6 +13,10 @@ function getInitialWallImage(orientation) {
 // 视野外仍留在页面中的缓冲格数（逻辑坐标），来回小幅拖动时不必反复移出移入
 const VIEW_KEEP_MARGIN = 6;
 
+// 地图原点：存档坐标的 (0, 0)，打开页面时视野左上角对齐原点
+// 原点左上方留出很大的空间，四个方向都可以拖动；地图坐标始终为正，按奇偶区分格子与墙壁不受影响（原点为偶数）
+const MAP_ORIGIN = 100000;
+
 // 拖动结束后紧随的一次 click 不当作点击格子，不弹出选择器
 function suppressNextClick() {
     const block = e => e.stopPropagation();
@@ -23,7 +27,7 @@ function suppressNextClick() {
 class InfiniteMap {
     constructor(container) {
         this.container = container;
-        // 全部已创建的格子：只有视野附近的放在页面中，其余移出页面，状态保留在元素上
+        // 已创建的格子：只有视野附近的放在页面中，其余移出页面，状态保留在元素上；移出视野的空白格子直接丢弃
         this.cells = new Map();
         this.attached = new Set();   // 当前在页面中的格子
         this.view = null;            // 当前视野的格子范围
@@ -31,7 +35,7 @@ class InfiniteMap {
         ({ size: this.cellSize, wall: this.wallSize } = getCellMetrics());   // 格子当前所用的尺寸
         this.renderedRange = null;   // 上次渲染的可视范围
 
-        // 视野外的格子不在页面中，由占位元素把滚动范围撑到已创建格子的最远处
+        // 视野外的格子不在页面中，由占位元素撑开滚动范围：已创建格子的最远处，且比视野多出一屏
         this.maxI = -1;
         this.maxJ = -1;
         this.extent = document.createElement('div');
@@ -39,12 +43,31 @@ class InfiniteMap {
         container.appendChild(this.extent);
 
         this.initDrag();
-        // 浏览器窗口大小变化时重新渲染可视区域
+        // 浏览器窗口大小变化时重新渲染可视区域；格子尺寸随屏幕宽度变化时，视野左上角仍对着同一处
         window.addEventListener('resize', () => {
+            const oldBase = this.cellSize + this.wallSize;
+            const { scrollLeft, scrollTop } = this.container;   // 先记下：更新位置后滚动范围随之变化
             const { size, wall } = applyCellMetricsVars();
             this.updateCellPositions(size, wall);
+            const ratio = (size + wall) / oldBase;
+            if (ratio !== 1) {
+                this.container.scrollLeft = scrollLeft * ratio;
+                this.container.scrollTop = scrollTop * ratio;
+            }
             this.renderViewport();
         });
+        this.scrollToOrigin();
+    }
+
+    // 视野左上角对齐地图原点：滚动范围先撑到原点处的一屏之外，才能滚到原点
+    scrollToOrigin() {
+        const { size, wall } = getCellMetrics();
+        const base = size + wall;
+        this.maxI = Math.max(this.maxI, MAP_ORIGIN + 2 * Math.ceil(this.container.clientWidth / base));
+        this.maxJ = Math.max(this.maxJ, MAP_ORIGIN + 2 * Math.ceil(this.container.clientHeight / base));
+        this.updateExtent(size, wall);
+        this.container.scrollLeft = MAP_ORIGIN / 2 * base;
+        this.container.scrollTop = MAP_ORIGIN / 2 * base;
         this.renderViewport();
     }
 
@@ -148,7 +171,15 @@ class InfiniteMap {
         const view = { i0: offsetX, i1: offsetX + cols * 2, j0: offsetY, j1: offsetY + rows * 2 };
         this.view = view;
 
-        // 离开视野（含缓冲）的格子移出页面
+        // 滚动范围比视野多出一屏，向右下方快速拖动时不会被已建格子的边缘挡住（只移动占位元素，不建格子）
+        const reachI = view.i1 + cols * 2, reachJ = view.j1 + rows * 2;
+        if (reachI > this.maxI || reachJ > this.maxJ) {
+            this.maxI = Math.max(this.maxI, reachI);
+            this.maxJ = Math.max(this.maxJ, reachJ);
+            this.updateExtent(size, wall);
+        }
+
+        // 离开视野（含缓冲）的格子移出页面；空白格子不再保留，回到视野时重新创建，拖动得再远也只保留画过内容的格子
         const m = VIEW_KEEP_MARGIN;
         this.attached.forEach(cell => {
             if (cell === this.pinnedCell) return;
@@ -157,6 +188,7 @@ class InfiniteMap {
             if (i < view.i0 - m || i >= view.i1 + m || j < view.j0 - m || j >= view.j1 + m) {
                 cell.remove();
                 this.attached.delete(cell);
+                if (this.isDisposable(cell)) this.cells.delete(`${i},${j}`);
             }
         });
 
@@ -258,6 +290,11 @@ class InfiniteMap {
             if (cell.firstElementChild) found.push(...cell.querySelectorAll(selector));
         });
         return found;
+    }
+
+    // 移出视野后可以丢弃的格子：与新建时一致，也没有选区、预览等高亮（只有格子类型的类名）
+    isDisposable(cell) {
+        return cell.classList.length === (cell.dataset.type === 'wall' ? 3 : 2) && this.isInitialCell(cell);
     }
 
     // 是否仍与 ensureCell 新建时一致：新建的格子只有 left、top，墙壁另有未知墙壁的背景图

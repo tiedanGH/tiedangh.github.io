@@ -1,4 +1,9 @@
 
+// 存档中的坐标以地图原点为 (0, 0)，读档时换算为地图坐标
+function toMapPosition(saveKey) {
+    return saveKey.split(',').map(n => Number(n) + MAP_ORIGIN);
+}
+
 class SaveManager {
     constructor(map) {
         this.map = map;
@@ -122,7 +127,7 @@ class SaveManager {
                             type: marker.dataset.markerType
                         });
                         if (marker.textContent === '🧍') {
-                            state.playerPosition = { i, j };
+                            state.playerPosition = { i: i - MAP_ORIGIN, j: j - MAP_ORIGIN };
                         }
                     });
                     hasCustomData = true;
@@ -184,13 +189,14 @@ class SaveManager {
                 });
             }
 
-            // 只保存有自定义数据的单元格
+            // 只保存有自定义数据的单元格，存档中的坐标以地图原点为 (0, 0)
             if (hasCustomData) {
-                state.cells[key] = cellData;
+                state.cells[`${i - MAP_ORIGIN},${j - MAP_ORIGIN}`] = cellData;
             }
         });
 
-        state.borders = window.borderManager?.list() || [];   // [边框]
+        // [边框]
+        state.borders = (window.borderManager?.list() || []).map(border => ({ ...border, i: border.i - MAP_ORIGIN, j: border.j - MAP_ORIGIN }));
 
         return state;
     }
@@ -367,12 +373,11 @@ class SaveManager {
         if (saveData.cells) {
             Object.keys(saveData.cells).forEach(key => {
                 const cellData = saveData.cells[key];
-                const [i, j] = key.split(',').map(Number);
+                const [i, j] = toMapPosition(key);
 
                 // 确保单元格存在
                 const { size, wall } = getCellMetrics();
-                this.map.ensureCell(i, j, size, wall);
-                const cell = this.map.cells.get(key);
+                const cell = this.map.ensureCell(i, j, size, wall);
 
                 if (!cell) return;
 
@@ -457,10 +462,13 @@ class SaveManager {
         // [边框] 同一黑点的旧边框被替换；墙壁同步对侧，不一致的边界墙按优先级
         const borderManager = window.borderManager;
         if (borderManager) {
-            const placed = (saveData.borders || []).map(({ i, j, w, h }) => borderManager.add(i, j, w, h, false));
-            Object.keys(saveData.cells || {}).forEach(key => syncBorderWall(this.map.cells.get(key)));
+            const placed = (saveData.borders || []).map(({ i, j, w, h }) => borderManager.add(i + MAP_ORIGIN, j + MAP_ORIGIN, w, h, false));
+            Object.keys(saveData.cells || {}).forEach(key => syncBorderWall(this.map.cells.get(toMapPosition(key).join(','))));
             placed.forEach(border => borderManager.reconcile(border));
         }
+
+        // 读档后视野回到原点
+        this.map.scrollToOrigin();
 
         // 重新渲染视口
         setTimeout(() => {
