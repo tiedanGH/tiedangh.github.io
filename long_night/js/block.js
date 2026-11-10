@@ -111,6 +111,7 @@ function getCurrentWallType(wallCell) {
 const BORDER_SIZES = [
     { label: '9×9', gridWidth: 9, gridHeight: 9 },
     { label: '10×10', gridWidth: 10, gridHeight: 10 },
+    { label: '11×11', gridWidth: 11, gridHeight: 11 },
     { label: '12×12', gridWidth: 12, gridHeight: 12 }
 ];
 
