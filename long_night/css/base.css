@@ -17,6 +17,8 @@ html, body {
     --marker-font: 14px;
     --boss-size: 16px;
     --boss-menu-size: 15px;
+    --mark-slot: 13px;      /* 标记超过 4 个时的格位 */
+    --mark-dense: 10px;     /* 标记超过 9 个时的行高 */
     --border-line: 3px;
 }
 
@@ -132,6 +134,53 @@ html, body {
     line-height: 1;
 }
 
+/* 标记排版（同主游戏）：4 个以内每行 2 个，单数时最后一个居中 */
+.marker-container:has(> .marker:nth-child(2)) {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    place-content: center;
+    place-items: center;
+}
+.marker-container:has(> .marker:nth-child(2)) > .marker:nth-child(odd):last-child {
+    grid-column: span 2;
+}
+.marker-container:has(> .marker:nth-child(2)) > .marker[data-marker-type] {
+    max-width: calc((var(--cell-size) - 2px) / 2);
+    max-height: calc((var(--cell-size) - 2px) / 2);
+}
+/* 超过 4 个每行 3 个，正好铺满 3×3，标记一同缩小，最后一行不满时居中；超过 9 个压缩行距，4 行仍不撑高格子 */
+/* BOSS 图标换用按格位、行高预先缩小的图片 */
+.marker-container:has(> .marker:nth-child(5)) {
+    --mark-row: var(--mark-slot);
+    --boss-minotaur: var(--boss-minotaur-slot);
+    --boss-bangbang: var(--boss-bangbang-slot);
+    --boss-tyrant: var(--boss-tyrant-slot);
+    display: flex;
+    align-content: center;
+    gap: 0;
+}
+.marker-container:has(> .marker:nth-child(10)) {
+    --mark-row: var(--mark-dense);
+    --boss-minotaur: var(--boss-minotaur-dense);
+    --boss-bangbang: var(--boss-bangbang-dense);
+    --boss-tyrant: var(--boss-tyrant-dense);
+}
+.marker-container:has(> .marker:nth-child(5)) > .marker {
+    flex: none;
+    width: var(--mark-slot);
+    height: var(--mark-row);
+    line-height: var(--mark-row);
+    text-align: center;
+}
+.marker-container:has(> .marker:nth-child(5)) > .marker:not([data-marker-type]) {
+    font-size: calc(var(--mark-slot) * 0.95);
+}
+/* 图标保持正方形，压缩行距时左右留白补足格位，图片按原尺寸绘制 */
+.marker-container:has(> .marker:nth-child(5)) > .marker[data-marker-type] {
+    width: var(--mark-row);
+    margin: 0 calc((var(--mark-slot) - var(--mark-row)) / 2);
+}
+
 /* 玩家编号描边 */
 .marker.player-number {
     text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 3px #fff;
@@ -202,6 +251,8 @@ html, body {
         --marker-font: 12px;
         --boss-size: 14px;
         --boss-menu-size: 14px;
+        --mark-slot: 10px;
+        --mark-dense: 7px;
     }
     .marker[data-marker-type="player"] {
         width: calc(var(--marker-font) * 1.35);

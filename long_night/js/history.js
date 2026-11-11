@@ -213,25 +213,7 @@ class HistoryManager {
 
                 // 恢复标记
                 if (cellData.markers && cellData.markers.length > 0) {
-                    let container = existingCell.querySelector('.marker-container');
-                    if (!container) {
-                        container = document.createElement('div');
-                        container.className = 'marker-container';
-                        Object.assign(container.style, {
-                            position: 'absolute',
-                            top: '0',
-                            left: '0',
-                            right: '0',
-                            bottom: '0',
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '2px',
-                            pointerEvents: 'none',
-                        });
-                        existingCell.appendChild(container);
-                    }
+                    const container = getMarkerContainer(existingCell);
 
                     cellData.markers.forEach(markerData => {
                         const span = document.createElement('span');

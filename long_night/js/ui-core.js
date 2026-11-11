@@ -114,21 +114,21 @@ function bossIconUrl(img, px) {
     }
 }
 
-// 地图缩放、窗口尺寸或设备像素比变化时重新生成
-async function refreshBossIcons(mapSize) {
+// 地图缩放、窗口尺寸或设备像素比变化时重新生成；标记超过 4 个、9 个时图标随格位缩小，另备对应尺寸
+async function refreshBossIcons(mapSize, slotSize, denseSize) {
     const root = document.documentElement;
     const dpr = window.devicePixelRatio || 1;
     const menuSize = parseFloat(getComputedStyle(root).getPropertyValue('--boss-menu-size'));
-    const mapPx = Math.round(mapSize * dpr), menuPx = Math.round(menuSize * dpr);
-    const key = `${mapPx}/${menuPx}`;
+    const sizes = { '': mapSize, '-slot': slotSize, '-dense': denseSize, '-menu': menuSize };   // 变量名后缀 → 显示尺寸
+    const pxs = Object.entries(sizes).map(([suffix, size]) => [suffix, Math.round(size * dpr)]);
+    const key = pxs.map(([, px]) => px).join('/');
     if (key === bossIconKey) return;
     bossIconKey = key;
     for (const name of BOSS_IMAGE_NAMES) {
         const img = await loadBossImage(name);
         if (key !== bossIconKey) return;   // 等待期间尺寸变化，交给新的一次生成
         if (!img) continue;
-        root.style.setProperty(`--boss-${name}`, bossIconUrl(img, mapPx));
-        root.style.setProperty(`--boss-${name}-menu`, bossIconUrl(img, menuPx));
+        for (const [suffix, px] of pxs) root.style.setProperty(`--boss-${name}${suffix}`, bossIconUrl(img, px));
     }
 }
 
